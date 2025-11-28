@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Imperial+Script&family=Miniver&family=Outfit:wght@100..900&display=swap');
+@import "tailwindcss";
+
+@theme{
+  --color-primary: #F84565;
+  --color-primary-dull: #D63854;
+
+}
+
+*{
+  font-faminly: 'Outfit', sans-serif;
+  scrollbar-whidth: thin;
+  scrollbar-color: #787777 #1e1e1e;
+}
+
+body{
+  color:white;
+  background-color: #09090B;
+}
