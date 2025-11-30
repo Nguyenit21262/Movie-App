@@ -14,7 +14,7 @@ const MovieCard = ({movie}) => {
         }}
         src={movie.backdrop_path}
         alt=""
-        className="rounded-lg h-52 w-full object-cover object-right-bottom cursor-pointer"
+        className="rounded-lg h-52 w-full object-cover  cursor-pointer"
       />
 
       <p className="font-semibold mt-2 truncate">{movie.title}</p>
