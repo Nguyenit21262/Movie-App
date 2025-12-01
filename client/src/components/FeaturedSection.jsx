@@ -7,8 +7,9 @@ import MovieCard from "./MovieCard";
 const FeaturedSection = () => {
   const navigate = useNavigate();
   return (
+    
     <div className="px-6 md:px-16 lg:px-24 xl:px-44 overflow-hidden">
-      <div className="relative flex items-center justify-between pt-20 pb-10">
+      <div className="relative flex items-center justify-between pt-30 ">
         <p className="text-gray-300 font-medium text-lg">Now Showing</p>
         <button
           onClick={() => {

@@ -26,7 +26,7 @@ const TrailersSection = () => {
         {dummyTrailers.map((trailer) => (
           <div
             key={trailer.image}
-            className="relative group-hover:not-hover:opacity-50 hover:-translate-y-1 duration-300 transition max-md:h-60 md:max-h-60 cursor-pointer"
+            className="relative hover:opacity-80 hover:-translate-y-1 duration-300 transition max-md:h-60 md:max-h-60 cursor-pointer"
             onClick={() => setCurrentTrailer(trailer)}
           >
             <img

@@ -4,7 +4,7 @@ import MovieCard from "../components/MovieCard";
 
 const Favorite = () => {
   return dummyShowsData.length > 0 ? (
-    <div className="relative my-30 mb-40 px-6 md:px-16 lg:px-40 xl:px-44 overflow-hidden ">
+    <div className="px-6 md:px-16 mt-20 lg:px-24 xl:px-44 overflow-hidden  ">
       <h1 className="text-lg font-medium my-4">Your Favorite Movies</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {dummyShowsData.map((movie) => (
