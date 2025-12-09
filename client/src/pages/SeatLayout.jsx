@@ -53,8 +53,8 @@ const SeatLayout = () => {
             <button
               key={seatId}
               onClick={() => handleSeatClick(seatId)}
-              className={`h-8 w-8 rounded border border-primary/60 cursor-pointer ${
-                selectedSeats.includes(seatId) && "bg-primary text-white"
+              className={`h-8 w-8 rounded border border-yellow/60 cursor-pointer ${
+                selectedSeats.includes(seatId) && "bg-yellow text-white"
               }`}
             >
               {seatId}
@@ -72,7 +72,7 @@ const SeatLayout = () => {
   return show ? (
     <div className="flex flex-col text-center md:flex-row px-6 md:px-16 lg:px-40 py-30">
       {/* Avaialble timings */}
-      <div className="w-60 bg-primary/10 border border-primary/20 rounded-lg py-10 h-max md:sticky md:top-30">
+      <div className="w-60 bg-yellow/10 border border-yellow/20 rounded-lg py-10 h-max md:sticky md:top-30">
         <p className="text-lg font-semibold px-6">Available Timings</p>
 
         <div className="mt-5 space-y-1">
@@ -82,8 +82,8 @@ const SeatLayout = () => {
               onClick={() => setSelectedTime(item)}
               className={`flex items-center gap-2 px-6 py-2 w-max rounded-r-md cursor-pointer transition ${
                 selectedTime?.time === item.time
-                  ? "bg-primary text-white"
-                  : "hover:bg-primary/20"
+                  ? "bg-yellow text-white"
+                  : "hover:bg-yellow/20"
               }`}
             >
               <ClockIcon className="w-4 h-4" />
@@ -112,8 +112,8 @@ const SeatLayout = () => {
         </div>
 
         <button
-          onClick={() => navigate("/my-booking")}
-          className="flex items-center gap-1 mt-20 px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer active:scale-95"
+          onClick={() => navigate("/my-bookings")}
+          className="flex items-center gap-1 mt-20 px-10 py-3 text-sm bg-yellow hover:bg-yellow-dark transition rounded-full font-medium cursor-pointer active:scale-95"
         >
           Proceed to Checkout
           <ArrowRightIcon strokeWidth={3} className="w-4 h-4 " />

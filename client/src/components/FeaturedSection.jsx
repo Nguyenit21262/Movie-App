@@ -7,24 +7,13 @@ import MovieCard from "./MovieCard";
 const FeaturedSection = () => {
   const navigate = useNavigate();
   return (
-    
-    <div className="px-6 md:px-16 lg:px-24 xl:px-44 overflow-hidden">
-      <div className="relative flex items-center justify-between pt-30 ">
-        <p className="text-gray-300 font-medium text-lg">Now Showing</p>
-        <button
-          onClick={() => {
-            navigate("/movies");
-            scrollTo(0, 0);
-          }}
-          className="group flex items-center gap-2 text-sm text-gray-300"
-        >
-          View All{" "}
-          <ArrowRight className="group-hover:translate-x-0.5 transition w-4.5 h-4.5" />
-        </button>
+    <div className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mt-5 overflow-hidden">
+      <div className="relative flex items-center justify-between  ">
+        <p className=" text-lg font-medium my-4">Now Showing</p>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mt-8">
-        {dummyShowsData.slice(0, 4).map((show) => (
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+        {dummyShowsData.slice(0, 10).map((show) => (
           <MovieCard key={show._id} movie={show} />
         ))}
       </div>
@@ -35,7 +24,7 @@ const FeaturedSection = () => {
             navigate("/movies");
             scrollTo(0, 0);
           }}
-          className="px-10 py-3 text-sm bg-primary hover:bg-primary-dull trasition rounded-md font-medium cursor-pointer"
+          className="px-10 py-3 text-sm bg-yellow hover:bg-yellow-dark trasition rounded-md font-medium cursor-pointer"
         >
           Show more
         </button>

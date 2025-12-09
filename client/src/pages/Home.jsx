@@ -7,7 +7,7 @@ import SeatLayout from "./SeatLayout";
 const Home = () => {
   return (
     <>
-      {/* <HeroSection /> */}
+      <HeroSection />
       <FeaturedSection />
       <TrailersSection/>
     </>

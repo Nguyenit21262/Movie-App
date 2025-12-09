@@ -19,7 +19,7 @@ const DataSelect = ({ dateTime, id }) => {
 
   return (
     <div id="dataselect" className="pt-30">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-10 relative p-8 bg-primary/10 border border-primary/20 rounded-lg">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-10 relative p-8 bg-yellow/10 border border-yellow/20 rounded-lg">
         <p className="text-lg font-semibold">Choose Date</p>
         <div className="flex items-center gap-6 text-sm mt-5">
           <ChevronLeft width={28} />
@@ -27,7 +27,7 @@ const DataSelect = ({ dateTime, id }) => {
             {Object.keys(dateTime).map((date) => (
               <button onClick={() => setSelected(date)}
                 key={date}
-                className={`flex flex-col items-center justify-center h-14 w-14 aspect-square rounded cursor-pointer ${selected === date ? "bg-primary text-white" : "border border-primary/70" }`}
+                className={`flex flex-col items-center justify-center h-14 w-14 aspect-square rounded cursor-pointer ${selected === date ? "bg-yellow text-white" : "border border-yellow/70" }`}
               >
                 <span>{new Date(date).getDate()}</span>
                 <span>
@@ -41,7 +41,7 @@ const DataSelect = ({ dateTime, id }) => {
           <ChevronRight width={28} />
         </div>
 
-        <button onClick={onBookHandler} className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer">
+        <button onClick={onBookHandler} className="bg-yellow text-white px-8 py-2 mt-6 rounded hover:bg-yellow/90 transition-all cursor-pointer">
           Book Now
         </button>
       </div>

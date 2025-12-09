@@ -1,109 +1,253 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
-import { MenuIcon, SearchIcon, TicketPlus, User, XIcon } from "lucide-react";
+import {
+  MenuIcon,
+  SearchIcon,
+  TicketPlus,
+  User,
+  XIcon,
+  Globe,
+} from "lucide-react";
 import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const { user } = useUser(); // kiểm tra user login hay chưa
-  const { openSignIn } = useClerk(); // hàm mở form đăng nhập
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  const { user } = useUser();
+  const { openSignIn } = useClerk();
+  const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
 
-  const navigate = useNavigate(); // hàm chuyển hướng trang
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const languages = [
+    { code: "en", name: "English" },
+    { code: "vi", name: "Vietnamese" },
+  ];
+
   return (
-    <div className="fixed top-0 left-0 z-50 w-full flex items-center justify-between px-6 md:px-16 lg:px-36 py-5">
-      {/* logo */}
-      <Link to="/" className="max-md:flex-1">
-        <img src={assets.logo} alt="" className="w-36 h-auto" />
-      </Link>
-
-      <div
-        className={`max-md:absolute max-md:top-0 max-md:left-0 max-md:font-medium 
-        max-md:text-lg z-50 flex flex-col md:flex-row items-center 
-        max-md:justify-center gap-8 min-md:px-8 py-3 max-md:h-screen 
-        min-md:rounded-full backdrop-blur bg-black/70 md:bg-white/10 md:border 
-      border-gray-300/20 overflow-hidden transition-[width] duration-300 ${
-        isOpen ? "max-md:w-full" : "max-md:w-0 "
+    <nav
+      className={`fixed top-0 left-0 z-50 w-full transition-all duration-300 ${
+        isScrolled
+          ? "backdrop-blur-lg border-b border-gray-800/50"
+          : "border-b border-gray-800"
       }`}
-      >
-        <XIcon
-          className="md:hidden absolute top-6 right-6 w-6 h-6 cursor-pointer mb-4"
-          onClick={() => setIsOpen(!isOpen)}
-        />
-        {/* menu */}
-        <Link
-          onClick={() => {
-            scrollTo(0, 0); setIsOpen(false);
-          }}
-          to="/"
-        >
-          Home
-        </Link>
-        <Link
-          onClick={() => {
-            scrollTo(0, 0); setIsOpen(false);
-          }}
-          to="/movies"
-        >
-          Movies
-        </Link>
-        <Link
-          onClick={() => {
-            scrollTo(0, 0); setIsOpen(false);
-          }}
-          to="#"
-        >
-          Theaters
-        </Link>
-        <Link
-          onClick={() => {
-            scrollTo(0, 0); setIsOpen(false);
-          }}
-          to="#"
-        >
-          Releases
-        </Link>
-        <Link
-          onClick={() => {
-            scrollTo(0, 0); setIsOpen(false);
-          }}
-          to="/favorite"
-        >
-          Favorite
-        </Link>
-      </div>
-
-      {/* nút tìm kiếm và nút login */}
-      <div className="flex items-center gap-8">
-        <SearchIcon className="max-md:hidden  w-6 h-6 cursor-pointer" />
-        {
-          // nếu user chưa đăng nhập thì hiện nút login
-          !user ? (
-            <button
-              onClick={openSignIn}
-              className="px-4 py-1 sm:px-7 sm-py-2 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer"
-            >
-              Login
-            </button>
-          ) : (
-            <UserButton>
-              <UserButton.MenuItems>
-                <UserButton.Action
-                  label="My Bookings"
-                  labelIcon={<TicketPlus width={15} />}
-                  onClick={() => navigate("/my-bookings")}
+    >
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          {/* Bên trái: Logo + Thanh tìm kiếm (desktop) + Menu (desktop) */}
+          <div className="flex items-center space-x-8">
+            {/* Logo */}
+            <div className="shrink-0">
+              <Link to="/">
+                <img
+                  src={assets.logo}
+                  alt="Logo"
+                  className="h-8 w-auto sm:h-10"
+                  onClick={() => scrollTo(0, 0)}
                 />
-              </UserButton.MenuItems>
-            </UserButton>
-          )
-        }
+              </Link>
+            </div>
+
+            {/* Thanh tìm kiếm - chỉ hiện trên desktop */}
+            <div className="hidden md:block flex-1 max-w-md">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search movies..."
+                  className="w-full px-8 py-2  text-white focus:outline-none focus:ring-2 focus:ring-white"
+                />
+                <SearchIcon className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
+              </div>
+            </div>
+
+            {/* Menu desktop */}
+            <div className="hidden md:flex items-center space-x-8">
+              <Link
+                to="/movies"
+                className="text-gray-300 hover:text-white transition-colors"
+                onClick={() => scrollTo(0, 0)}
+              >
+                Movies
+              </Link>
+              <Link
+                to="movies"
+                className="text-gray-300 hover:text-white transition-colors"
+                onClick={() => scrollTo(0, 0)}
+              >
+                Theaters
+              </Link>
+              {/* <Link
+                to="#"
+                className="text-gray-300 hover:text-white transition-colors"
+              >
+                Releases
+              </Link> */}
+              <Link
+                to="/favorite"
+                className="text-gray-300 hover:text-white transition-colors"
+                onClick={() => scrollTo(0, 0)}
+              >
+                Favorite
+              </Link>
+            </div>
+          </div>
+
+          {/* Bên phải: Nút chuyển ngữ, User/Avatar, Mobile menu button */}
+          <div className="flex items-center space-x-4">
+            {/* Nút chuyển ngữ */}
+            <div className="relative">
+              <button
+                onClick={() => setIsLangOpen(!isLangOpen)}
+                className="flex items-center text-gray-300 hover:text-white focus:outline-none"
+              >
+                <Globe className="h-5 w-5" />
+              </button>
+
+              {isLangOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
+                  <div className="py-1">
+                    {languages.map((lang) => (
+                      <button
+                        key={lang.code}
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
+                        onClick={() => {
+                          // Xử lý chuyển ngữ ở đây
+                          setIsLangOpen(false);
+                        }}
+                      >
+                        {lang.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* User/Avatar hoặc Login Button */}
+            {!user ? (
+              <button
+                onClick={openSignIn}
+                className="px-4 py-2 bg-white text-black hover:bg-yellow-600  font-medium rounded-full transition-colors whitespace-nowrap"
+              >
+                Login
+              </button>
+            ) : (
+              <div className="flex items-center">
+                <UserButton>
+                  <UserButton.MenuItems>
+                    <UserButton.Action
+                      label="My Bookings"
+                      labelIcon={<TicketPlus width={15} />}
+                      onClick={() => navigate("/my-bookings")}
+                    />
+                  </UserButton.MenuItems>
+                </UserButton>
+              </div>
+            )}
+
+            {/* Mobile menu button (chỉ hiện trên mobile) */}
+            <button
+              className="md:hidden text-gray-300 hover:text-white"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            >
+              {isMenuOpen ? (
+                <XIcon className="h-6 w-6" />
+              ) : (
+                <MenuIcon className="h-6 w-6" />
+              )}
+            </button>
+          </div>
+        </div>
       </div>
 
-      <MenuIcon
-        className="max-md:ml-4 md:hidden w-8 h-8 cursor-pointer"
-        onClick={() => setIsOpen(!isOpen)}
-      />
-    </div>
+      {/* Mobile Menu Overlay */}
+      {isMenuOpen && (
+        <div className="md:hidden fixed top-0 left-0 w-full h-screen bg-gray-900 z-40 pt-16">
+          <div className="px-4">
+            {/* Thanh tìm kiếm trong mobile menu */}
+            <div className="mb-6">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search movies..."
+                  className="w-full px-4 py-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                />
+                <SearchIcon className="absolute right-3 top-3.5 h-5 w-5 text-gray-400" />
+              </div>
+            </div>
+
+            {/* Menu links trong mobile */}
+            <div className="flex flex-col space-y-4">
+              <Link
+                to="/"
+                className="text-gray-300 hover:text-white text-lg py-2 transition-colors"
+                onClick={() => {
+                  scrollTo(0, 0);
+                  setIsMenuOpen(false);
+                }}
+              >
+                Home
+              </Link>
+              <Link
+                to="/movies"
+                className="text-gray-300 hover:text-white text-lg py-2 transition-colors"
+                onClick={() => {
+                  scrollTo(0, 0);
+                  setIsMenuOpen(false);
+                }}
+              >
+                Movies
+              </Link>
+              <Link
+                to="#"
+                className="text-gray-300 hover:text-white text-lg py-2 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Theaters
+              </Link>
+              <Link
+                to="#"
+                className="text-gray-300 hover:text-white text-lg py-2 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Releases
+              </Link>
+              <Link
+                to="/favorite"
+                className="text-gray-300 hover:text-white text-lg py-2 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Favorite
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Đóng dropdown ngôn ngữ khi click ra ngoài */}
+      {isLangOpen && (
+        <div
+          className="fixed inset-0 z-30"
+          onClick={() => setIsLangOpen(false)}
+        ></div>
+      )}
+    </nav>
   );
 };
 

@@ -5,17 +5,23 @@
   --color-primary: #F84565;
   --color-primary-dull: #D63854;
 
+  --color-yellow: #FF8C00;
+  --color-yellow-dark: #FFB800;
+
+  --color-white: #FFFFFF
+
+
 }
 
 *{
-  font-faminly: 'Outfit', sans-serif;
-  scrollbar-whidth: thin;
+  font-family: 'Outfit', sans-serif;
+  scrollbar-width: thin;
   scrollbar-color: #787777 #1e1e1e;
 }
 
 body{
   color:white;
-  background-color: #09090B;
+  background-color: #111111;
 }
 
 .no-scrollbar{
