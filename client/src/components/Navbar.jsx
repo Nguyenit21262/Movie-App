@@ -70,7 +70,7 @@ const Navbar = () => {
                 <input
                   type="text"
                   placeholder="Search movies..."
-                  className="w-full px-8 py-2  text-white focus:outline-none focus:ring-2 focus:ring-white"
+                  className="w-full px-8 py-2 bg-gray-500 text-white focus:outline-none focus:ring-2 focus:ring-white"
                 />
                 <SearchIcon className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
               </div>
@@ -86,7 +86,7 @@ const Navbar = () => {
                 Movies
               </Link>
               <Link
-                to="movies"
+                to="/theatermovies"
                 className="text-gray-300 hover:text-white transition-colors"
                 onClick={() => scrollTo(0, 0)}
               >

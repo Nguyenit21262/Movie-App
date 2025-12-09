@@ -39,7 +39,7 @@ const MovieDetails = () => {
             className="w-full h-full object-cover"
           />
           {/* Gradient overlay - mờ dần từ trên xuống */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black"></div>
+          <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/50 to-black"></div>
           {/* Lớp overlay thêm độ mờ */}
           <div className="absolute inset-0 bg-black/30"></div>
         </div>
@@ -49,11 +49,11 @@ const MovieDetails = () => {
           <div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
             {/* hình ảnh bộ phim */}
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-yellow/30 to-transparent rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute -inset-1 bg-linear-to-r from-yellow/30 to-transparent rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <img
                 src={show.movie.poster_path}
                 alt=""
-                className="max-md:mx-auto rounded-xl h-104 max-w-70 object-cover relative shadow-2xl"
+                className="max-md:mx-auto rounded-xl h-115 max-w-70 object-cover relative shadow-2xl"
               />
             </div>
             
@@ -67,7 +67,7 @@ const MovieDetails = () => {
                 </span>
               </div>
               
-              <h1 className="text-4xl md:text-5xl font-bold max-w-96 text-balance bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-bold max-w-96 text-balance bg-linear-to-r from-white to-gray-300 bg-clip-text text-transparent">
                 {show.movie.title}
               </h1>
               
@@ -114,7 +114,7 @@ const MovieDetails = () => {
                 >
                   Buy Tickets
                 </a>
-                <button className="p-3 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 transition-all rounded-full cursor-pointer active:scale-95 shadow-lg border border-white/10">
+                <button className="p-3 bg-linear-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 transition-all rounded-full cursor-pointer active:scale-95 shadow-lg border border-white/10">
                   <Heart className="w-5 h-5" />
                 </button>
               </div>
@@ -124,13 +124,13 @@ const MovieDetails = () => {
       </div>
 
       {/* Phần từ cast trở xuống có background đen */}
-      <div className="bg-black px-8 md:px-16 lg:px-40">
+      <div className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mt-5 overflow-hidden">
         {/* các diễn viên */}
         <div className="max-w-6xl mx-auto">
           <p className="text-lg font-medium mt-20">Your Favorite Cast</p>
           <div className="overflow-x-auto no-scrollbar mt-8 pb-4">
-            <div className="flex items-center gap-4 w-max px-4">
-              {show.movie.casts.slice(0, 9).map((cast, index) => (
+            <div className="flex items-center gap-5 w-max px-4">
+              {show.movie.casts.slice(0, 11).map((cast, index) => (
                 <div key={index} className="flex flex-col items-center text-center">
                   <img
                     src={cast.profile_path}
@@ -169,18 +169,6 @@ const MovieDetails = () => {
             {dummyShowsData.slice(0, 5).map((show) => (
               <MovieCard key={show._id} movie={show} />
             ))}
-          </div>
-
-          <div className="flex justify-center mt-20">
-            <button
-              onClick={() => {
-                navigate("/movies");
-                scrollTo(0, 0);
-              }}
-              className="px-10 py-3 text-sm bg-yellow hover:bg-yellow-dark trasition rounded-md font-medium cursor-pointer"
-            >
-              Show more
-            </button>
           </div>
         </div>
       </div>

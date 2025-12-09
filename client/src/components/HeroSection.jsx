@@ -6,11 +6,11 @@ import timeFormat from "../lib/timeFormat";
 
 const HeroSection = () => {
   const navigate = useNavigate();
-  
+
   // Lấy phần tử đầu tiên của dummyShowsData để hiển thị
   const movie = dummyShowsData[1];
 
-  return  (
+  return (
     <div
       className="relative flex flex-col items-start justify-center gap-4 px-6 md:px-16 lg:px-36 bg-cover bg-center h-screen transition-all duration-1000"
       style={{
@@ -21,7 +21,9 @@ const HeroSection = () => {
       <div className="flex items-center gap-4">
         {movie.vote_average && (
           <div className="mt-20 flex items-center gap-2 bg-yellow px-3 py-1 rounded-full">
-            <span className="text-white font-bold">{movie.vote_average.toFixed(1)}</span>
+            <span className="text-white font-bold">
+              {movie.vote_average.toFixed(1)}
+            </span>
             <span className="text-gray-300 text-sm">/10</span>
           </div>
         )}
@@ -39,16 +41,19 @@ const HeroSection = () => {
       {/* Movie Info */}
       <div className="flex flex-wrap items-center gap-4 text-gray-300">
         <div className="flex items-center gap-1 bg-gray-800/50 px-3 py-1 rounded-full">
-          <span className="text-sm">{movie.genres.map((genre) => genre.name).join(" | ")}</span>
+          <span className="text-sm">
+            {movie.genres.map((genre) => genre.name).join(" | ")}
+          </span>
         </div>
 
-        <div className="flex items-center gap-1">
-          <CalendarIcon className="w-4.5 h-4.5" />
+
+        <div className="flex items-center gap-1 bg-gray-800/50 px-3 py-1 rounded-full">
+          {/* <CalendarIcon className="w-4.5 h-4.5" /> */}
           <span>{movie.release_date}</span>
         </div>
 
-        <div className="flex items-center gap-1">
-          <ClockIcon className="w-4.5 h-4.5" />
+        <div className="flex items-center gap-1 bg-gray-800/50 px-3 py-1 rounded-full">
+          {/* <ClockIcon className="w-4.5 h-4.5" /> */}
           <span>{timeFormat(movie.runtime)}</span>
         </div>
       </div>
@@ -56,10 +61,7 @@ const HeroSection = () => {
       <p className="max-w-2xl text-gray-300 text-lg">{movie.overview}</p>
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-4 mt-4">
-        <button
-          onClick={() => navigate(`/movie/${movie.id}/trailer`)}
-          className="flex items-center gap-2 px-8 py-3 text-sm bg-yellow hover:bg-yellow-dark transition rounded-full font-medium cursor-pointer"
-        >
+        <button className="flex items-center gap-2 px-8 py-3 text-sm bg-yellow hover:bg-yellow-dark transition rounded-full font-medium cursor-pointer">
           <Play className="w-5 h-5" fill="currentColor" />
           Watch Trailer
         </button>

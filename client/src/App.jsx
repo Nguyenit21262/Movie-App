@@ -14,6 +14,7 @@ import DashBoard from "./pages/admin/DashBoard";
 import AddMovies from "./pages/admin/AddMovies";
 import ListMovies from "./pages/admin/ListMovies";
 import ListBooking from "./pages/admin/ListBooking";
+import TheaterMovies from "./pages/TheaterMovies";
 
 
 const App = () => {
@@ -25,8 +26,8 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />}></Route>
         <Route path="/movies" element={<Movies />}></Route>
-
         <Route path="/movies/:id" element={<MovieDetails />}></Route>
+        <Route path="/theatermovies" element={<TheaterMovies />}></Route>
         <Route path="/movies/:id/:date" element={<SeatLayout />}></Route>
         <Route path="/my-bookings" element={<MyBookings />}></Route>
         <Route path="/favorite" element={<Favorite />}></Route>
