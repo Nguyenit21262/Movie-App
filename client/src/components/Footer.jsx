@@ -16,18 +16,8 @@ const Footer = () => {
               the 1500s, when an unknown printer took a galley of type and
               scrambled it to make a type specimen book.
             </p>
-            <div className="flex items-center gap-2 mt-4">
-              <img
-                src={assets.googlePlay}
-                alt="google play"
-                className="h-10 w-auto border border-white rounded"
-              />
-              <img
-                src={assets.appStore}
-                alt="app store"
-                className="h-10 w-auto border border-white rounded"
-              />
-            </div>
+
+            
           </div>
           <div className="flex-1 flex items-start md:justify-end gap-20 md:gap-40">
             <div>
