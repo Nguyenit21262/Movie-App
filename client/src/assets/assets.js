@@ -287,6 +287,151 @@ export const dummyShowsData = [
   },
 ];
 
+export const dummyShowsData1 = [
+  {
+    _id: "789012",
+    id: 789012,
+    title: "Echoes of the Void",
+    overview:
+      "A deep-space exploratory crew discovers an ancient artifact that projects dark, terrifying visions, threatening to tear their minds—and their reality—apart.",
+    poster_path:
+      "https://image.tmdb.org/t/p/original/void_poster.jpg", // Placeholder
+    backdrop_path:
+      "https://image.tmdb.org/t/p/original/void_backdrop.jpg", // Placeholder
+    genres: [
+      { id: 878, name: "Science Fiction" },
+      { id: 27, name: "Horror" },
+      { id: 9648, name: "Mystery" },
+    ],
+    casts: [
+        { name: "Jessica A", profile_path: "https://image.tmdb.org/t/p/original/jessica_a.jpg" },
+        { name: "Mark B", profile_path: "https://image.tmdb.org/t/p/original/mark_b.jpg" },
+        { name: "Lia C", profile_path: "https://image.tmdb.org/t/p/original/lia_c.jpg" },
+    ],
+    release_date: "2025-11-01",
+    original_language: "en",
+    tagline: "Fear is not an echo, it's a certainty.",
+    vote_average: 7.8,
+    vote_count: 45000,
+    runtime: 115,
+    image: "https://img.youtube.com/vi/placeholder_void/maxresdefault.jpg",
+    videoUrl: "https://www.youtube.com/embed/placeholder_void",
+  },
+  {
+    _id: "102938",
+    id: 102938,
+    title: "The Golden Compass 2: Arctic Journey",
+    overview:
+      "The young heroine returns on a thrilling quest across frozen lands to find the missing Sky Shard, facing ice giants and ancient magical beasts along the way.",
+    poster_path:
+      "https://image.tmdb.org/t/p/original/compass_poster.jpg", // Placeholder
+    backdrop_path:
+      "https://image.tmdb.org/t/p/original/compass_backdrop.jpg", // Placeholder
+    genres: [
+      { id: 12, name: "Adventure" },
+      { id: 14, name: "Fantasy" },
+      { id: 10751, name: "Family" },
+    ],
+    casts: [
+        { name: "Ethan D", profile_path: "https://image.tmdb.org/t/p/original/ethan_d.jpg" },
+        { name: "Fiona E", profile_path: "https://image.tmdb.org/t/p/original/fiona_e.jpg" },
+        { name: "Gary F", profile_path: "https://image.tmdb.org/t/p/original/gary_f.jpg" },
+    ],
+    release_date: "2025-12-19",
+    original_language: "en",
+    tagline: "The world is wider than you think.",
+    vote_average: 8.5,
+    vote_count: 62000,
+    runtime: 138,
+    image: "https://img.youtube.com/vi/placeholder_compass/maxresdefault.jpg",
+    videoUrl: "https://www.youtube.com/embed/placeholder_compass",
+  },
+  {
+    _id: "456789",
+    id: 456789,
+    title: "Neon Streets",
+    overview:
+      "In a hyper-futuristic city, a former police detective must navigate a web of corporate corruption and high-tech crime to clear his name after being framed for a murder he didn't commit.",
+    poster_path:
+      "https://image.tmdb.org/t/p/original/neon_poster.jpg", // Placeholder
+    backdrop_path:
+      "https://image.tmdb.org/t/p/original/neon_backdrop.jpg", // Placeholder
+    genres: [
+      { id: 28, name: "Action" },
+      { id: 80, name: "Crime" },
+      { id: 53, name: "Thriller" },
+    ],
+    casts: [
+        { name: "Henry G", profile_path: "https://image.tmdb.org/t/p/original/henry_g.jpg" },
+        { name: "Ivy H", profile_path: "https://image.tmdb.org/t/p/original/ivy_h.jpg" },
+        { name: "Jack I", profile_path: "https://image.tmdb.org/t/p/original/jack_i.jpg" },
+    ],
+    release_date: "2026-01-20",
+    original_language: "en",
+    tagline: "The future is fast and unforgiving.",
+    vote_average: 7.1,
+    vote_count: 31000,
+    runtime: 106,
+    image: "https://img.youtube.com/vi/placeholder_neon/maxresdefault.jpg",
+    videoUrl: "https://www.youtube.com/embed/placeholder_neon",
+  },
+  {
+    _id: "112233",
+    id: 112233,
+    title: "Summer Breeze",
+    overview:
+      "A heartwarming romantic comedy about two estranged childhood sweethearts who are forced to work together to save their small town's annual summer festival.",
+    poster_path:
+      "https://image.tmdb.org/t/p/original/breeze_poster.jpg", // Placeholder
+    backdrop_path:
+      "https://image.tmdb.org/t/p/original/breeze_backdrop.jpg", // Placeholder
+    genres: [
+      { id: 35, name: "Comedy" },
+      { id: 10749, name: "Romance" },
+    ],
+    casts: [
+        { name: "Kevin J", profile_path: "https://image.tmdb.org/t/p/original/kevin_j.jpg" },
+        { name: "Lana K", profile_path: "https://image.tmdb.org/t/p/original/lana_k.jpg" },
+        { name: "Mike L", profile_path: "https://image.tmdb.org/t/p/original/mike_l.jpg" },
+    ],
+    release_date: "2025-07-04",
+    original_language: "en",
+    tagline: "Love is always in the air, especially in July.",
+    vote_average: 6.9,
+    vote_count: 22000,
+    runtime: 95,
+    image: "https://img.youtube.com/vi/placeholder_breeze/maxresdefault.jpg",
+    videoUrl: "https://www.youtube.com/embed/placeholder_breeze",
+  },
+  {
+    _id: "998877",
+    id: 998877,
+    title: "The Historian's Labyrinth",
+    overview:
+      "A history professor inherits an old diary that leads him on a thrilling international hunt for a lost treasure connected to a centuries-old secret society.",
+    poster_path:
+      "https://image.tmdb.org/t/p/original/labyrinth_poster.jpg", // Placeholder
+    backdrop_path:
+      "https://image.tmdb.org/t/p/original/labyrinth_backdrop.jpg", // Placeholder
+    genres: [
+      { id: 12, name: "Adventure" },
+      { id: 9648, name: "Mystery" },
+      { id: 53, name: "Thriller" },
+    ],
+    casts: [
+        { name: "Nina M", profile_path: "https://image.tmdb.org/t/p/original/nina_m.jpg" },
+        { name: "Owen N", profile_path: "https://image.tmdb.org/t/p/original/owen_n.jpg" },
+        { name: "Penny O", profile_path: "https://image.tmdb.org/t/p/original/penny_o.jpg" },
+    ],
+    release_date: "2026-03-15",
+    original_language: "en",
+    tagline: "Every secret has a map. Every map has a price.",
+    vote_average: 7.5,
+    vote_count: 40000,
+    runtime: 124,
+  },
+];
+
 export const dummyDateTimeData = {
   "2025-07-24": [
     { time: "2025-07-24T01:00:00.000Z", showId: "68395b407f6329be2bb45bd1" },

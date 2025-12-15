@@ -1,13 +1,16 @@
-import React, { useState } from 'react'
-import { dummyShowsData } from "../assets/assets";
-import MovieCard from "../components/MovieCard";
-const TheaterMovies = () => {
-  return dummyShowsData.length > 0 ? (
+import React from "react";
+import { dummyShowsData1 } from "../assets/assets";
+import TheatersCard from "../components/TheatersCard"; // Sửa: Dùng TheatersCard
+import { ArrowRight } from "lucide-react";
+
+const Theaters = () => {
+  return dummyShowsData1.length > 0 ? (
     <div className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mt-25 overflow-hidden">
       <h1 className="text-lg font-medium my-4">Theater Movies</h1>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        {dummyShowsData.map((movie) => (
-          <MovieCard movie={movie} key={movie._id} />
+        {/* Sửa: Dùng TheatersCard */}
+        {dummyShowsData1.map((theaters) => (
+          <TheatersCard theater={theaters} key={theaters._id} /> 
         ))}
       </div>
     </div>
@@ -18,4 +21,4 @@ const TheaterMovies = () => {
   );
 };
 
-export default TheaterMovies
+export default Theaters;

@@ -86,18 +86,12 @@ const Navbar = () => {
                 Movies
               </Link>
               <Link
-                to="/theatermovies"
+                to="/theaters"
                 className="text-gray-300 hover:text-white transition-colors"
                 onClick={() => scrollTo(0, 0)}
               >
                 Theaters
               </Link>
-              {/* <Link
-                to="#"
-                className="text-gray-300 hover:text-white transition-colors"
-              >
-                Releases
-              </Link> */}
               <Link
                 to="/favorite"
                 className="text-gray-300 hover:text-white transition-colors"

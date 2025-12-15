@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { dummyDateTimeData, dummyShowsData } from "../assets/assets";
+import { dummyDateTimeData, dummyShowsData1 } from "../assets/assets";
 import { useEffect } from "react";
 import { ArrowRight, Heart, PlayCircleIcon, StarIcon } from "lucide-react";
 import timeFormat from "../lib/timeFormat";
@@ -8,16 +8,16 @@ import DataSelect from "../components/DataSelect";
 import MovieCard from "../components/MovieCard";
 import Loading from "../components/Loading";
 
-const MovieDetails = () => {
+const TheatersDetail = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [show, setShow] = useState(null);
 
   const getShow = async () => {
-    const show = dummyShowsData.find((show) => show._id === id);
+    const show = dummyShowsData1.find((show) => show._id === id);
     if (show) {
       setShow({
-        movie: show,
+        theaters: show,
         dateTime: dummyDateTimeData,
       });
     }
@@ -34,8 +34,8 @@ const MovieDetails = () => {
         {/* Background chỉ cho phần này */}
         <div className="absolute inset-0 z-0">
           <img
-            src={show.movie.backdrop_path || show.movie.poster_path}
-            alt="Movie Background"
+            src={show.theaters.backdrop_path || show.theaters.poster_path}
+            alt="Theaters Background"
             className="w-full h-full object-cover"
           />
           {/* Gradient overlay - mờ dần từ trên xuống */}
@@ -51,7 +51,7 @@ const MovieDetails = () => {
             <div className="relative group">
               <div className="absolute -inset-1 bg-linear-to-r from-yellow/30 to-transparent rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <img
-                src={show.movie.poster_path}
+                src={show.theaters.poster_path}
                 alt=""
                 className="max-md:mx-auto rounded-xl h-115 max-w-70 object-cover relative shadow-2xl"
               />
@@ -68,28 +68,28 @@ const MovieDetails = () => {
               </div>
 
               <h1 className="text-4xl md:text-5xl font-bold max-w-96 text-balance bg-linear-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                {show.movie.title}
+                {show.theaters.title}
               </h1>
 
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm rounded-full">
                   <StarIcon className="w-5 h-5 text-yellow fill-yellow" />
                   <span className="font-medium">
-                    {show.movie.vote_average.toFixed(1)}
+                    {show.theaters.vote_average.toFixed(1)}
                   </span>
                 </div>
                 <span className="text-gray-400">•</span>
                 <span className="text-gray-300">
-                  {timeFormat(show.movie.runtime)}
+                  {timeFormat(show.theaters.runtime)}
                 </span>
                 <span className="text-gray-400">•</span>
                 <span className="text-gray-300">
-                  {show.movie.release_date.split("-")[0]}
+                  {show.theaters.release_date.split("-")[0]}
                 </span>
               </div>
 
               <div className="flex flex-wrap gap-2 mt-2">
-                {show.movie.genres.map((genre, index) => (
+                {show.theaters.genres.map((genre, index) => (
                   <span
                     key={index}
                     className="px-3 py-1 bg-white/5 backdrop-blur-sm rounded-full text-sm border border-white/10 hover:bg-white/10 transition-colors"
@@ -100,13 +100,13 @@ const MovieDetails = () => {
               </div>
 
               <p className="text-gray-300 mt-4 text-base leading-relaxed max-w-xl backdrop-blur-sm bg-white/5 p-4 rounded-xl border border-white/10">
-                {show.movie.overview}
+                {show.theaters.overview}
               </p>
 
               <div className="flex items-center flex-wrap gap-4 mt-6">
                 <button
                   onClick={() => {
-                    navigate(`/movie/${show.movie._id}/trailer`);
+                    navigate(`/theaters/${show.theaters._id}/trailer`);
                     scrollTo(0, 0);
                   }}
                   className="flex items-center gap-3 px-7 py-3 text-sm bg-yellow hover:from-yellow-dark hover:to-yellow transition-all rounded-lg font-semibold cursor-pointer active:scale-95 shadow-lg shadow-yellow/20"
@@ -136,14 +136,15 @@ const MovieDetails = () => {
           <p className="text-lg font-medium mt-20">Your Favorite Cast</p>
           <div className="overflow-x-auto no-scrollbar mt-8 pb-4">
             <div className="flex items-center gap-5 w-max px-4">
-              {show.movie.casts.slice(0, 11).map((cast, index) => (
+              {/* Sửa: Thay show.movie.casts thành show.theaters.casts */}
+              {show.theaters.casts.slice(0, 11).map((cast, index) => (
                 <div
                   key={index}
                   className="flex flex-col items-center text-center"
                 >
                   <img
                     src={cast.profile_path}
-                    alt=""
+                    alt={cast.name}
                     className="rounded-full h-20 md:h-20 aspect-square object-cover"
                   />
                   <p className="font-medium text-xs mt-3">{cast.name}</p>
@@ -177,8 +178,9 @@ const MovieDetails = () => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-            {dummyShowsData.slice(0, 5).map((show) => (
-              <MovieCard key={show._id} movie={show} />
+            {/* Vẫn dùng dummyShowsData và sử dụng component TheatersCard đã sửa */}
+            {dummyShowsData.slice(0, 5).map((theater) => (
+              <TheatersCard theater={theater} key={theater._id} /> 
             ))}
           </div>
         </div>
@@ -189,4 +191,4 @@ const MovieDetails = () => {
   );
 };
 
-export default MovieDetails;
+export default TheatersDetail;
