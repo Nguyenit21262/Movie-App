@@ -20,6 +20,7 @@ import TheatersDetail from "./pages/TheatersDetail"
 
 const App = () => {
   const isAdminRoute = useLocation().pathname.startsWith("/admin");
+  
   return (
     <>
       <Toaster />

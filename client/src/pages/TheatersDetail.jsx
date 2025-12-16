@@ -1,12 +1,21 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { dummyDateTimeData, dummyShowsData1 } from "../assets/assets";
+import { dummyDateTimeData, dummyShowsData } from "../assets/assets";
 import { useEffect } from "react";
-import { ArrowRight, Heart, PlayCircleIcon, StarIcon } from "lucide-react";
+import {
+  ArrowRight,
+  Heart,
+  PlayCircleIcon,
+  StarIcon,
+  Clock,
+  Calendar,
+  Tag,
+} from "lucide-react";
 import timeFormat from "../lib/timeFormat";
 import DataSelect from "../components/DataSelect";
-import MovieCard from "../components/MovieCard";
+import TheatersCard from "../components/TheatersCard";
 import Loading from "../components/Loading";
+import VideoPlay from "../components/VideoPlay";
 
 const TheatersDetail = () => {
   const navigate = useNavigate();
@@ -14,7 +23,7 @@ const TheatersDetail = () => {
   const [show, setShow] = useState(null);
 
   const getShow = async () => {
-    const show = dummyShowsData1.find((show) => show._id === id);
+    const show = dummyShowsData.find((show) => show._id === id);
     if (show) {
       setShow({
         theaters: show,
@@ -22,6 +31,14 @@ const TheatersDetail = () => {
       });
     }
   };
+
+  const [isVideoPlayOpen, setIsVideoPlayOpen] = useState(false);
+
+  // Hàm mở modal
+  const openVideoPlay = () => setIsVideoPlayOpen(true);
+
+  // Hàm đóng modal (sẽ truyền xuống VideoPlay)
+  const closeVideoPlay = () => setIsVideoPlayOpen(false);
 
   useEffect(() => {
     getShow();
@@ -39,7 +56,7 @@ const TheatersDetail = () => {
             className="w-full h-full object-cover"
           />
           {/* Gradient overlay - mờ dần từ trên xuống */}
-          <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/50 to-black"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/50 to-black"></div>
           {/* Lớp overlay thêm độ mờ */}
           <div className="absolute inset-0 bg-black/30"></div>
         </div>
@@ -49,7 +66,7 @@ const TheatersDetail = () => {
           <div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
             {/* hình ảnh bộ phim */}
             <div className="relative group">
-              <div className="absolute -inset-1 bg-linear-to-r from-yellow/30 to-transparent rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-yellow/30 to-transparent rounded-xl blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               <img
                 src={show.theaters.poster_path}
                 alt=""
@@ -67,60 +84,58 @@ const TheatersDetail = () => {
                 </span>
               </div>
 
-              <h1 className="text-4xl md:text-5xl font-bold max-w-96 text-balance bg-linear-to-r from-white to-gray-300 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-bold max-w-96 text-balance bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                 {show.theaters.title}
               </h1>
 
+              {/* Runtime */}
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm rounded-full">
-                  <StarIcon className="w-5 h-5 text-yellow fill-yellow" />
-                  <span className="font-medium">
-                    {show.theaters.vote_average.toFixed(1)}
-                  </span>
-                </div>
-                <span className="text-gray-400">•</span>
-                <span className="text-gray-300">
-                  {timeFormat(show.theaters.runtime)}
-                </span>
-                <span className="text-gray-400">•</span>
-                <span className="text-gray-300">
-                  {show.theaters.release_date.split("-")[0]}
+                <Clock className="w-4 h-4 text-gray-400" />
+                <span>{timeFormat(show.theaters.runtime)}</span>
+              </div>
+
+              {/* Release Year */}
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-gray-400" />
+                <span>{show.theaters.release_date.split("-")[0]}</span>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-gray-300 mt-2">
+                <Tag className="w-4 h-4 text-gray-400" />
+                <span>
+                  {show.theaters.genres.map((g) => g.name).join(", ")}
                 </span>
               </div>
 
-              <div className="flex flex-wrap gap-2 mt-2">
-                {show.theaters.genres.map((genre, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-white/5 backdrop-blur-sm rounded-full text-sm border border-white/10 hover:bg-white/10 transition-colors"
-                  >
-                    {genre.name}
-                  </span>
-                ))}
+              {/* Description */}
+              <div>
+                <h3 className="text-3xl font-semibold mb-2"> Description</h3>
+                <p className="text-gray-300 leading-relaxed">
+                  {show.theaters.overview}
+                </p>
               </div>
-
-              <p className="text-gray-300 mt-4 text-base leading-relaxed max-w-xl backdrop-blur-sm bg-white/5 p-4 rounded-xl border border-white/10">
-                {show.theaters.overview}
-              </p>
 
               <div className="flex items-center flex-wrap gap-4 mt-6">
                 <button
-                  onClick={() => {
-                    navigate(`/theaters/${show.theaters._id}/trailer`);
-                    scrollTo(0, 0);
-                  }}
-                  className="flex items-center gap-3 px-7 py-3 text-sm bg-yellow hover:from-yellow-dark hover:to-yellow transition-all rounded-lg font-semibold cursor-pointer active:scale-95 shadow-lg shadow-yellow/20"
+                  onClick={openVideoPlay}
+                  className="flex items-center gap-3 px-7 py-3 text-sm  hover:from-yellow-dark hover:to-yellow transition-all font-semibold cursor-pointer active:scale-95 backdrop-blur-sm bg-white/5 p-4 rounded-xl border border-white/10"
                 >
                   <PlayCircleIcon className="w-5 h-5" />
                   Watch Trailer
                 </button>
-                <a
+                {isVideoPlayOpen && (
+                  <VideoPlay
+                    showData={show.theaters}
+                    onClose={closeVideoPlay}
+                  />
+                )}
+                {/* <a
                   href="#dataselect"
                   className="px-10 py-3 text-sm bg-primary hover:from-primary-dark hover:to-primary transition-all rounded-lg font-semibold cursor-pointer active:scale-95 shadow-lg shadow-primary/20"
                 >
                   Buy Tickets
-                </a>
-                <button className="p-3 bg-linear-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 transition-all rounded-full cursor-pointer active:scale-95 shadow-lg border border-white/10">
+                </a> */}
+                <button className="p-3 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 transition-all rounded-full cursor-pointer active:scale-95 shadow-lg border border-white/10">
                   <Heart className="w-5 h-5" />
                 </button>
               </div>
@@ -129,31 +144,8 @@ const TheatersDetail = () => {
         </div>
       </div>
 
-      {/* Phần từ cast trở xuống có background đen */}
+      {/*  background đen */}
       <div className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mt-5 overflow-hidden">
-        {/* các diễn viên */}
-        <div className="max-w-6xl mx-auto">
-          <p className="text-lg font-medium mt-20">Your Favorite Cast</p>
-          <div className="overflow-x-auto no-scrollbar mt-8 pb-4">
-            <div className="flex items-center gap-5 w-max px-4">
-              {/* Sửa: Thay show.movie.casts thành show.theaters.casts */}
-              {show.theaters.casts.slice(0, 11).map((cast, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center text-center"
-                >
-                  <img
-                    src={cast.profile_path}
-                    alt={cast.name}
-                    className="rounded-full h-20 md:h-20 aspect-square object-cover"
-                  />
-                  <p className="font-medium text-xs mt-3">{cast.name}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* DataSelect Component */}
         <div className="max-w-6xl mx-auto" id="dataselect">
           <DataSelect dateTime={show.dateTime} id={id} />
@@ -177,10 +169,10 @@ const TheatersDetail = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-3 mb-8">
             {/* Vẫn dùng dummyShowsData và sử dụng component TheatersCard đã sửa */}
-            {dummyShowsData.slice(0, 5).map((theater) => (
-              <TheatersCard theater={theater} key={theater._id} /> 
+            {dummyShowsData.slice(0, 4).map((theater) => (
+              <TheatersCard theater={theater} key={theater._id} />
             ))}
           </div>
         </div>

@@ -1,52 +1,98 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { StarIcon } from "lucide-react";
+import { PlayCircle, Ticket, Clock, Calendar } from "lucide-react";
 import timeFormat from "../lib/timeFormat";
 
 const TheatersCard = ({ theater }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full min-w-[230px] max-w-[230px] h-80 overflow-hidden block rounded relative hover:scale-105 transition-all group">
-      {/* Rating badge */}
-      <div className="absolute top-3 left-3 z-10 bg-gray-900/80 backdrop-blur-sm text-white px-2 py-1 rounded-full flex items-center gap-1">
-        <StarIcon className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-        <span className="text-xs font-bold">
-          {theater.vote_average.toFixed(1)}
-        </span>
-      </div>
-
-      {/* Hình ảnh phim và thông tin */}
-      <div className="relative overflow-hidden h-full"> {/* Thay đổi h-70 thành h-full để poster lấp đầy */}
+    <div className="w-[280px] flex flex-col gap-3 group">
+      {/* Card */}
+      <div className="relative h-80 rounded-xl overflow-hidden bg-neutral-900 shadow-xl transition-transform duration-300 group-hover:scale-105">
+        {/* Poster */}
         <img
+          src={theater.poster_path}
+          alt={theater.title}
           onClick={() => {
             navigate(`/theaters/${theater._id}`);
             scrollTo(0, 0);
           }}
-          // Sửa: Dùng poster_path thay vì backdrop_path để hiển thị poster dọc
-          src={theater.poster_path} 
-          alt={theater.title}
-          className="w-full h-full object-cover cursor-pointer transition-transform duration-500 group-hover:scale-105"
+          className="
+            w-full h-full object-cover cursor-pointer
+            transition-all duration-500
+            group-hover:scale-110
+            group-hover:brightness-50
+            group-hover:blur-[2px]
+            
+          "
         />
 
-        {/* Thông tin phim  */}
-        <div className="absolute bottom-0 h-16 backdrop-blur-3xl w-full bg-black/60 p-2 text-white"> 
-          <h3
-            onClick={() => {
-              navigate(`/theaters/${theater._id}`);
-              scrollTo(0, 0);
-            }}
-            className="text-ellipsis line-clamp-1 text-lg font-semibold cursor-pointer hover:text-yellow-400 transition"
-          >
+        {/* Hover Overlay */}
+        <div
+          className="
+    absolute inset-0
+    flex flex-col justify-center
+    gap-3
+    text-left
+    px-4
+    opacity-0 group-hover:opacity-100
+    transition-opacity duration-300
+    pointer-events-none
+  "
+        >
+
+          {/* title */}
+          <p className="text-lg text-white font-semibold">
             {theater.title}
-          </h3>
-          <div className="text-sm text-neutral-400 flex justify-between items-center">
+          </p>
+
+          {/* Genre */}
+          <p className="text-sm text-white font-medium">
+            {theater.genres?.map((g) => g.name).join(", ")}
+          </p>
+
+          {/* Release date */}
+          <div className="flex items-center gap-2 text-sm text-neutral-300">
+            <Calendar size={16} />
             <span>{theater.release_date}</span>
-            <span className="flex items-center gap-1">
-              <span>{timeFormat(theater.runtime)}</span>
-            </span>
+          </div>
+
+          {/* Runtime */}
+          <div className="flex items-center gap-2 text-sm text-neutral-300">
+            <Clock size={16} />
+            <span>{timeFormat(theater.runtime)}</span>
           </div>
         </div>
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => window.open(theater.videoUrl, "_blank")}
+          className="
+            flex-1 flex items-center justify-center gap-1
+    rounded-sm hover:bg-orange-500
+    text-white text-sm py-2
+    transition
+   underline 
+          "
+        >
+          <PlayCircle size={16} />
+          Trailer
+        </button>
+
+        <button
+          onClick={() => navigate(`/theaters/${theater._id}`)}
+          className="
+            flex-1 flex items-center justify-center gap-1
+            rounded-sm bg-yellow hover:bg-orange-500
+            text-white text-sm py-2 transition
+          "
+        >
+          <Ticket size={16} />
+          Tickets
+        </button>
       </div>
     </div>
   );

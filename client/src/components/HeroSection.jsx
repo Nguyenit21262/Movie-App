@@ -7,11 +7,11 @@ import timeFormat from "../lib/timeFormat";
 const HeroSection = () => {
   const navigate = useNavigate();
 
-  // Lấy phần tử đầu tiên của dummyShowsData để hiển thị
   const movie = dummyShowsData[1];
 
   return (
     <div
+    onClick={() => navigate(`/movies/${movie._id}`)}
       className="relative flex flex-col items-start justify-center gap-4 px-6 md:px-16 lg:px-36 bg-cover bg-center h-screen transition-all duration-1000"
       style={{
         backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.5)), url(${movie.backdrop_path})`,
@@ -29,7 +29,7 @@ const HeroSection = () => {
         )}
       </div>
       {/* Title */}
-      <h1 className="text-5xl md:text-[70px] md:leading-[1.1] font-bold text-white max-w-2xl">
+      <h1 className="text-5xl md:text-[70px] md:leading-[1.1] font-bold text-white max-w-2xl cursor-pointer">
         {movie.title}
       </h1>
       {/* Tagline (nếu có) */}

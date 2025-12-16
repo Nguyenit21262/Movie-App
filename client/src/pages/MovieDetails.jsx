@@ -4,9 +4,10 @@ import { dummyDateTimeData, dummyShowsData } from "../assets/assets";
 import { useEffect } from "react";
 import { ArrowRight, Heart, PlayCircleIcon, StarIcon } from "lucide-react";
 import timeFormat from "../lib/timeFormat";
-import DataSelect from "../components/DataSelect";
 import MovieCard from "../components/MovieCard";
 import Loading from "../components/Loading";
+import TrailersSection from "../components/TrailersSection";
+import MovieReview from "../components/MovieReview";
 
 const MovieDetails = () => {
   const navigate = useNavigate();
@@ -104,7 +105,7 @@ const MovieDetails = () => {
               </p>
 
               <div className="flex items-center flex-wrap gap-4 mt-6">
-                <button
+                {/* <button
                   onClick={() => {
                     navigate(`/movie/${show.movie._id}/trailer`);
                     scrollTo(0, 0);
@@ -112,14 +113,22 @@ const MovieDetails = () => {
                   className="flex items-center gap-3 px-7 py-3 text-sm bg-yellow hover:from-yellow-dark hover:to-yellow transition-all rounded-lg font-semibold cursor-pointer active:scale-95 shadow-lg shadow-yellow/20"
                 >
                   <PlayCircleIcon className="w-5 h-5" />
-                  Watch Trailer
-                </button>
+                  Play M
+                </button> */}
+
                 <a
+                  href="#trailer"
+                  className="flex items-center gap-3 px-7 py-3 text-sm bg-yellow hover:from-yellow-dark hover:to-yellow transition-all rounded-lg font-semibold cursor-pointer active:scale-95 shadow-lg shadow-yellow/20"
+                > <PlayCircleIcon className="w-5 h-5" />
+                  Play Movie
+                </a>
+
+                {/* <a
                   href="#dataselect"
                   className="px-10 py-3 text-sm bg-primary hover:from-primary-dark hover:to-primary transition-all rounded-lg font-semibold cursor-pointer active:scale-95 shadow-lg shadow-primary/20"
                 >
                   Buy Tickets
-                </a>
+                </a> */}
                 <button className="p-3 bg-linear-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 transition-all rounded-full cursor-pointer active:scale-95 shadow-lg border border-white/10">
                   <Heart className="w-5 h-5" />
                 </button>
@@ -153,10 +162,7 @@ const MovieDetails = () => {
           </div>
         </div>
 
-        {/* DataSelect Component */}
-        <div className="max-w-6xl mx-auto" id="dataselect">
-          <DataSelect dateTime={show.dateTime} id={id} />
-        </div>
+        <TrailersSection/>
 
         {/* You May Also Like Section */}
         <div className="max-w-6xl mx-auto">
@@ -181,9 +187,12 @@ const MovieDetails = () => {
               <MovieCard key={show._id} movie={show} />
             ))}
           </div>
+
+            <MovieReview/>
         </div>
       </div>
     </div>
+
   ) : (
     <Loading />
   );
