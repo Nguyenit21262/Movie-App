@@ -22,82 +22,84 @@ const MovieReview = () => {
   };
 
   return (
-    <div className="mx-auto max-w-full">
+    <div className="max-w-6xl mx-auto  px-4 sm:px-0">
       {/* Comment Form */}
-      <div className="mb-8 rounded-md dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-6">
-        <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white">
-          💬 Comments
-        </h3>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Write your comment..."
-            rows="4"
-            maxLength={500}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 
-            bg-transparent text-gray-800 dark:text-white 
-            placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+      <form onSubmit={handleSubmit}>
+        <div className="flex items-start gap-3 text-sm">
+          {/* Avatar */}
+          <img
+            className="w-9 h-9 rounded-full object-cover"
+            src=""
+            alt="user"
           />
 
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {comment.length}/500
-            </span>
+          {/* Input box */}
+          <div className="flex-1 bg-white dark:bg-gray-900 transition border border-gray-500/30 rounded-md focus-within:border-indigo-500">
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Add your comment..."
+              rows={4}
+              maxLength={500}
+              className="w-full resize-none rounded-md rounded-b-none p-3 pb-0 outline-none bg-transparent text-gray-800 dark:text-white placeholder-gray-400"
+            />
 
-            <button
-              type="submit"
-              disabled={!comment.trim()}
-              className="px-6 py-2 rounded-lg bg-blue-600 text-white font-medium
-              hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Comment
-            </button>
+            <div className="flex items-center justify-between px-3 pb-2">
+              {/* Left icons */}
+              <div className="flex items-center gap-3 text-gray-500">
+                <button type="button" aria-label="Add photo">
+                  📎
+                </button>
+                <button type="button" aria-label="Add emoji">
+                  😊
+                </button>
+              </div>
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={!comment.trim()}
+                className="bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all text-white font-medium px-5 py-2 rounded disabled:opacity-50"
+              >
+                Post
+              </button>
+            </div>
           </div>
-        </form>
-      </div>
+        </div>
+      </form>
 
       {/* Comment List */}
-      <div>
-        <h4 className="text-sm font-semibold mb-4 text-gray-800 dark:text-white">
+      <div className="mt-12">
+        <h4 className="text-sm font-semibold mb-6 text-gray-800 dark:text-white">
           Comments ({comments.length})
         </h4>
 
         {comments.length === 0 ? (
-          <div className="text-center py-10 text-gray-500 dark:text-gray-400">
+          <p className="text-center text-gray-500">
             No comments yet.
-          </div>
+          </p>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {comments.map((item) => (
-              <div
-                key={item.id}
-                className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-sm p-5"
-              >
-                <div className="flex items-start gap-4">
-                  {/* Avatar */}
-                  <div className="w-10 h-10 shrink-0 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                    <span className="text-blue-600 dark:text-blue-300 font-semibold">
-                      U
+              <div key={item.id} className="flex items-start gap-3">
+                {/* Avatar */}
+                <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center font-semibold text-indigo-600">
+                  U
+                </div>
+
+                {/* Content */}
+                <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-md p-4 w-full">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-medium text-gray-800 dark:text-white">
+                      User
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {item.time}
                     </span>
                   </div>
-
-                  {/* Content */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      <span className="font-medium text-gray-800 dark:text-white">
-                        User
-                      </span>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {item.time}
-                      </span>
-                    </div>
-
-                    <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                      {item.text}
-                    </p>
-                  </div>
+                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
+                    {item.text}
+                  </p>
                 </div>
               </div>
             ))}

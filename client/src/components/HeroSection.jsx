@@ -11,8 +11,11 @@ const HeroSection = () => {
 
   return (
     <div
-    onClick={() => navigate(`/movies/${movie._id}`)}
-      className="relative flex flex-col items-start justify-center gap-4 px-6 md:px-16 lg:px-36 bg-cover bg-center h-screen transition-all duration-1000"
+      onClick={() => {
+        navigate(`/movies/${movie._id}`);
+        scrollTo(0, 0);
+      }}
+      className="relative flex flex-col items-start justify-center gap-4 px-6 md:px-16 lg:px-36 bg-cover bg-center h-screen transition-all duration-1000 mb-6"
       style={{
         backgroundImage: `linear-gradient(to right, rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.5)), url(${movie.backdrop_path})`,
       }}
@@ -45,7 +48,6 @@ const HeroSection = () => {
             {movie.genres.map((genre) => genre.name).join(" | ")}
           </span>
         </div>
-
 
         <div className="flex items-center gap-1 bg-gray-800/50 px-3 py-1 rounded-full">
           {/* <CalendarIcon className="w-4.5 h-4.5" /> */}

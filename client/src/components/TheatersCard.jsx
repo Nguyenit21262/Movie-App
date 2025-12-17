@@ -3,21 +3,17 @@ import { useNavigate } from "react-router-dom";
 import { PlayCircle, Ticket, Clock, Calendar } from "lucide-react";
 import timeFormat from "../lib/timeFormat";
 
-const TheatersCard = ({ theater }) => {
+const TheatersCard = ({ theater, onClick }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-[280px] flex flex-col gap-3 group">
+    <div onClick={onClick} className="w-[280px] flex flex-col gap-3 group">
       {/* Card */}
       <div className="relative h-80 rounded-xl overflow-hidden bg-neutral-900 shadow-xl transition-transform duration-300 group-hover:scale-105">
         {/* Poster */}
         <img
           src={theater.poster_path}
           alt={theater.title}
-          onClick={() => {
-            navigate(`/theaters/${theater._id}`);
-            scrollTo(0, 0);
-          }}
           className="
             w-full h-full object-cover cursor-pointer
             transition-all duration-500
@@ -41,11 +37,8 @@ const TheatersCard = ({ theater }) => {
     pointer-events-none
   "
         >
-
           {/* title */}
-          <p className="text-lg text-white font-semibold">
-            {theater.title}
-          </p>
+          <p className="text-lg text-white font-semibold">{theater.title}</p>
 
           {/* Genre */}
           <p className="text-sm text-white font-medium">

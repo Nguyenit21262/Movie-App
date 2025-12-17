@@ -159,7 +159,7 @@ const TheatersDetail = () => {
             </p>
             <button
               onClick={() => {
-                navigate("/movies");
+                navigate(`/theaters`);
                 scrollTo(0, 0);
               }}
               className="group flex items-center gap-2 text-sm text-gray-300"
@@ -170,9 +170,16 @@ const TheatersDetail = () => {
           </div>
 
           <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-3 mb-8">
-            {/* Vẫn dùng dummyShowsData và sử dụng component TheatersCard đã sửa */}
+        
             {dummyShowsData.slice(0, 4).map((theater) => (
-              <TheatersCard theater={theater} key={theater._id} />
+              <TheatersCard
+                theater={theater}
+                key={theater._id}
+                onClick={() => {
+                  navigate(`/theaters/${theater.id}`);
+                  scrollTo(0, 0);
+                }}
+              />
             ))}
           </div>
         </div>
