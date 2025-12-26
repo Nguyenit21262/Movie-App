@@ -4,18 +4,14 @@ import { assets } from "../assets/assets";
 import {
   MenuIcon,
   SearchIcon,
-  TicketPlus,
-  User,
   XIcon,
   Globe,
 } from "lucide-react";
-import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLangOpen, setIsLangOpen] = useState(false);
-  const { user } = useUser();
-  const { openSignIn } = useClerk();
+  const user = null; // Thay bằng logic xác thực người dùng thực tế
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -92,17 +88,9 @@ const Navbar = () => {
               >
                 Theaters
               </Link>
-              {/* <Link
-                to="/favorite"
-                className="text-gray-300 hover:text-white transition-colors"
-                onClick={() => scrollTo(0, 0)}
-              >
-                Favorite
-              </Link> */}
             </div>
           </div>
 
-          {/* Bên phải: Nút chuyển ngữ, User/Avatar, Mobile menu button */}
           <div className="flex items-center space-x-4">
             {/* Nút chuyển ngữ */}
             <div className="relative">
@@ -136,23 +124,18 @@ const Navbar = () => {
             {/* User/Avatar hoặc Login Button */}
             {!user ? (
               <button
-                onClick={openSignIn}
-                className="px-4 py-2  text-gray-300 hover:text-white font-medium rounded-full transition-colors whitespace-nowrap"
+                onClick={() => {navigate("/login"), scrollTo(0, 0)}}
+                className="px-4 py-2 text-gray-300 hover:text-white font-medium rounded-full transition-colors whitespace-nowrap"
               >
                 Login
               </button>
             ) : (
-              <div className="flex items-center">
-                <UserButton>
-                  <UserButton.MenuItems>
-                    <UserButton.Action
-                      label="My Bookings"
-                      labelIcon={<TicketPlus width={15} />}
-                      onClick={() => navigate("/my-bookings")}
-                    />
-                  </UserButton.MenuItems>
-                </UserButton>
-              </div>
+              <button
+                onClick={() => navigate("/my-bookings")}
+                className="px-4 py-2 text-gray-300 hover:text-white font-medium rounded-full transition-colors whitespace-nowrap"
+              >
+                My Bookings
+              </button>
             )}
 
             {/* Mobile menu button (chỉ hiện trên mobile) */}

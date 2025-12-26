@@ -2,7 +2,14 @@ import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { dummyDateTimeData, dummyShowsData } from "../assets/assets";
 import { useEffect } from "react";
-import { ArrowRight, Heart, PlayCircleIcon, StarIcon, Tag } from "lucide-react";
+import {
+  ArrowRight,
+  Heart,
+  PlayCircleIcon,
+  StarIcon,
+  Tag,
+  MessageCircle,
+} from "lucide-react";
 import timeFormat from "../lib/timeFormat";
 import MovieCard from "../components/MovieCard";
 import Loading from "../components/Loading";
@@ -110,6 +117,13 @@ const MovieDetails = () => {
                 <button className="p-3 bg-linear-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 transition-all rounded-full cursor-pointer active:scale-95 shadow-lg border border-white/10">
                   <Heart className="w-5 h-5" />
                 </button>
+                <a
+                  href="#comment"
+                  className="p-3 bg-linear-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 transition-all rounded-full cursor-pointer active:scale-95 shadow-lg border border-white/10"
+                >
+                  {" "}
+                  <MessageCircle className="w-5 h-5" />
+                </a>
               </div>
             </div>
           </div>
@@ -140,7 +154,7 @@ const MovieDetails = () => {
           </div>
         </div>
 
-        <TrailersSection />
+        <TrailersSection id="trailerMovie"/>
 
         {/* You May Also Like Section */}
         <div className="max-w-6xl mx-auto mb-10">

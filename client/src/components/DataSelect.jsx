@@ -12,7 +12,7 @@ const DataSelect = ({ dateTime, id }) => {
     if (!selected) {
       return toast("Please select a date");
     } else {
-      navigate(`/movies/${id}/${selected}`);
+      navigate(`/theaters/${id}/${selected}`);
       scrollTo(0, 0);
     }
   };

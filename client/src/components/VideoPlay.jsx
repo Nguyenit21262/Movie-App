@@ -1,54 +1,47 @@
-import React from "react";
-import Loading from "./Loading";
+import React, { useEffect } from "react";
+import { useNavigate, useOutletContext } from "react-router-dom";
 import { X } from "lucide-react";
+import Loading from "./Loading";
 
-const VideoPlay = ({ showData, onClose }) => {
+const VideoPlay = () => {
+  const navigate = useNavigate();
+  const { showData } = useOutletContext();
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = "auto"; };
+  }, []);
+
   if (!showData) return <Loading />;
 
   return (
     <section
-      className="
-      fixed inset-0 z-[999]
-      flex items-center justify-center
-      bg-black/70 backdrop-blur-sm
-    "
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-md transition-all duration-300"
+      onClick={() => navigate(-1)}
     >
-      {/* Modal */}
       <div
-        className="
-        relative w-full max-w-4xl
-        mx-4
-        bg-neutral-900
-        rounded-xl
-        shadow-2xl
-        overflow-hidden
-      "
+        className="relative w-full max-w-5xl mx-4 bg-neutral-900 rounded-2xl shadow-2xl overflow-hidden border border-white/10"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-          <h2 className="text-white text-lg font-semibold truncate">
+        <div className="flex items-center justify-between px-5 py-4 bg-neutral-900 border-b border-white/10 text-white">
+          <h2 className="text-lg font-bold tracking-tight truncate mr-4">
             {showData.title}
           </h2>
-
           <button
-            onClick={onClose}
-            className="
-              text-white/70 hover:text-white
-              transition
-            "
+            onClick={() => navigate(-1)}
+            className="p-2 hover:bg-white/10 rounded-full transition-colors text-gray-400 hover:text-white"
           >
-            <X size={22} />
+            <X size={24} />
           </button>
         </div>
 
-        {/* Video */}
         <div className="aspect-video bg-black">
           <iframe
             src={showData.videoUrl}
-            title={`Trailer for ${showData.title}`}
+            title={showData.title}
+            className="w-full h-full"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
-            className="w-full h-full"
           />
         </div>
       </div>

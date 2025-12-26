@@ -1,3 +1,4 @@
+import { SendHorizontal } from "lucide-react";
 import React, { useState } from "react";
 
 const MovieReview = () => {
@@ -22,7 +23,7 @@ const MovieReview = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto  px-4 sm:px-0">
+    <div id="comment" className="max-w-6xl mx-auto px-4 sm:px-0">
       {/* Comment Form */}
       <form onSubmit={handleSubmit}>
         <div className="flex items-start gap-3 text-sm">
@@ -44,24 +45,13 @@ const MovieReview = () => {
               className="w-full resize-none rounded-md rounded-b-none p-3 pb-0 outline-none bg-transparent text-gray-800 dark:text-white placeholder-gray-400"
             />
 
-            <div className="flex items-center justify-between px-3 pb-2">
-              {/* Left icons */}
-              <div className="flex items-center gap-3 text-gray-500">
-                <button type="button" aria-label="Add photo">
-                  📎
-                </button>
-                <button type="button" aria-label="Add emoji">
-                  😊
-                </button>
-              </div>
-
-              {/* Submit */}
+            <div className="flex items-end justify-end px-3 pb-2">
               <button
                 type="submit"
                 disabled={!comment.trim()}
-                className="bg-indigo-500 hover:bg-indigo-600 active:scale-95 transition-all text-white font-medium px-5 py-2 rounded disabled:opacity-50"
+                className="active:scale-95 transition-all disabled:opacity-60"
               >
-                Post
+                <SendHorizontal className="w-6 h-6 text-black" />
               </button>
             </div>
           </div>
@@ -70,14 +60,12 @@ const MovieReview = () => {
 
       {/* Comment List */}
       <div className="mt-12">
-        <h4 className="text-sm font-semibold mb-6 text-gray-800 dark:text-white">
+        <h4 className="text-sm font-semibold mb-6 text-gray-300 dark:text-white">
           Comments ({comments.length})
         </h4>
 
         {comments.length === 0 ? (
-          <p className="text-center text-gray-500">
-            No comments yet.
-          </p>
+          <p className="text-center text-gray-500">No comments yet.</p>
         ) : (
           <div className="space-y-6">
             {comments.map((item) => (
@@ -93,9 +81,7 @@ const MovieReview = () => {
                     <span className="font-medium text-gray-800 dark:text-white">
                       User
                     </span>
-                    <span className="text-xs text-gray-500">
-                      {item.time}
-                    </span>
+                    <span className="text-xs text-gray-500">{item.time}</span>
                   </div>
                   <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
                     {item.text}
