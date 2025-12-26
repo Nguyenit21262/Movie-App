@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { assets, dummyDateTimeData, dummyShowsData } from "../assets/assets";
 import { ArrowRightIcon, ClockIcon } from "lucide-react";
 import isoTimeFormat from "../lib/isotimeFormat";
@@ -19,6 +19,8 @@ const SeatLayout = () => {
   const [selectedTime, setSelectedTime] = useState(null);
   const [show, setShow] = useState(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const showtimeId = searchParams.get("showtime");
 
   const getShow = async () => {
     const show = dummyShowsData.find((show) => show._id === id);
@@ -31,9 +33,9 @@ const SeatLayout = () => {
   };
 
   const handleSeatClick = (seatId) => {
-    if (!selectedTime) {
-      return toast("Pleaase select the time first");
-    }
+    // if (!selectedTime) {
+    //   return toast("Pleaase select the time first");
+    // }
     if (!selectedSeats.includes(seatId) && selectedSeats.length > 4) {
       return toast("You can only select 5 seats");
     }
@@ -72,7 +74,7 @@ const SeatLayout = () => {
   return show ? (
     <div className="flex flex-col text-center md:flex-row px-6 md:px-16 lg:px-40 py-30">
       {/* Avaialble timings */}
-      <div className="w-60 bg-yellow/10 border border-yellow/20 rounded-lg py-10 h-max md:sticky md:top-30">
+      {/* <div className="w-60 bg-yellow/10 border border-yellow/20 rounded-lg py-10 h-max md:sticky md:top-30">
         <p className="text-lg font-semibold px-6">Available Timings</p>
 
         <div className="mt-5 space-y-1">
@@ -91,7 +93,7 @@ const SeatLayout = () => {
             </div>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* seats layout */}
       <div className="relative flex-1 flex flex-col items-center max-md:mt-16">

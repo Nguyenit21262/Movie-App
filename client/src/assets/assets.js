@@ -288,28 +288,244 @@ export const dummyShowsData = [
 ];
 
 
+// Thêm dữ liệu phòng chiếu vào assets.js
+export const dummyRoomsData = {
+  "room1": {
+    id: "room1",
+    name: "Room 1 - Standard",
+    capacity: 120,
+    type: "2D",
+    features: ["English", "Subtitle", "Dolby Digital"],
+    basePrice: 12.99
+  },
+  "room2": {
+    id: "room2",
+    name: "Room 2 - Premium",
+    capacity: 80,
+    type: "3D",
+    features: ["English", "Subtitle", "3D Glasses", "Dolby Atmos"],
+    basePrice: 15.99
+  },
+  "room3": {
+    id: "room3",
+    name: "IMAX Hall",
+    capacity: 150,
+    type: "3D IMAX",
+    features: ["English", "Laser Projection", "Dolby Atmos", "Recliner Seats"],
+    basePrice: 19.99
+  },
+  "room4": {
+    id: "room4",
+    name: "VIP Suite",
+    capacity: 40,
+    type: "2D",
+    features: ["English", "Butler Service", "Food & Drink", "Premium Seating"],
+    basePrice: 29.99
+  }
+};
+
+// Cập nhật dummyDateTimeData với thông tin đầy đủ
 export const dummyDateTimeData = {
   "2025-07-24": [
-    { time: "2025-07-24T01:00:00.000Z", showId: "68395b407f6329be2bb45bd1" },
-    { time: "2025-07-24T03:00:00.000Z", showId: "68395b407f6329be2bb45bd2" },
-    { time: "2025-07-24T05:00:00.000Z", showId: "68395b407f6329be2bb45bd3" },
+    {
+      id: "show_1_20250724_1000",
+      showId: "68395b407f6329be2bb45bd1",
+      time: "10:00",
+      roomId: "room1",
+      type: "2D",
+      price: 12.99,
+      seatsAvailable: 45,
+      features: ["English", "Subtitle"],
+      totalSeats: 120
+    },
+    {
+      id: "show_2_20250724_1300",
+      showId: "68395b407f6329be2bb45bd2",
+      time: "13:00",
+      roomId: "room3",
+      type: "3D IMAX",
+      price: 19.99,
+      seatsAvailable: 28,
+      features: ["Dolby Atmos", "3D Glasses"],
+      totalSeats: 150
+    },
+    {
+      id: "show_3_20250724_1600",
+      showId: "68395b407f6329be2bb45bd3",
+      time: "16:00",
+      roomId: "room2",
+      type: "3D",
+      price: 15.99,
+      seatsAvailable: 65,
+      features: ["English", "Subtitle"],
+      totalSeats: 80
+    },
+    {
+      id: "show_4_20250724_1900",
+      showId: "68395b407f6329be2bb45bd4",
+      time: "19:00",
+      roomId: "room4",
+      type: "2D",
+      price: 29.99,
+      seatsAvailable: 15,
+      features: ["Butler Service", "Food & Drink"],
+      totalSeats: 40
+    }
   ],
   "2025-07-25": [
-    { time: "2025-07-25T01:00:00.000Z", showId: "68395b407f6329be2bb45bd4" },
-    { time: "2025-07-25T03:00:00.000Z", showId: "68395b407f6329be2bb45bd5" },
-    { time: "2025-07-25T05:00:00.000Z", showId: "68395b407f6329be2bb45bd6" },
+    {
+      id: "show_5_20250725_1030",
+      showId: "68395b407f6329be2bb45bd5",
+      time: "10:30",
+      roomId: "room1",
+      type: "2D",
+      price: 12.99,
+      seatsAvailable: 89,
+      features: ["English", "Subtitle"],
+      totalSeats: 120
+    },
+    {
+      id: "show_6_20250725_1400",
+      showId: "68395b407f6329be2bb45bd6",
+      time: "14:00",
+      roomId: "room3",
+      type: "3D IMAX",
+      price: 19.99,
+      seatsAvailable: 42,
+      features: ["Dolby Atmos", "3D Glasses"],
+      totalSeats: 150
+    },
+    {
+      id: "show_7_20250725_1730",
+      showId: "68395b407f6329be2bb45bd7",
+      time: "17:30",
+      roomId: "room2",
+      type: "3D",
+      price: 15.99,
+      seatsAvailable: 34,
+      features: ["English", "Subtitle"],
+      totalSeats: 80
+    },
+    {
+      id: "show_8_20250725_2100",
+      showId: "68395b407f6329be2bb45bd8",
+      time: "21:00",
+      roomId: "room1",
+      type: "2D",
+      price: 12.99,
+      seatsAvailable: 102,
+      features: ["English", "Subtitle"],
+      totalSeats: 120
+    }
   ],
   "2025-07-26": [
-    { time: "2025-07-26T01:00:00.000Z", showId: "68395b407f6329be2bb45bd7" },
-    { time: "2025-07-26T03:00:00.000Z", showId: "68395b407f6329be2bb45bd8" },
-    { time: "2025-07-26T05:00:00.000Z", showId: "68395b407f6329be2bb45bd9" },
+    {
+      id: "show_9_20250726_1100",
+      showId: "68395b407f6329be2bb45bd9",
+      time: "11:00",
+      roomId: "room3",
+      type: "3D IMAX",
+      price: 19.99,
+      seatsAvailable: 23,
+      features: ["Dolby Atmos", "3D Glasses"],
+      totalSeats: 150
+    },
+    {
+      id: "show_10_20250726_1430",
+      showId: "68395b407f6329be2bb45bda",
+      time: "14:30",
+      roomId: "room4",
+      type: "2D",
+      price: 29.99,
+      seatsAvailable: 8,
+      features: ["Butler Service", "Food & Drink"],
+      totalSeats: 40
+    },
+    {
+      id: "show_11_20250726_1800",
+      showId: "68395b407f6329be2bb45bdb",
+      time: "18:00",
+      roomId: "room2",
+      type: "3D",
+      price: 15.99,
+      seatsAvailable: 56,
+      features: ["English", "Subtitle"],
+      totalSeats: 80
+    },
+    {
+      id: "show_12_20250726_2130",
+      showId: "68395b407f6329be2bb45bdc",
+      time: "21:30",
+      roomId: "room1",
+      type: "2D",
+      price: 12.99,
+      seatsAvailable: 78,
+      features: ["English", "Subtitle"],
+      totalSeats: 120
+    }
   ],
   "2025-07-27": [
-    { time: "2025-07-27T01:00:00.000Z", showId: "68395b407f6329be2bb45bda" },
-    { time: "2025-07-27T03:00:00.000Z", showId: "68395b407f6329be2bb45bdb" },
-    { time: "2025-07-27T05:00:00.000Z", showId: "68395b407f6329be2bb45bdc" },
-  ],
+    {
+      id: "show_13_20250727_1200",
+      showId: "68395b407f6329be2bb45bdd",
+      time: "12:00",
+      roomId: "room2",
+      type: "3D",
+      price: 15.99,
+      seatsAvailable: 42,
+      features: ["English", "Subtitle"],
+      totalSeats: 80
+    },
+    {
+      id: "show_14_20250727_1530",
+      showId: "68395b407f6329be2bb45bde",
+      time: "15:30",
+      roomId: "room3",
+      type: "3D IMAX",
+      price: 19.99,
+      seatsAvailable: 67,
+      features: ["Dolby Atmos", "3D Glasses"],
+      totalSeats: 150
+    },
+    {
+      id: "show_15_20250727_1900",
+      showId: "68395b407f6329be2bb45bdf",
+      time: "19:00",
+      roomId: "room4",
+      type: "2D",
+      price: 29.99,
+      seatsAvailable: 22,
+      features: ["Butler Service", "Food & Drink"],
+      totalSeats: 40
+    },
+    {
+      id: "show_16_20250727_2230",
+      showId: "68395b407f6329be2bb45be0",
+      time: "22:30",
+      roomId: "room1",
+      type: "2D",
+      price: 12.99,
+      seatsAvailable: 95,
+      features: ["English", "Subtitle"],
+      totalSeats: 120
+    }
+  ]
 };
+
+// Helper function để lấy thông tin phòng từ roomId
+export const getRoomInfo = (roomId) => {
+  return dummyRoomsData[roomId] || {
+    id: roomId,
+    name: `Room ${roomId}`,
+    capacity: 100,
+    type: "2D",
+    features: ["Standard"],
+    basePrice: 12.99
+  };
+};
+
+// Cập nhật DataSelect component để sử dụng dữ liệu mới
+// Chỉ cần import getRoomInfo và sử dụng trong component
 
 export const dummyDashboardData = {
   totalBookings: 14,
@@ -421,4 +637,6 @@ export const dummyBookingData = [
     bookedSeats: ["A1", "A2", "A3"],
     isPaid: true,
   },
+
+  
 ];
