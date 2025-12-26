@@ -1,10 +1,12 @@
 import React from "react";
 import { assets } from "../assets/assets";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+
+    const navigate = useNavigate();
   return (
     <div className="relative h-[700px] w-full overflow-hidden bg-black">
-
       {/* BACKGROUND IMAGE */}
       <img
         src="image.png"
@@ -17,11 +19,7 @@ const Login = () => {
 
       {/* LOGO TOP LEFT */}
       <div className="absolute top-6 left-6 z-20 flex items-center ">
-        <img
-          src={assets.logo}
-          alt="Cinema Logo"
-          className="h-12 w-auto"
-        />
+        <img src={assets.logo} alt="Cinema Logo" className="h-12 w-auto" />
       </div>
 
       {/* FORM */}
@@ -116,9 +114,12 @@ const Login = () => {
           {/* SIGN UP */}
           <p className="text-gray-400 text-sm mt-4">
             New to Cinema?
-            <a className="ml-1 text-white hover:underline">
-              Create account
-            </a>
+            <span
+            onClick={() => {navigate("/register"); scrollTo(0,0)}}
+            className="ml-1 text-yellow-400 hover:underline cursor-pointer"
+          >
+            Sign up
+          </span>
           </p>
         </form>
       </div>

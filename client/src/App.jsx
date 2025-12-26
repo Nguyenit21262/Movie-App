@@ -19,13 +19,15 @@ import AddMovies from "./pages/admin/AddMovies";
 import ListMovies from "./pages/admin/ListMovies";
 import ListBooking from "./pages/admin/ListBooking";
 import Login from "./pages/Login";
+import Register from "./pages/Resigter";
 const App = () => {
   const isAdminRoute = useLocation().pathname.startsWith("/admin");
   const isLoginRoute = useLocation().pathname === "/login";
+   const isRegisterRoute = useLocation().pathname === "/register";
   return (
     <>
       <Toaster />
-      {!isAdminRoute && !isLoginRoute && (
+      {!isAdminRoute && !isLoginRoute && !isRegisterRoute && (
         <>
           <Navbar />
           <ChatButton />
@@ -34,6 +36,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/movies/:id" element={<MovieDetails />} />
         <Route path="/theaters" element={<Theaters />} />
@@ -53,7 +56,7 @@ const App = () => {
           <Route path="list-bookings" element={<ListBooking />} />
         </Route>
       </Routes>
-      {!isAdminRoute && !isLoginRoute && <Footer />}
+      {!isAdminRoute && !isLoginRoute && !isRegisterRoute && <Footer />}
     </>
   );
 };
