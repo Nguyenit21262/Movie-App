@@ -8,7 +8,7 @@ const Movies = () => {
 
   return dummyShowsData.length > 0 ? (
     <div className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mt-24">
-      <h1 className="text-lg font-medium mb-4">Now Showing</h1>
+      <h1 className="text-lg font-medium mb-4">Top Picks</h1>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
         {dummyShowsData.map((movie) => (

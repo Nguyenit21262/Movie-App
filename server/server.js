@@ -6,23 +6,33 @@ import cookieParser from "cookie-parser";
 import authRouter from "./routes/authRoutes.js";
 
 const app = express();
-const port = process.env.PORT || 3000; 
+const port = process.env.PORT || 4000;
 
 connectDB();
 
-// 2. Middleware cấu hình
+// Cấu hình Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ 
-    origin: process.env.FRONTEND_URL, 
-    credentials: true 
-}));
 
-// 3. API Endpoints
+// Cấu hình CORS chi tiết để nhận được Cookie
+const allowedOrigins = ['http://localhost:5173', 'http://localhost:3000']; 
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+  })
+);
+
+// API Endpoints
 app.get("/", (req, res) => res.send("Server is Live!"));
 app.use("/api/auth", authRouter);
 
-// 4. Khởi chạy Server
 app.listen(port, () =>
   console.log(`Server listening at http://localhost:${port}`)
 );

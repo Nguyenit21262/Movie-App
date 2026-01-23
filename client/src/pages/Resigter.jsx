@@ -76,7 +76,7 @@ const Register = () => {
             />
           </div>
 
-          {/* PHONE */}
+          {/* PHONE
           <div className="w-full mt-5">
             <input
               type="text"
@@ -91,7 +91,7 @@ const Register = () => {
                 outline-none
               "
             />
-          </div>
+          </div> */}
 
           {/* PASSWORD */}
           <div className="w-full mt-5">

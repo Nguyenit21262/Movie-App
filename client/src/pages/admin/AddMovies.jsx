@@ -51,13 +51,17 @@ const AddMovies = () => {
   return nowPlayingMovies.length > 0 ? (
     <>
       <Title text1="Add" text2="Movies" />
-      <p className="mt-10 text-lkg font-medium">Now Playing Movies</p>
-      <div className="group flex flex-wrap gap-3 mt-4 w-max">
+      <p className="mt-10 text-lkg text-black font-medium">
+        Now Playing Movies
+      </p>
+      <div className="group flex flex-wrap gap-3 mt-4 w-max text-black">
         {nowPlayingMovies.map((movie) => (
           <div
             key={movie.id}
             className={`relative max-w-40 cursor-pointer group-hover:not-hover:opacity-40 hover:-translate-y-1 transition duration-300`}
-            onClick={() => setSelectedMovie(movie.id)}
+            onClick={() =>
+              setSelectedMovie((prev) => (prev === movie.id ? null : movie.id))
+            }
           >
             <div className="relative rounded-sm overflow-hidden">
               <img
@@ -82,13 +86,13 @@ const AddMovies = () => {
               </div>
             )}
             <p className="font-medium truncate">{movie.title}</p>
-            <p className="text-gray-400 text-sm">{movie.release_date}</p>
+            <p className="text-sm">{movie.release_date}</p>
           </div>
         ))}
       </div>
 
       {/* show price input */}
-      <div className="mt-8">
+      <div className="mt-8 text-black">
         <label className="block text-sm font-medium mb-2">Show Price</label>
         <div className="inline-flex items-center gap-2 border border-gray-600 px-6 py-2 rounded-md">
           <p className="text-gray-400 text-sm">{currency}</p>
@@ -104,7 +108,7 @@ const AddMovies = () => {
       </div>
 
       {/* date time selection */}
-      <div className="mt-6">
+      <div className="mt-6 text-bla">
         <label className="block text-sm font-medium mb-2">
           Select Date and Time
         </label>
@@ -153,7 +157,9 @@ const AddMovies = () => {
         </div>
       )}
 
-      <button className="bg-yellow text-white px-8 py-2 mt-6 rounded hover:ng-yellow/90 transition-all cursor-pointer">Add Show</button>
+      <button className="bg-yellow text-white px-8 py-2 mt-6 rounded hover:ng-yellow/90 transition-all cursor-pointer">
+        Add Show
+      </button>
     </>
   ) : (
     <Loading />

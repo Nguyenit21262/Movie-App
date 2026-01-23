@@ -9,7 +9,7 @@ const FeaturedSection = () => {
   return (
     <div className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mt-5 overflow-hidden">
       <div className="relative flex items-center justify-between  ">
-        <p className=" text-lg font-medium my-4">Now Showing</p>
+        <p className=" text-lg font-medium my-4">Top Picks</p>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">

@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { dummyBookingData } from "../../assets/assets";
 import Loading from "../../components/Loading";
 import Title from "../../components/admin/Title.jsx";
@@ -18,38 +17,56 @@ const ListBooking = () => {
   useEffect(() => {
     getAllBookings();
   }, []);
+
   return !isloading ? (
-    <div>
+    <div className="p-5">
       <Title text1="List" text2="Bookings" />
-      <div className="max-w-4xl mt-6 overflow-x-auto">
-        <table className="w-full border-collapse rounded-md overflow-hidden text-nowrap">
+      <div className="max-w-4xl mt-6 overflow-x-auto shadow-sm">
+        <table className="w-full border-collapse border border-gray-300 text-nowrap">
           <thead>
-            <tr className="bg-yellow/20 text-left text-white">
-            <th className="p-2 font-medium pl-5">User Name</th>
-              <th className="p-2 font-medium ">Movie Name</th>
-              <th p-2 font-medium>
+            <tr className="bg-[#4548f8] text-white">
+              <th className="border border-gray-300 p-3 font-semibold text-left">
+                User Name
+              </th>
+              <th className="border border-gray-300 p-3 font-semibold text-left">
+                Movie Name
+              </th>
+              <th className="border border-gray-300 p-3 font-semibold text-left">
                 Show Time
               </th>
-              <th p-2 font-medium>
+              <th className="border border-gray-300 p-3 font-semibold text-left">
                 Seats
               </th>
-              <th p-2 font-medium>
+              <th className="border border-gray-300 p-3 font-semibold text-left">
                 Amount
               </th>
             </tr>
           </thead>
 
-          <tbody className="text-sm font-light">
-          {bookings.map((item, index) => (
-            <tr key={index} className="border-b border-yellow/10 bg-yellow/5 even:bg-yellow/10">
-              <td className="p-2 min-w-45 pl-5">{item.user.name}</td>
-              <td className="p-2">{item.show.movie.title}</td>
-              <td className="p-2">{dateFormat(item.show.showDateTime)}</td>
-              <td className="p-2">{Object.keys(item.bookedSeats).map(seat => item.bookedSeats[seat]).join(", ")}</td>
-              <td className="p-2">{currency} {currency} {item.amount}</td>
-            </tr>
-          ))}
-        </tbody>
+          <tbody className="text-sm text-gray-800">
+            {bookings.map((item, index) => (
+              <tr
+                key={index}
+                className="hover:bg-red-50 transition-colors odd:bg-white even:bg-[#F5F5F5]"
+              >
+                <td className="border border-gray-300 p-3">{item.user.name}</td>
+                <td className="border border-gray-300 p-3">
+                  {item.show.movie.title}
+                </td>
+                <td className="border border-gray-300 p-3">
+                  {dateFormat(item.show.showDateTime)}
+                </td>
+                <td className="border border-gray-300 p-3">
+                  {Object.keys(item.bookedSeats)
+                    .map((seat) => item.bookedSeats[seat])
+                    .join(", ")}
+                </td>
+                <td className="border border-gray-300 p-3 font-medium text-[#007BFF]">
+                  {currency} {item.amount}
+                </td>
+              </tr>
+            ))}
+          </tbody>
         </table>
       </div>
     </div>

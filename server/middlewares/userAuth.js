@@ -13,9 +13,9 @@ const userAuth = (req, res, next) => {
 
   // 2. Kiểm tra sự tồn tại của token
   if (!token) {
-    return res.status(401).json({ 
-      success: false, 
-      message: "Unauthorized: No token provided. Please login again." 
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized: No token provided. Please login again.",
     });
   }
 
@@ -29,21 +29,23 @@ const userAuth = (req, res, next) => {
        * Gán userId vào req.body để các controller tiếp theo (như verifyEmail, sendOtp)
        * có thể sử dụng trực tiếp mà không cần client gửi lên, tăng tính bảo mật.
        */
-      req.body.userId = tokenDecode.id;
-      
+      req.userId = tokenDecode.id;
+
       // Cho phép request đi tiếp tới Controller hoặc Middleware tiếp theo
       next();
     } else {
-      return res.status(401).json({ 
-        success: false, 
-        message: "Unauthorized: Invalid token payload. Login Again." 
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: Invalid token payload. Login Again.",
       });
     }
   } catch (error) {
+    console.error("JWT Verify Error:", error.name); // Sẽ in ra 'JsonWebTokenError' hoặc 'TokenExpiredError'
+    console.error("Chi tiết:", error.message); // Sẽ in ra lý do cụ thể
     // 5. Xử lý trường hợp token sai, hết hạn hoặc bị can thiệp
-    return res.status(401).json({ 
-      success: false, 
-      message: "Unauthorized: Invalid or expired token. Please login again." 
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized: Invalid or expired token. Please login again.",
     });
   }
 };

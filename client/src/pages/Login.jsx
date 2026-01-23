@@ -44,7 +44,7 @@ const Login = () => {
           </p>
 
           {/* GOOGLE */}
-          <button
+          {/* <button
             type="button"
             className="
               w-full mt-8 h-12
@@ -58,14 +58,14 @@ const Login = () => {
               src="https://raw.githubusercontent.com/prebuiltui/prebuiltui/main/assets/login/googleLogo.svg"
               alt="google"
             />
-          </button>
+          </button> */}
 
           {/* DIVIDER */}
-          <div className="flex items-center gap-4 w-full my-6">
+          {/* <div className="flex items-center gap-4 w-full my-6">
             <div className="w-full h-px bg-white/10"></div>
             <p className="text-sm text-gray-400">or</p>
             <div className="w-full h-px bg-white/10"></div>
-          </div>
+          </div> */}
 
           {/* EMAIL */}
           <div className="flex items-center w-full h-12 rounded-full bg-black/40 border border-white/10 pl-5 gap-2">

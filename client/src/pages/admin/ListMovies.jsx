@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { dummyShowsData } from "../../assets/assets";
 import Loading from "../../components/Loading";
 import Title from "../../components/admin/Title.jsx";
 import dateFormat from "../../lib/dateFormat";
-// list các movie đã được book
+
 const ListMovies = () => {
   const [loading, setLoading] = useState(true);
   const [shows, setShows] = useState([]);
@@ -33,31 +32,48 @@ const ListMovies = () => {
   useEffect(() => {
     getAllShows();
   }, []);
-  return !loading ? (<div>
-    <Title text1 = "List" text2="Show"/>
-    <div className="max-w-4xl mt-6 overflow-x-auto">
-      <table className="w-full border-collapse rounded-md overflow-hidden text-nowrap">
-        <thead>
-          <tr className="bg-yellow/20 text-left text-white">
-            <th className="p-2 font-medium pl-5">Movie Name</th>
-            <th p-2 font-medium>Show Time</th>
-            <th p-2 font-medium>Total Bookings</th>
-            <th p-2 font-medium>Earnings</th>
-          </tr>
-        </thead>
-        <tbody className="text-sm font-light">
-          {shows.map((show, index) => (
-            <tr key={index} className="border-b border-yellow/10 bg-yellow/5 even:bg-yellow/10">
-              <td className="p-2 min-w-45 pl-5">{show.movie.title}</td>
-              <td className="p-2">{dateFormat(show.showDateTime)}</td>
-              <td className="p-2">{Object.keys(show.occupiedSeats).length}</td>
-              <td className="p-2">{currency} {Object.keys(show.occupiedSeats).length * show.showPrice}</td>
+
+  return !loading ? (
+    <div className="p-5">
+      <Title text1="List" text2="Show" />
+      <div className="max-w-4xl mt-6 overflow-x-auto shadow-sm">
+        
+        <table className="w-full border-collapse border border-gray-300 text-nowrap">
+          <thead>
+            <tr className="bg-[#4548f8] text-white">
+              <th className="border border-gray-300 p-3 font-semibold text-left pl-5">Movie Name</th>
+              <th className="border border-gray-300 p-3 font-semibold text-left">Show Time</th>
+              <th className="border border-gray-300 p-3 font-semibold text-left">Total Bookings</th>
+              <th className="border border-gray-300 p-3 font-semibold text-left">Earnings</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="text-sm text-black">
+            {shows.map((show, index) => (
+              <tr 
+                key={index} 
+                className="odd:bg-white even:bg-[#F5F5F5] hover:bg-orange-50 transition-colors"
+              >
+                <td className="border border-gray-300 p-3 min-w-45 pl-5 font-medium">
+                  {show.movie.title}
+                </td>
+                <td className="border border-gray-300 p-3">
+                  {dateFormat(show.showDateTime)}
+                </td>
+                <td className="border border-gray-300 p-3 text-center">
+                  {Object.keys(show.occupiedSeats).length}
+                </td>
+                <td className="border border-gray-300 p-3 font-bold text-[#FF8C00]">
+                  {currency} {Object.keys(show.occupiedSeats).length * show.showPrice}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>): <Loading/>;
+  ) : (
+    <Loading />
+  );
 };
 
 export default ListMovies;
