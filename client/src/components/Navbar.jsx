@@ -1,40 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
-import {
-  MenuIcon,
-  SearchIcon,
-  XIcon,
-  Globe,
-} from "lucide-react";
+import { AppContent } from "../context/AppContext";
+import { SearchIcon } from "lucide-react";
+import axios from "axios";
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLangOpen, setIsLangOpen] = useState(false);
-  const user = null; // Thay bằng logic xác thực người dùng thực tế
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
+  const { userData, isLoggedIn, backendUrl, setIsLoggedIn, setUserData } =
+    useContext(AppContent);
+
+  const logout = async () => {
+    try {
+      axios.defaults.withCredentials = true;
+      const { data } = await axios.post(`${backendUrl}/api/auth/logout`);
+
+      if (data.success) {
+        setIsLoggedIn(false);
+        setUserData(null);
+        navigate("/");
       }
-    };
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const languages = [
-    { code: "en", name: "English" },
-    { code: "vi", name: "Vietnamese" },
-  ];
 
   return (
     <nav
@@ -46,22 +43,13 @@ const Navbar = () => {
     >
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo + Thanh tìm kiếm (desktop) + Menu (desktop) */}
+          {/* Left */}
           <div className="flex items-center space-x-8">
-            {/* Logo */}
-            <div className="shrink-0">
-              <Link to="/">
-                <img
-                  src={assets.logo}
-                  alt="Logo"
-                  className="h-8 w-auto sm:h-10"
-                  onClick={() => scrollTo(0, 0)}
-                />
-              </Link>
-            </div>
+            <Link to="/" onClick={() => scrollTo(0, 0)}>
+              <img src={assets.logo} alt="Logo" className="h-8 sm:h-10" />
+            </Link>
 
-            {/* Thanh tìm kiếm */}
-            <div className="hidden md:block flex-1 max-w-md">
+            <div className="hidden md:block max-w-md">
               <div className="relative">
                 <input
                   type="text"
@@ -72,151 +60,55 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* Menu desktop */}
-            <div className="hidden md:flex items-center space-x-8">
-              <Link
-                to="/movies"
-                className="text-gray-300 hover:text-white transition-colors"
-                onClick={() => scrollTo(0, 0)}
-              >
+            <div className="hidden md:flex space-x-8">
+              <Link to="/movies" className="text-gray-300 hover:text-white">
                 Movies
               </Link>
-              <Link
-                to="/theaters"
-                className="text-gray-300 hover:text-white transition-colors"
-                onClick={() => scrollTo(0, 0)}
-              >
+              <Link to="/theaters" className="text-gray-300 hover:text-white">
                 Theaters
               </Link>
             </div>
           </div>
 
+          {/* Right */}
           <div className="flex items-center space-x-4">
-            {/* Nút chuyển ngữ */}
-            <div className="relative">
-              <button
-                onClick={() => setIsLangOpen(!isLangOpen)}
-                className="flex items-center text-gray-300 hover:text-white focus:outline-none"
-              >
-                <Globe className="h-5 w-5" />
-              </button>
-
-              {isLangOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg z-50">
-                  <div className="py-1">
-                    {languages.map((lang) => (
-                      <button
-                        key={lang.code}
-                        className="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white"
-                        onClick={() => {
-                          // Xử lý chuyển ngữ ở đây
-                          setIsLangOpen(false);
-                        }}
-                      >
-                        {lang.name}
-                      </button>
-                    ))}
+            {isLoggedIn && userData ? (
+              <div className="relative group">
+                <div className="pb-2">
+                  <div className="h-9 w-9 rounded-full bg-pink-600 flex items-center justify-center text-white font-semibold cursor-pointer">
+                    {userData.name[0].toUpperCase()}
                   </div>
                 </div>
-              )}
-            </div>
 
-            {/* User/Avatar hoặc Login Button */}
-            {!user ? (
+                <div className="absolute hidden group-hover:block right-0 w-48 bg-white rounded-lg shadow-xl overflow-hidden">
+                  <ul>
+                    <li
+                      onClick={() => navigate("/my-bookings")}
+                      className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
+                    >
+                      My Bookings
+                    </li>
+
+                    <li
+                      onClick={logout}
+                      className="px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
+                    >
+                      Logout
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            ) : (
               <button
-                onClick={() => {navigate("/login"), scrollTo(0, 0)}}
-                className="px-4 py-2 text-gray-300 hover:text-white font-medium rounded-full transition-colors whitespace-nowrap"
+                onClick={() => navigate("/login")}
+                className="text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-yellow"
               >
                 Login
               </button>
-            ) : (
-              <button
-                onClick={() => navigate("/my-bookings")}
-                className="px-4 py-2 text-gray-300 hover:text-white font-medium rounded-full transition-colors whitespace-nowrap"
-              >
-                My Bookings
-              </button>
             )}
-
-            {/* Mobile menu button (chỉ hiện trên mobile) */}
-            <button
-              className="md:hidden text-gray-300 hover:text-white"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? (
-                <XIcon className="h-6 w-6" />
-              ) : (
-                <MenuIcon className="h-6 w-6" />
-              )}
-            </button>
           </div>
         </div>
       </div>
-
-      {/* Mobile Menu Overlay */}
-      {isMenuOpen && (
-        <div className="md:hidden fixed top-0 left-0 w-full h-screen bg-gray-900 z-40 pt-16">
-          <div className="px-4">
-            {/* Thanh tìm kiếm trong mobile menu */}
-            <div className="mb-6">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search movies..."
-                  className="w-full px-4 py-3 bg-gray-800 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                />
-                <SearchIcon className="absolute right-3 top-3.5 h-5 w-5 text-gray-400" />
-              </div>
-            </div>
-
-            {/* Menu links trong mobile */}
-            <div className="flex flex-col space-y-4">
-              <Link
-                to="/"
-                className="text-gray-300 hover:text-white text-lg py-2 transition-colors"
-                onClick={() => {
-                  scrollTo(0, 0);
-                  setIsMenuOpen(false);
-                }}
-              >
-                Home
-              </Link>
-              <Link
-                to="/movies"
-                className="text-gray-300 hover:text-white text-lg py-2 transition-colors"
-                onClick={() => {
-                  scrollTo(0, 0);
-                  setIsMenuOpen(false);
-                }}
-              >
-                Movies
-              </Link>
-              <Link
-                to="#"
-                className="text-gray-300 hover:text-white text-lg py-2 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Theaters
-              </Link>
-              <Link
-                to="/favorite"
-                className="text-gray-300 hover:text-white text-lg py-2 transition-colors"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Favorite
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Đóng dropdown ngôn ngữ khi click ra ngoài */}
-      {isLangOpen && (
-        <div
-          className="fixed inset-0 z-30"
-          onClick={() => setIsLangOpen(false)}
-        ></div>
-      )}
     </nav>
   );
 };

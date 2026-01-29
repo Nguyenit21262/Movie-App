@@ -1,6 +1,8 @@
 import React from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ChatButton from "./components/ChatButton";
@@ -20,22 +22,34 @@ import ListMovies from "./pages/admin/ListMovies";
 import ListBooking from "./pages/admin/ListBooking";
 import Login from "./pages/Login";
 import Register from "./pages/Resigter";
+import EmailVerify from "./pages/EmailVerify";
+import ResetPassword from "./pages/ResetPassword";
 const App = () => {
   const isAdminRoute = useLocation().pathname.startsWith("/admin");
   const isLoginRoute = useLocation().pathname === "/login";
-   const isRegisterRoute = useLocation().pathname === "/register";
+  const isRegisterRoute = useLocation().pathname === "/register";
+  const isEmailVerifyRoute = useLocation().pathname === "/email-verify";
+  const isResetPasswordRoute = useLocation().pathname === "/reset-password";
+
   return (
     <>
-      <Toaster />
-      {!isAdminRoute && !isLoginRoute && !isRegisterRoute && (
-        <>
-          <Navbar />
-          <ChatButton />
-        </>
-      )}
+      <ToastContainer position="top-right" autoClose={3000} theme="dark" />
+
+      {!isAdminRoute &&
+        !isLoginRoute &&
+        !isRegisterRoute &&
+        !isEmailVerifyRoute &&
+        !isResetPasswordRoute && (
+          <>
+            <Navbar />
+            <ChatButton />
+          </>
+        )}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/email-verify" element={<EmailVerify />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/register" element={<Register />} />
         <Route path="/movies" element={<Movies />} />
         <Route path="/movies/:id" element={<MovieDetails />} />
@@ -56,7 +70,11 @@ const App = () => {
           <Route path="list-bookings" element={<ListBooking />} />
         </Route>
       </Routes>
-      {!isAdminRoute && !isLoginRoute && !isRegisterRoute && <Footer />}
+      {!isAdminRoute &&
+        !isLoginRoute &&
+        !isRegisterRoute &&
+        !isEmailVerifyRoute &&
+        !isResetPasswordRoute && <Footer />}
     </>
   );
 };

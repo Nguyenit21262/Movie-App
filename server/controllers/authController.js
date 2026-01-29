@@ -83,6 +83,7 @@ export const login = async (req, res) => {
 
     return res.status(200).json({
       success: true,
+      isAccountVerified: user.isAccountVerified,
       message: "User logged in successfully",
     });
   } catch (error) {
@@ -297,5 +298,4 @@ export const resetPassword = async (req, res) => {
       message: "Server Error",
     });
   }
-  Z;
 };

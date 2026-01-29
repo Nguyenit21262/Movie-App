@@ -21,16 +21,16 @@ const MyBookings = () => {
     <div className="relative px-6 md:px-16 lg:px-40 pt-30 md:pt-40 min-h-[80vh]">
       <h1 className="text-lg font-semibold mb-4">My Bookings</h1>
 
-      {bookings.map((item) => {
+      {bookings.map((item, index) => {
         const { movie } = item.show;
 
         return (
           <div
-            key={item.id}
-             className="mx-auto max-w-3xl
-             flex flex-col md:flex-row justify-between
-             bg-yellow-500/10 border border-yellow-500/20
-             rounded-lg mt-4 p-4"
+            key={index}
+            className="mx-auto max-w-3xl
+      flex flex-col md:flex-row justify-between
+      bg-yellow-500/10 border border-yellow-500/20
+      rounded-lg mt-4 p-4"
           >
             {/* MOVIE INFO */}
             <div className="flex flex-col md:flex-row">
