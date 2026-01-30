@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 /**
  * Middleware xác thực người dùng dựa trên JWT Token từ Cookie.
  * Kiểm tra quyền truy cập trước khi cho phép vào các route yêu cầu đăng nhập.
- * * @param {Object} req - Express request object.
+ * @param {Object} req - Express request object.
  * @param {Object} res - Express response object.
  * @param {Function} next - Express next middleware function.
  */
@@ -26,8 +26,8 @@ const userAuth = (req, res, next) => {
     // 4. Nếu giải mã thành công và có thông tin ID người dùng
     if (tokenDecode.id) {
       /**
-       * Gán userId vào req.body để các controller tiếp theo (như verifyEmail, sendOtp)
-       * có thể sử dụng trực tiếp mà không cần client gửi lên, tăng tính bảo mật.
+       * Gán userId vào req để các controller tiếp theo có thể sử dụng
+       * trực tiếp mà không cần client gửi lên, tăng tính bảo mật.
        */
       req.userId = tokenDecode.id;
 
@@ -36,12 +36,13 @@ const userAuth = (req, res, next) => {
     } else {
       return res.status(401).json({
         success: false,
-        message: "Unauthorized: Invalid token payload. Login Again.",
+        message: "Unauthorized: Invalid token payload. Please login again.",
       });
     }
   } catch (error) {
-    console.error("JWT Verify Error:", error.name); // Sẽ in ra 'JsonWebTokenError' hoặc 'TokenExpiredError'
-    console.error("Chi tiết:", error.message); // Sẽ in ra lý do cụ thể
+    console.error("JWT Verify Error:", error.name);
+    console.error("Details:", error.message);
+
     // 5. Xử lý trường hợp token sai, hết hạn hoặc bị can thiệp
     return res.status(401).json({
       success: false,

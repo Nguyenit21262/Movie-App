@@ -2,21 +2,16 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-    },
+    name: { type: String, required: true },
 
     email: {
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
     },
 
-    password: {
-      type: String,
-      required: true,
-    },
+    password: { type: String, required: true },
 
     role: {
       type: String,
@@ -24,65 +19,24 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
 
-    // ===== Thông tin cá nhân =====
-    dateOfBirth: {
-      type: Date,
-      required: true,
-    },
+    //Profile
+    dateOfBirth: { type: Date, required: true },
+    currentCity: { type: String, required: true },
+    occupation: { type: String, required: true },
+    sex: { type: String, enum: ["male", "female", "other"] },
 
-    currentCity: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    //Email verify OTP
+    isAccountVerified: { type: Boolean, default: false },
+    verifyOtp: { type: String, default: "" },
+    verifyOtpExpireAt: { type: Number, default: 0 },
 
-    occupation: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    //Login 2FA OTP
+    loginOtp: { type: String, default: "" },
+    loginOtpExpireAt: { type: Number, default: 0 },
 
-    sex: {
-      type: String,
-      enum: ["male", "female", "other"],
-    },
-
-    // ===== Xác thực =====
-    verifyOtp: {
-      type: String,
-      default: "",
-    },
-
-    verifyOtpExpireAt: {
-      type: Number,
-      default: 0,
-    },
-
-    isAccountVerified: {
-      type: Boolean,
-      default: false,
-    },
-
-    resetOtp: {
-      type: String,
-      default: "",
-    },
-
-    resetOtpExpireAt: {
-      type: Number,
-      default: 0,
-    },
-
-    image: {
-      type: String,
-      default: "userImage.png",
-    },
+    image: { type: String, default: "userImage.png" },
   },
-  {
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
-const User = mongoose.models.user || mongoose.model("user", userSchema);
-
-export default User;
+export default mongoose.model("User", userSchema);

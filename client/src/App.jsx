@@ -24,6 +24,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Resigter";
 import EmailVerify from "./pages/EmailVerify";
 import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
 const App = () => {
   const isAdminRoute = useLocation().pathname.startsWith("/admin");
   const isLoginRoute = useLocation().pathname === "/login";
@@ -62,6 +63,7 @@ const App = () => {
         <Route path="/theaters/:id/:date" element={<SeatLayout />} />
         <Route path="/my-bookings" element={<MyBookings />} />
         <Route path="/favorite" element={<Favorite />} />
+        <Route path="/profile" element={<Profile />} />
 
         <Route path="/admin/*" element={<Layout />}>
           <Route index element={<DashBoard />} />

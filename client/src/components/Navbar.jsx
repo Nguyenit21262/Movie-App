@@ -83,6 +83,13 @@ const Navbar = () => {
                 <div className="absolute hidden group-hover:block right-0 w-48 bg-white rounded-lg shadow-xl overflow-hidden">
                   <ul>
                     <li
+                      onClick={() => navigate("/profile")}
+                      className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
+                    >
+                      Profile
+                    </li>
+
+                    <li
                       onClick={() => navigate("/my-bookings")}
                       className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
                     >

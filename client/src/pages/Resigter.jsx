@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 
 const Register = () => {
   const navigate = useNavigate();
-  const { backendUrl, setIsLoggedIn, getUserData } = useContext(AppContent);
+  const { backendUrl } = useContext(AppContent);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -24,11 +24,7 @@ const Register = () => {
       value = value.slice(0, 2) + "/" + value.slice(2);
     } else if (value.length > 4) {
       value =
-        value.slice(0, 2) +
-        "/" +
-        value.slice(2, 4) +
-        "/" +
-        value.slice(4, 8);
+        value.slice(0, 2) + "/" + value.slice(2, 4) + "/" + value.slice(4, 8);
     }
     setDateOfBirth(value);
   };
@@ -77,15 +73,13 @@ const Register = () => {
       });
 
       if (data.success) {
+        localStorage.setItem("verifyEmail", email);
         toast.update(loadingToast, {
           render: "Account created successfully! Please verify your email",
           type: "success",
           isLoading: false,
           autoClose: 3000,
         });
-
-        setIsLoggedIn(true);
-        await getUserData();
         navigate("/email-verify");
       } else {
         toast.update(loadingToast, {
