@@ -3,8 +3,8 @@ import {
   ChartLineIcon,
   CircleDollarSignIcon,
   PlayCircleIcon,
-  StarIcon,
   UsersIcon,
+  StarIcon,
 } from "lucide-react";
 
 import { dummyDashboardData } from "../../assets/assets";
@@ -29,43 +29,35 @@ const DashBoard = () => {
       title: "Total Bookings",
       value: dashboardData.totalBookings || "0",
       icon: ChartLineIcon,
-      bg: "bg-blue-500",
-
-      iconColor: "text-blue-800",
+      bg: "bg-blue-100",
+      iconColor: "text-blue-600",
     },
     {
       title: "Total Revenue",
       value: `${currency} ${dashboardData.totalRevenue || "0"}`,
       icon: CircleDollarSignIcon,
-      bg: "bg-green-500",
-
-      iconColor: "text-green-800",
+      bg: "bg-green-100",
+      iconColor: "text-green-600",
     },
     {
       title: "Active Shows",
       value: dashboardData.activeShows.length || "0",
       icon: PlayCircleIcon,
-      bg: "bg-purple-500",
-
-      iconColor: "text-purple-800",
+      bg: "bg-purple-100",
+      iconColor: "text-purple-600",
     },
     {
       title: "Total User",
       value: dashboardData.totalUser || "0",
       icon: UsersIcon,
-      bg: "bg-orange-500",
-
-      iconColor: "text-orange-800",
+      bg: "bg-orange-100",
+      iconColor: "text-orange-600",
     },
   ];
 
-  const fetchDashboardData = async () => {
+  useEffect(() => {
     setDashboardData(dummyDashboardData);
     setLoading(false);
-  };
-
-  useEffect(() => {
-    fetchDashboardData();
   }, []);
 
   if (loading) return <Loading />;
@@ -80,13 +72,12 @@ const DashBoard = () => {
           <div
             key={index}
             className={`flex items-center justify-between px-4 py-3
-              ${card.bg} ${card.border}
-              border rounded-md
-              hover:shadow-md transition`}
+              ${card.bg}
+              border border-gray-200 rounded-md`}
           >
             <div>
-              <h1 className="text-sm text-gray-700">{card.title}</h1>
-              <p className="text-xl font-semibold mt-1 text-gray-900">
+              <p className="text-sm text-gray-600">{card.title}</p>
+              <p className="text-xl font-semibold text-gray-900 mt-1">
                 {card.value}
               </p>
             </div>
@@ -95,43 +86,65 @@ const DashBoard = () => {
         ))}
       </div>
 
-      {/* ACTIVE MOVIES */}
-      <p className="mt-10 text-lg text-black font-medium">Active Movies</p>
+      {/* ACTIVE MOVIES TABLE */}
+      <p className="mt-10 text-lg font-semibold text-gray-900">
+        Active Movies
+      </p>
 
-      <div className="flex flex-wrap gap-4 mt-4 max-w-5xl">
-        {dashboardData.activeShows.map((show) => (
-          <div
-            key={show._id}
-            className="w-[220px]  overflow-hidden
-              bg-gray-800 border border-yellow/20
-              hover:-translate-y-1 transition duration-300"
-          >
-            <img
-              src={show.movie.poster_path}
-              alt={show.movie.title}
-              className="h-60 w-full object-cover"
-            />
+      <div className="mt-4 overflow-x-auto">
+        <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Movie
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Rating
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Show Time
+              </th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">
+                Price
+              </th>
+            </tr>
+          </thead>
 
-            <p className="font-medium p-2 truncate text-white">
-              {show.movie.title}
-            </p>
+          <tbody>
+            {dashboardData.activeShows.map((show) => (
+              <tr
+                key={show._id}
+                className="border-t hover:bg-gray-50 transition"
+              >
+                <td className="px-4 py-3 flex items-center gap-3">
+                  <img
+                    src={show.movie.poster_path}
+                    alt={show.movie.title}
+                    className="w-16 h-auto rounded"
+                  />
+                  <span className="font-medium text-gray-900">
+                    {show.movie.title}
+                  </span>
+                </td>
 
-            <div className="flex items-center justify-between px-2">
-              <p className="text-lg font-medium text-yellow">
-                {currency} {show.showPrice}
-              </p>
+                <td className="px-4 py-3 text-gray-800">
+                  <div className="flex items-center gap-1">
+                    <StarIcon className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                    {show.movie.vote_average.toFixed(1)}
+                  </div>
+                </td>
 
-              <p className="flex items-center gap-1 text-sm text-white">
-                <StarIcon className="w-4 h-4 text-yellow fill-yellow" />
-                {show.movie.vote_average.toFixed(1)}
-              </p>
-            </div>
+                <td className="px-4 py-3 text-gray-700">
+                  {dateFormat(show.showDateTime)}
+                </td>
 
-            <div className="px-2 pt-2 pb-3 text-sm text-gray-300">
-              {dateFormat(show.showDateTime)}
-            </div>
-          </div>
-        ))}
+                <td className="px-4 py-3 font-semibold text-gray-900">
+                  {currency} {show.showPrice || show.price || 0}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </>
   );

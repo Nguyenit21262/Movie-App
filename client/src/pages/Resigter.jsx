@@ -13,13 +13,44 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [sex, setSex] = useState("");
+  const [currentCity, setCurrentCity] = useState("");
+  const [occupation, setOccupation] = useState("");
+
+  const handleDobChange = (e) => {
+    let value = e.target.value.replace(/[^\d]/g, "");
+    if (value.length >= 3 && value.length <= 4) {
+      value = value.slice(0, 2) + "/" + value.slice(2);
+    } else if (value.length > 4) {
+      value =
+        value.slice(0, 2) +
+        "/" +
+        value.slice(2, 4) +
+        "/" +
+        value.slice(4, 8);
+    }
+    setDateOfBirth(value);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Kiểm tra dữ liệu đầu vào
-    if (!name || !email || !password || !confirmPassword) {
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !confirmPassword ||
+      !dateOfBirth ||
+      !currentCity ||
+      !occupation ||
+      !sex
+    ) {
       return toast.error("Please fill in all required fields");
+    }
+
+    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(dateOfBirth)) {
+      return toast.error("Date of birth must be in DD/MM/YYYY format");
     }
 
     if (password.length < 6) {
@@ -35,11 +66,14 @@ const Register = () => {
     try {
       axios.defaults.withCredentials = true;
 
-      // Gửi request đăng ký
       const { data } = await axios.post(`${backendUrl}/api/auth/register`, {
         name,
         email,
         password,
+        dateOfBirth,
+        currentCity,
+        occupation,
+        sex,
       });
 
       if (data.success) {
@@ -52,8 +86,6 @@ const Register = () => {
 
         setIsLoggedIn(true);
         await getUserData();
-
-        // Điều hướng sang trang xác thực email
         navigate("/email-verify");
       } else {
         toast.update(loadingToast, {
@@ -77,7 +109,6 @@ const Register = () => {
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-black">
-      {/* BACKGROUND IMAGE */}
       <img
         src="image.png"
         alt="cinema-bg"
@@ -86,7 +117,6 @@ const Register = () => {
 
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/40 backdrop-blur-[2px]" />
 
-      {/* LOGO */}
       <div className="absolute top-6 left-6 z-20 flex items-center">
         <img src={assets.logo} alt="Cinema Logo" className="h-12 w-auto" />
       </div>
@@ -94,51 +124,86 @@ const Register = () => {
       <div className="relative z-10 flex items-center justify-center h-full">
         <form
           onSubmit={handleSubmit}
-          className="md:w-[400px] w-[320px] bg-black/75 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-10 shadow-[0_0_60px_rgba(99,102,241,0.2)] flex flex-col items-center"
+          className="md:w-[700px] w-[340px] bg-black/75 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-10 shadow-[0_0_60px_rgba(99,102,241,0.2)] flex flex-col items-center"
         >
           <h2 className="text-4xl font-bold text-white tracking-wide">
             Sign up
           </h2>
-          <p className="text-sm text-gray-400 mt-3 text-center">
-            Create your cinema account to start watching
-          </p>
 
-          <div className="w-full mt-8 flex flex-col gap-4">
-            {/* Full Name */}
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
-            />
+          <div className="w-full mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-4">
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+              />
 
-            {/* Email */}
-            <input
-              type="email"
-              placeholder="Email Address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
-            />
+              <input
+                type="email"
+                placeholder="Email Address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+              />
 
-            {/* Password */}
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
-            />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+              />
 
-            {/* Confirm Password */}
-            <input
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
-            />
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+              />
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <input
+                type="text"
+                placeholder="Date of Birth (DD/MM/YYYY)"
+                value={dateOfBirth}
+                onChange={handleDobChange}
+                maxLength={10}
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+              />
+
+              <select
+                value={sex}
+                onChange={(e) => setSex(e.target.value)}
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-300 focus:border-indigo-500 outline-none transition-all appearance-none"
+              >
+                <option value="" disabled>
+                  Select Sex
+                </option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+
+              <input
+                type="text"
+                placeholder="Current City"
+                value={currentCity}
+                onChange={(e) => setCurrentCity(e.target.value)}
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+              />
+
+              <input
+                type="text"
+                placeholder="Occupation"
+                value={occupation}
+                onChange={(e) => setOccupation(e.target.value)}
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+              />
+            </div>
           </div>
 
           <button

@@ -31,9 +31,9 @@ const DataSelect = ({ dateTime, id }) => {
   };
 
   return (
-    <div className="pt-30 ">
+    <div className="pt-30 bg-black">
       {/* DATE SELECT */}
-      <div className=" p-8 bg-yellow-500/10 border border-white/10 rounded-xl">
+      <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-xl">
         <h3 className="flex items-center justify-center text-2xl font-bold text-white mb-4">
           Select Date & Time
         </h3>
@@ -46,10 +46,10 @@ const DataSelect = ({ dateTime, id }) => {
                 setSelectedDate(date);
                 setSelectedShowtime(null);
               }}
-              className={`min-w-[70px] p-3 rounded-xl ${
+              className={`min-w-[70px] p-3 rounded-xl transition ${
                 selectedDate === date
                   ? "bg-yellow-500 text-black"
-                  : "bg-white/5 text-white"
+                  : "bg-zinc-800 text-gray-200 hover:bg-zinc-700"
               }`}
             >
               <div className="text-lg font-bold">
@@ -68,7 +68,7 @@ const DataSelect = ({ dateTime, id }) => {
         {selectedDate && (
           <div
             ref={showtimesRef}
-            className="mt-8 border-t border-white/10 pt-6"
+            className="mt-8 border-t border-zinc-800 pt-6"
           >
             <p className="text-gray-400 mb-4">
               {showtimes.length} showtimes available
@@ -81,15 +81,17 @@ const DataSelect = ({ dateTime, id }) => {
                   <div
                     key={st.id}
                     onClick={() => setSelectedShowtime(st)}
-                    className={`p-4 rounded-xl cursor-pointer border ${
+                    className={`p-4 rounded-xl cursor-pointer border transition ${
                       selectedShowtime?.id === st.id
                         ? "border-yellow-500 bg-yellow-500/10"
-                        : "border-white/10 bg-white/5"
+                        : "border-zinc-700 bg-zinc-800/60 hover:bg-zinc-700/60"
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <Clock className="w-4 h-4 text-yellow-500" />
-                      <span className="text-xl font-bold">{time(st.time)}</span>
+                      <span className="text-xl font-bold text-gray-100">
+                        {time(st.time)}
+                      </span>
                     </div>
 
                     <div className="text-sm text-gray-300 flex items-center gap-2">
@@ -110,10 +112,10 @@ const DataSelect = ({ dateTime, id }) => {
               <button
                 onClick={onBook}
                 disabled={!selectedShowtime}
-                className={`w-full md:w-auto px-8 py-3 rounded-xl font-bold ${
+                className={`w-full md:w-auto px-8 py-3 rounded-xl font-bold transition ${
                   selectedShowtime
-                    ? "bg-yellow-500 text-black"
-                    : "bg-gray-700 text-gray-400"
+                    ? "bg-yellow-500 text-black hover:bg-yellow-400"
+                    : "bg-zinc-700 text-gray-400 cursor-not-allowed"
                 }`}
               >
                 {selectedShowtime
