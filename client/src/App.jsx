@@ -31,6 +31,7 @@ const App = () => {
   const isRegisterRoute = useLocation().pathname === "/register";
   const isEmailVerifyRoute = useLocation().pathname === "/email-verify";
   const isResetPasswordRoute = useLocation().pathname === "/reset-password";
+  const isProfileRoute = useLocation().pathname === "/profile";
 
   return (
     <>
@@ -53,7 +54,7 @@ const App = () => {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/register" element={<Register />} />
         <Route path="/movies" element={<Movies />} />
-        <Route path="/movies/:id" element={<MovieDetails />} />
+        <Route path="/movies/tmdb/:id" element={<MovieDetails />} />
         <Route path="/theaters" element={<Theaters />} />
 
         <Route path="/theaters/:id" element={<TheatersDetail />}>
@@ -76,7 +77,8 @@ const App = () => {
         !isLoginRoute &&
         !isRegisterRoute &&
         !isEmailVerifyRoute &&
-        !isResetPasswordRoute && <Footer />}
+        !isResetPasswordRoute &&
+        !isProfileRoute && <Footer />}
     </>
   );
 };

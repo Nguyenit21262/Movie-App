@@ -155,7 +155,7 @@ const ResetPassword = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
             </div>
 
@@ -197,7 +197,7 @@ const ResetPassword = () => {
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 maxLength={6}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 text-center placeholder-gray-500 focus:border-indigo-500 outline-none transition-all tracking-widest"
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 text-center placeholder-gray-500 focus:border-white outline-none transition-all tracking-widest"
               />
 
               <input
@@ -205,7 +205,7 @@ const ResetPassword = () => {
                 placeholder="New Password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
 
               <input
@@ -213,7 +213,7 @@ const ResetPassword = () => {
                 placeholder="Confirm New Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
             </div>
 

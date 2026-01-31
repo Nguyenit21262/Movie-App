@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { dummyDateTimeData, dummyShowsData } from "../assets/assets";
-import { useEffect } from "react";
+import axios from "axios";
 import {
   ArrowRight,
   Heart,
@@ -10,119 +9,146 @@ import {
   Tag,
   MessageCircle,
 } from "lucide-react";
+
 import timeFormat from "../lib/timeFormat";
 import MovieCard from "../components/MovieCard";
 import Loading from "../components/Loading";
 import TrailersSection from "../components/TrailersSection";
 import MovieReview from "../components/MovieReview";
+import { getTMDBPosterUrl, getTMDBBackdropUrl } from "../lib/tmdbConfig";
+import { AppContent } from "../context/AppContext"; // Fixed: AppContext not AppContent
 
 const MovieDetails = () => {
+  const { backendUrl } = useContext(AppContent);
+  const { id } = useParams(); // TMDB ID
   const navigate = useNavigate();
-  const { id } = useParams();
-  const [show, setShow] = useState(null);
+  
+  const [movie, setMovie] = useState(null);
+  const [credits, setCredits] = useState(null);
+  const [videos, setVideos] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const getShow = async () => {
-    const show = dummyShowsData.find((show) => show._id === id);
-    if (show) {
-      setShow({
-        movie: show,
-        dateTime: dummyDateTimeData,
-      });
+  const fetchMovieDetails = async () => {
+    try {
+      setLoading(true);
+      
+      const res = await axios.get(`${backendUrl}/api/movies/tmdb/${id}`);
+
+      console.log("Movie Details Response:", res.data);
+
+      if (res.data.success) {
+        setMovie(res.data.movie);
+        setCredits(res.data.credits);
+        setVideos(res.data.videos || []);
+        setRecommendations(res.data.recommendations || []);
+      }
+      
+      setLoading(false);
+    } catch (error) {
+      console.error("Fetch movie detail error:", error);
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    getShow();
-  }, [id]);
+    if (id && backendUrl) {
+      fetchMovieDetails();
+      window.scrollTo(0, 0);
+    }
+  }, [id, backendUrl]);
 
-  return show ? (
-    <div className=" bg-black">
-      {/* Phần thông tin phim có background */}
+  if (loading || !movie) return <Loading />;
+
+  return (
+    <div className="bg-black min-h-screen">
+      {/* ===== HERO SECTION ===== */}
       <div className="relative">
-        {/* Background chỉ cho phần này */}
         <div className="absolute inset-0 z-0">
           <img
-            src={show.movie.backdrop_path || show.movie.poster_path}
-            alt="Movie Background"
+            src={getTMDBBackdropUrl(movie.backdrop_path, "original")}
+            alt={movie.title}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              e.target.src = getTMDBPosterUrl(movie.poster_path, "original");
+            }}
           />
-          {/* Gradient overlay - mờ dần từ trên xuống */}
-          <div className="absolute inset-0 bg-linear-to-b from-transparent via-black/50 to-black"></div>
-          {/* Lớp overlay thêm độ mờ */}
-          <div className="absolute inset-0 bg-black/30"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/60 to-black" />
+          <div className="absolute inset-0 bg-black/30" />
         </div>
 
-        {/* Nội dung thông tin phim */}
-        <div className="relative z-10 px-8 md:px-16 lg:px-36 pt-24 md:pt-36 lg:pt-44">
-          <div className="flex flex-col md:flex-row gap-8 max-w-6xl mx-auto">
-            {/* hình ảnh bộ phim */}
-            <div className="relative group">
-              <img
-                src={show.movie.poster_path}
-                alt=""
-                className="max-md:mx-auto rounded-xl h-[440px] w-[300px] object-cover shadow-2xl"
-              />
-            </div>
+        <div className="relative z-10 px-8 md:px-16 lg:px-36 pt-28 lg:pt-44 pb-20">
+          <div className="flex flex-col md:flex-row gap-10 max-w-6xl mx-auto">
+            {/* Poster */}
+            <img
+              src={getTMDBPosterUrl(movie.poster_path, "w500")}
+              alt={movie.title}
+              className="rounded-lg h-[440px] w-[300px] object-cover shadow-2xl mx-auto md:mx-0"
+              onError={(e) => {
+                e.target.src = "https://via.placeholder.com/300x440/1a1a1a/ffffff?text=No+Image";
+              }}
+            />
 
-            <div className="relative flex flex-col gap-3">
-              <div className="inline-flex items-center gap-2">
-                <span className="px-3 py-1 bg-white/10 backdrop-blur-sm rounded-full text-sm border border-white/20">
-                  English
-                </span>
-                <span className="px-3 py-1 bg-yellow/20 backdrop-blur-sm rounded-full text-sm border border-yellow/30">
-                  HD
-                </span>
-              </div>
-
-              <h1 className="text-4xl md:text-5xl font-bold max-w-96 text-balance bg-linear-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                {show.movie.title}
+            {/* Info */}
+            <div className="flex flex-col gap-4">
+              <h1 className="text-4xl md:text-5xl font-bold text-white">
+                {movie.title}
               </h1>
 
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-sm rounded-full">
-                  <StarIcon className="w-5 h-5 text-yellow fill-yellow" />
-                  <span className="font-medium">
-                    {show.movie.vote_average.toFixed(1)}
+              {movie.tagline && (
+                <p className="text-xl text-gray-300 italic">"{movie.tagline}"</p>
+              )}
+
+              <div className="flex items-center gap-3 text-gray-300">
+                <div className="flex items-center gap-1">
+                  <StarIcon className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                  <span className="font-semibold">
+                    {(movie.vote_average/2).toFixed(1)}
                   </span>
                 </div>
-                <span className="text-gray-400">•</span>
-                <span className="text-gray-300">
-                  {timeFormat(show.movie.runtime)}
-                </span>
-                <span className="text-gray-400">•</span>
-                <span className="text-gray-300">
-                  {show.movie.release_date.split("-")[0]}
-                </span>
+                <span>•</span>
+                {movie.runtime > 0 && (
+                  <>
+                    <span>{timeFormat(movie.runtime)}</span>
+                    <span>•</span>
+                  </>
+                )}
+                {movie.release_date && (
+                  <span>{new Date(movie.release_date).getFullYear()}</span>
+                )}
               </div>
 
-              <div className="flex items-center gap-2 text-sm text-gray-300 mt-2">
-                <Tag className="w-4 h-4 text-gray-400" />
-                <span>{show.movie.genres.map((g) => g.name).join(", ")}</span>
-              </div>
+              {movie.genres && movie.genres.length > 0 && (
+                <div className="flex items-center gap-2 text-sm text-gray-300">
+                  <Tag className="w-4 h-4" />
+                  <span>
+                    {movie.genres.map((g) => g.name || g).join(", ")}
+                  </span>
+                </div>
+              )}
 
-              <p className="text-gray-300 mt-6 text-[15px] md:text-base leading-7 max-w-2xl ">
-                {show.movie.overview}
+              <p className="text-gray-300 mt-4 leading-7 max-w-2xl">
+                {movie.overview}
               </p>
 
-              <div className="flex items-center flex-wrap gap-4 mt-6">
+              <div className="flex gap-4 mt-6">
                 <a
                   href="#trailer"
-                  className="flex items-center gap-3 px-7 py-3 text-sm bg-yellow hover:from-yellow-dark hover:to-yellow transition-all rounded-lg font-semibold cursor-pointer active:scale-95 shadow-lg shadow-yellow/20"
+                  className="flex items-center gap-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 rounded-lg font-semibold text-black transition"
                 >
-                  {" "}
                   <PlayCircleIcon className="w-5 h-5" />
-                  Play Movie
+                  Watch Trailer
                 </a>
 
-                <button className="p-3 bg-linear-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 transition-all rounded-full cursor-pointer active:scale-95 shadow-lg border border-white/10">
-                  <Heart className="w-5 h-5" />
+                <button className="p-3 bg-gray-800 hover:bg-gray-700 rounded-full transition">
+                  <Heart className="text-white" />
                 </button>
-                <a
-                  href="#comment"
-                  className="p-3 bg-linear-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 transition-all rounded-full cursor-pointer active:scale-95 shadow-lg border border-white/10"
+
+                <a 
+                  href="#comment" 
+                  className="p-3 bg-gray-800 hover:bg-gray-700 rounded-full transition"
                 >
-                  {" "}
-                  <MessageCircle className="w-5 h-5" />
+                  <MessageCircle className="text-white" />
                 </a>
               </div>
             </div>
@@ -130,69 +156,67 @@ const MovieDetails = () => {
         </div>
       </div>
 
-      {/* Phần từ cast trở xuống có background đen */}
-      <div className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mt-2 overflow-hidden">
-        {/* các diễn viên */}
-        <div className="max-w-6xl mx-auto">
-          <p className="text-lg font-semibold mt-24 mb-2">Cast</p>
-          <div className="overflow-x-auto scrollbar-none mt-6 pb-6">
-            <div className="flex items-center gap-5 w-max px-4">
-              {show.movie.casts.slice(0, 11).map((cast, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center text-center"
-                >
-                  <img
-                    src={cast.profile_path}
-                    alt=""
-                    className="rounded-full h-20 md:h-20 aspect-square object-cover"
-                  />
-                  <p className="font-medium text-xs mt-3">{cast.name}</p>
-                </div>
-              ))}
-            </div>
+      {/* ===== CAST ===== */}
+      {credits && credits.cast && credits.cast.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 mt-24">
+          <p className="text-lg font-semibold mb-6 text-white">Cast</p>
+          <div className="flex gap-5 overflow-x-auto pb-6 scrollbar-none">
+            {credits.cast.slice(0, 10).map((cast, index) => (
+              <div key={cast.id || index} className="text-center min-w-[120px]">
+                <img
+                  src={
+                    cast.profile_path
+                      ? getTMDBPosterUrl(cast.profile_path, "w185")
+                      : "https://via.placeholder.com/80x80/1a1a1a/ffffff?text=No+Image"
+                  }
+                  alt={cast.name}
+                  className="rounded-full h-20 w-20 object-cover mx-auto"
+                  onError={(e) => {
+                    e.target.src = "https://via.placeholder.com/80x80/1a1a1a/ffffff?text=No+Image";
+                  }}
+                />
+                <p className="text-xs mt-2 text-white font-medium">{cast.name}</p>
+                <p className="text-xs text-gray-400">{cast.character}</p>
+              </div>
+            ))}
           </div>
         </div>
+      )}
 
-        <TrailersSection id="trailerMovie"/>
+      {/* ===== TRAILERS ===== */}
+      <TrailersSection videos={videos} movieTitle={movie.title} />
 
-        {/* You May Also Like Section */}
-        <div className="max-w-6xl mx-auto mb-10">
-          <div className="relative flex items-center justify-between pt-20 pb-10">
-            <p className="text-gray-300 font-medium text-lg">
-              You May Also Like
-            </p>
+      {/* ===== RECOMMENDATIONS ===== */}
+      {recommendations && recommendations.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 mt-20 mb-16">
+          <div className="flex justify-between items-center mb-8">
+            <p className="text-lg text-white font-semibold">You May Also Like</p>
             <button
-              onClick={() => {
-                navigate("/movies");
-                scrollTo(0, 0);
-              }}
-              className="group flex items-center gap-2 text-sm text-gray-300"
+              onClick={() => navigate("/movies")}
+              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition"
             >
-              View All{" "}
-              <ArrowRight className="group-hover:translate-x-0.5 transition w-4.5 h-4.5" />
+              View All <ArrowRight className="w-4 h-4" />
             </button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6 justify-center">
-            {dummyShowsData.slice(0, 5).map((show) => (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+            {recommendations.slice(0, 5).map((m) => (
               <MovieCard
-                key={show._id}
-                movie={show}
+                key={m.id}
+                movie={m}
                 onClick={() => {
-                  navigate(`/movies/${show._id}`);
-                  scrollTo(0, 0);
+                  navigate(`/movies/tmdb/${m.id}`);
+                  window.scrollTo(0, 0);
                 }}
               />
             ))}
           </div>
         </div>
+      )}
 
-        <MovieReview />
-      </div>
+      {/* ===== REVIEWS ===== */}
+      <MovieReview movieId={id} />
     </div>
-  ) : (
-    <Loading />
   );
 };
 

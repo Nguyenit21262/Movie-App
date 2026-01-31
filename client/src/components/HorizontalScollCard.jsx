@@ -13,9 +13,19 @@ const HorizontalScollCard = ({
   const handleNext = () => {
     contaierRef.current.scrollLeft += 245;
   };
+  
   const handlePrevious = () => {
     contaierRef.current.scrollLeft -= 245;
   };
+
+  // Add console logging to debug
+  console.log(`${heading} - Data:`, data);
+
+  // Check if data is valid
+  if (!Array.isArray(data)) {
+    console.error(`${heading} - Data is not an array:`, data);
+    return null;
+  }
 
   return (
     <section className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mt-2">
@@ -37,33 +47,48 @@ const HorizontalScollCard = ({
             scroll-smooth
           "
         >
-          {data.map((item, index) => (
-            <MovieCard
-              key={item.id || item._id || index}
-              movie={item}
-              media_type={media_type}
-              onClick={() => onItemClick?.(item)}
-            />
-          ))}
+          {data.length > 0 ? (
+            data.map((item, index) => {
+              // Skip if item is undefined or null
+              if (!item) {
+                console.warn(`${heading} - Item at index ${index} is undefined`);
+                return null;
+              }
+
+              return (
+                <MovieCard
+                  key={item.id || item._id || index}
+                  movie={item}
+                  media_type={media_type}
+                  onClick={() => onItemClick?.(item)}
+                />
+              );
+            })
+          ) : (
+            <div className="text-gray-400 py-8">No movies available</div>
+          )}
         </div>
 
-        <div className="absolute inset-0 hidden lg:flex items-center justify-between pointer-events-none">
-          <button
-            onClick={handlePrevious}
-            className="pointer-events-auto bg-white p-1 text-black rounded-full -ml-2 shadow"
-            aria-label="Scroll left"
-          >
-            <ChevronLeft size={20} />
-          </button>
+        {/* Navigation Buttons */}
+        {data.length > 0 && (
+          <div className="absolute inset-0 hidden lg:flex items-center justify-between pointer-events-none">
+            <button
+              onClick={handlePrevious}
+              className="pointer-events-auto bg-white p-1 text-black rounded-full -ml-2 shadow hover:bg-gray-200 transition"
+              aria-label="Scroll left"
+            >
+              <ChevronLeft size={20} />
+            </button>
 
-          <button
-            onClick={handleNext}
-            className="pointer-events-auto bg-white p-1 text-black rounded-full -mr-2 shadow"
-            aria-label="Scroll right"
-          >
-            <ChevronRight size={20} />
-          </button>
-        </div>
+            <button
+              onClick={handleNext}
+              className="pointer-events-auto bg-white p-1 text-black rounded-full -mr-2 shadow hover:bg-gray-200 transition"
+              aria-label="Scroll right"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

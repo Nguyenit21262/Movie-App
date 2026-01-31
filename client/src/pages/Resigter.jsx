@@ -131,7 +131,7 @@ const Register = () => {
                 placeholder="Full Name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
 
               <input
@@ -139,7 +139,7 @@ const Register = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
 
               <input
@@ -147,7 +147,7 @@ const Register = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
 
               <input
@@ -155,7 +155,7 @@ const Register = () => {
                 placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
             </div>
 
@@ -166,13 +166,13 @@ const Register = () => {
                 value={dateOfBirth}
                 onChange={handleDobChange}
                 maxLength={10}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
 
               <select
                 value={sex}
                 onChange={(e) => setSex(e.target.value)}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-300 focus:border-indigo-500 outline-none transition-all appearance-none"
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-300 focus:border-white outline-none transition-all appearance-none"
               >
                 <option value="" disabled>
                   Select Sex
@@ -187,7 +187,7 @@ const Register = () => {
                 placeholder="Current City"
                 value={currentCity}
                 onChange={(e) => setCurrentCity(e.target.value)}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
 
               <input
@@ -195,7 +195,7 @@ const Register = () => {
                 placeholder="Occupation"
                 value={occupation}
                 onChange={(e) => setOccupation(e.target.value)}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-indigo-500 outline-none transition-all"
+                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
             </div>
           </div>
