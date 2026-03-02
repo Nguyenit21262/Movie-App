@@ -28,9 +28,6 @@ export const importMoviesFromTMDB = async (req, res) => {
         case "upcoming":
           tmdbMovies = await TMDBService.getUpcomingMovies(page);
           break;
-        case "top_rated":
-          tmdbMovies = await TMDBService.getTopRatedMovies(page);
-          break;
         default:
           tmdbMovies = await TMDBService.getPopularMovies(page);
       }
@@ -82,17 +79,28 @@ export const importMoviesFromTMDB = async (req, res) => {
 };
 
 /**
- * Get all movies from database
+ * Get all movies from database with genre filtering
  */
 export const getAllMovies = async (req, res) => {
   try {
-    const { page = 1, limit = 20, sort = "-release_date", search } = req.query;
+    const { 
+      page = 1, 
+      limit = 20, 
+      sort = "-release_date", 
+      search,
+      genre 
+    } = req.query;
 
     const query = {};
 
     // Add search filter if provided
     if (search) {
       query.$text = { $search: search };
+    }
+
+    // Add genre filter if provided
+    if (genre && genre !== "all") {
+      query.genres = genre;
     }
 
     const movies = await Movie.find(query)
@@ -115,6 +123,41 @@ export const getAllMovies = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch movies",
+    });
+  }
+};
+
+/**
+ * Get genre statistics from database
+ */
+export const getGenreStats = async (req, res) => {
+  try {
+    const genreStats = await Movie.aggregate([
+      // Unwind genres array to get individual genres
+      { $unwind: "$genres" },
+      // Group by genre and count
+      {
+        $group: {
+          _id: "$genres",
+          count: { $sum: 1 }
+        }
+      },
+      // Sort by count descending
+      { $sort: { count: -1 } }
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      genres: genreStats.map(g => ({
+        name: g._id,
+        count: g.count
+      }))
+    });
+  } catch (error) {
+    console.error("Get genre stats error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch genre statistics",
     });
   }
 };
@@ -317,7 +360,7 @@ export const deleteMovie = async (req, res) => {
 };
 
 /**
- * Get popular movies from TMDB (real-time)
+ * Get top rated movies from TMDB (real-time)
  */
 export const getTopRatedMovies = async (req, res) => {
   try {
@@ -339,6 +382,9 @@ export const getTopRatedMovies = async (req, res) => {
   }
 };
 
+/**
+ * Get popular movies from TMDB (real-time)
+ */
 export const getTMDBPopular = async (req, res) => {
   try {
     const { page = 1 } = req.query;
@@ -406,16 +452,17 @@ export const getTMDBUpcoming = async (req, res) => {
 };
 
 /**
- * Get movie details from TMDB with credits
+ * Get movie details from TMDB with credits, videos, and recommendations
  */
 export const getTMDBMovieDetails = async (req, res) => {
   try {
     const { tmdbId } = req.params;
 
-    const [details, credits, videos] = await Promise.all([
+    const [details, credits, videos, recommendations] = await Promise.all([
       TMDBService.getMovieDetails(tmdbId),
       TMDBService.getMovieCredits(tmdbId),
       TMDBService.getMovieVideos(tmdbId),
+      TMDBService.getRecommendations(tmdbId),
     ]);
 
     return res.status(200).json({
@@ -423,6 +470,7 @@ export const getTMDBMovieDetails = async (req, res) => {
       movie: details,
       credits,
       videos: videos.results,
+      recommendations: recommendations.results,
     });
   } catch (error) {
     console.error("Get TMDB movie details error:", error);

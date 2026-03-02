@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import {
   ArrowRight,
   Heart,
@@ -10,197 +9,143 @@ import {
   MessageCircle,
 } from "lucide-react";
 
+import { AppContent } from "../context/AppContext";
+import { useMovieDetails } from "../hooks/useMovieDetails";
+import { getTMDBPosterUrl, getTMDBBackdropUrl } from "../lib/tmdb/tmdbConfig";
 import timeFormat from "../lib/timeFormat";
 import MovieCard from "../components/MovieCard";
-import Loading from "../components/Loading";
 import TrailersSection from "../components/TrailersSection";
 import MovieReview from "../components/MovieReview";
-import { getTMDBPosterUrl, getTMDBBackdropUrl } from "../lib/tmdbConfig";
-import { AppContent } from "../context/AppContext"; // Fixed: AppContext not AppContent
+import Loading from "../components/Loading";
 
 const MovieDetails = () => {
   const { backendUrl } = useContext(AppContent);
-  const { id } = useParams(); // TMDB ID
+  const { id } = useParams();
   const navigate = useNavigate();
-  
-  const [movie, setMovie] = useState(null);
-  const [credits, setCredits] = useState(null);
-  const [videos, setVideos] = useState([]);
-  const [recommendations, setRecommendations] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  const fetchMovieDetails = async () => {
-    try {
-      setLoading(true);
-      
-      const res = await axios.get(`${backendUrl}/api/movies/tmdb/${id}`);
+  const {
+    movie,
+    credits,
+    videos,
+    recommendations,
+    loading,
+  } = useMovieDetails(backendUrl, id);
 
-      console.log("Movie Details Response:", res.data);
+  const rating = useMemo(
+    () => movie?.vote_average ? (movie.vote_average / 2).toFixed(1) : null,
+    [movie]
+  );
 
-      if (res.data.success) {
-        setMovie(res.data.movie);
-        setCredits(res.data.credits);
-        setVideos(res.data.videos || []);
-        setRecommendations(res.data.recommendations || []);
-      }
-      
-      setLoading(false);
-    } catch (error) {
-      console.error("Fetch movie detail error:", error);
-      setLoading(false);
-    }
-  };
+  const castList = useMemo(
+    () => credits?.cast?.slice(0, 10) ?? [],
+    [credits]
+  );
 
-  useEffect(() => {
-    if (id && backendUrl) {
-      fetchMovieDetails();
-      window.scrollTo(0, 0);
-    }
-  }, [id, backendUrl]);
+  const recsList = useMemo(
+    () => recommendations.slice(0, 5),
+    [recommendations]
+  );
 
-  if (loading || !movie) return <Loading />;
+  if (loading) return <Loading />;
+  if (!movie) return null;
 
   return (
-    <div className="bg-black min-h-screen">
-      {/* ===== HERO SECTION ===== */}
+    <div className="bg-neutral-900 min-h-screen">
+      {/* HERO */}
       <div className="relative">
-        <div className="absolute inset-0 z-0">
+        <img
+          src={getTMDBBackdropUrl(movie.backdrop_path, "original")}
+          alt={movie.title}
+          className="w-full h-[600px] object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/50 to-transparent" />
+
+        <div className="absolute bottom-0 px-16 pb-20 flex gap-10">
           <img
-            src={getTMDBBackdropUrl(movie.backdrop_path, "original")}
-            alt={movie.title}
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              e.target.src = getTMDBPosterUrl(movie.poster_path, "original");
-            }}
+            src={getTMDBPosterUrl(movie.poster_path, "w500")}
+            className="w-[280px] rounded-xl shadow-2xl"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/60 to-black" />
-          <div className="absolute inset-0 bg-black/30" />
-        </div>
 
-        <div className="relative z-10 px-8 md:px-16 lg:px-36 pt-28 lg:pt-44 pb-20">
-          <div className="flex flex-col md:flex-row gap-10 max-w-6xl mx-auto">
-            {/* Poster */}
-            <img
-              src={getTMDBPosterUrl(movie.poster_path, "w500")}
-              alt={movie.title}
-              className="rounded-lg h-[440px] w-[300px] object-cover shadow-2xl mx-auto md:mx-0"
-              onError={(e) => {
-                e.target.src = "https://via.placeholder.com/300x440/1a1a1a/ffffff?text=No+Image";
-              }}
-            />
+          <div className="max-w-2xl">
+            <h1 className="text-5xl font-bold text-white">{movie.title}</h1>
 
-            {/* Info */}
-            <div className="flex flex-col gap-4">
-              <h1 className="text-4xl md:text-5xl font-bold text-white">
-                {movie.title}
-              </h1>
-
-              {movie.tagline && (
-                <p className="text-xl text-gray-300 italic">"{movie.tagline}"</p>
+            <div className="flex items-center gap-4 text-gray-300 mt-4">
+              {rating && (
+                <span className="flex items-center gap-1">
+                  <StarIcon className="text-yellow-400 fill-yellow-400" />
+                  {rating}
+                </span>
               )}
-
-              <div className="flex items-center gap-3 text-gray-300">
-                <div className="flex items-center gap-1">
-                  <StarIcon className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-                  <span className="font-semibold">
-                    {(movie.vote_average/2).toFixed(1)}
-                  </span>
-                </div>
-                <span>•</span>
-                {movie.runtime > 0 && (
-                  <>
-                    <span>{timeFormat(movie.runtime)}</span>
-                    <span>•</span>
-                  </>
-                )}
-                {movie.release_date && (
-                  <span>{new Date(movie.release_date).getFullYear()}</span>
-                )}
-              </div>
-
-              {movie.genres && movie.genres.length > 0 && (
-                <div className="flex items-center gap-2 text-sm text-gray-300">
-                  <Tag className="w-4 h-4" />
-                  <span>
-                    {movie.genres.map((g) => g.name || g).join(", ")}
-                  </span>
-                </div>
+              {movie.runtime > 0 && <span>{timeFormat(movie.runtime)}</span>}
+              {movie.release_date && (
+                <span>{new Date(movie.release_date).getFullYear()}</span>
               )}
+            </div>
 
-              <p className="text-gray-300 mt-4 leading-7 max-w-2xl">
-                {movie.overview}
-              </p>
+            <div className="flex gap-2 mt-2 text-sm text-gray-300">
+              <Tag size={14} />
+              {movie.genres?.map((g) => g.name).join(", ")}
+            </div>
 
-              <div className="flex gap-4 mt-6">
-                <a
-                  href="#trailer"
-                  className="flex items-center gap-2 px-6 py-3 bg-yellow-500 hover:bg-yellow-600 rounded-lg font-semibold text-black transition"
-                >
-                  <PlayCircleIcon className="w-5 h-5" />
-                  Watch Trailer
-                </a>
+            <p className="text-gray-300 mt-6 leading-7">
+              {movie.overview}
+            </p>
 
-                <button className="p-3 bg-gray-800 hover:bg-gray-700 rounded-full transition">
-                  <Heart className="text-white" />
-                </button>
-
-                <a 
-                  href="#comment" 
-                  className="p-3 bg-gray-800 hover:bg-gray-700 rounded-full transition"
-                >
-                  <MessageCircle className="text-white" />
-                </a>
-              </div>
+            <div className="flex gap-4 mt-6">
+              <a
+                href="#trailer"
+                className="px-6 py-3 bg-yellow-500 rounded-lg font-semibold text-black flex items-center gap-2"
+              >
+                <PlayCircleIcon /> Watch Trailer
+              </a>
+              <button className="p-3 bg-gray-800 rounded-full">
+                <Heart />
+              </button>
+              <a href="#comment" className="p-3 bg-gray-800 rounded-full">
+                <MessageCircle />
+              </a>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ===== CAST ===== */}
-      {credits && credits.cast && credits.cast.length > 0 && (
-        <div className="max-w-6xl mx-auto px-4 mt-24">
-          <p className="text-lg font-semibold mb-6 text-white">Cast</p>
-          <div className="flex gap-5 overflow-x-auto pb-6 scrollbar-none">
-            {credits.cast.slice(0, 10).map((cast, index) => (
-              <div key={cast.id || index} className="text-center min-w-[120px]">
+      {/* CAST */}
+      {castList.length > 0 && (
+        <div className="px-16 mt-16">
+          <h2 className="text-white text-xl mb-6">Cast</h2>
+          <div className="flex gap-6 overflow-x-auto scrollbar-none pb-2">
+            {castList.map((c) => (
+              <div key={c.id} className="min-w-[120px] text-center">
                 <img
-                  src={
-                    cast.profile_path
-                      ? getTMDBPosterUrl(cast.profile_path, "w185")
-                      : "https://via.placeholder.com/80x80/1a1a1a/ffffff?text=No+Image"
-                  }
-                  alt={cast.name}
-                  className="rounded-full h-20 w-20 object-cover mx-auto"
-                  onError={(e) => {
-                    e.target.src = "https://via.placeholder.com/80x80/1a1a1a/ffffff?text=No+Image";
-                  }}
+                  src={getTMDBPosterUrl(c.profile_path, "w185")}
+                  className="w-20 h-20 rounded-full mx-auto"
                 />
-                <p className="text-xs mt-2 text-white font-medium">{cast.name}</p>
-                <p className="text-xs text-gray-400">{cast.character}</p>
+                <p className="text-white text-sm mt-2">{c.name}</p>
+                <p className="text-gray-400 text-xs">{c.character}</p>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* ===== TRAILERS ===== */}
       <TrailersSection videos={videos} movieTitle={movie.title} />
 
-      {/* ===== RECOMMENDATIONS ===== */}
-      {recommendations && recommendations.length > 0 && (
-        <div className="max-w-6xl mx-auto px-4 mt-20 mb-16">
-          <div className="flex justify-between items-center mb-8">
-            <p className="text-lg text-white font-semibold">You May Also Like</p>
+      {/* RECOMMEND */}
+      {recsList.length > 0 && (
+        <div className="px-16 pb-20">
+          <div className="flex justify-between mb-8">
+            <h2 className="text-white text-xl">You May Also Like</h2>
             <button
               onClick={() => navigate("/movies")}
-              className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition"
+              className="flex items-center gap-2 text-gray-400 hover:text-white"
             >
-              View All <ArrowRight className="w-4 h-4" />
+              View All <ArrowRight size={16} />
             </button>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {recommendations.slice(0, 5).map((m) => (
+          <div className="grid grid-cols-5 gap-x-10 gap-y-8">
+
+            {recsList.map((m) => (
               <MovieCard
                 key={m.id}
                 movie={m}
@@ -214,8 +159,9 @@ const MovieDetails = () => {
         </div>
       )}
 
-      {/* ===== REVIEWS ===== */}
-      <MovieReview movieId={id} />
+      <div id="comment">
+        <MovieReview movieId={id} />
+      </div>
     </div>
   );
 };

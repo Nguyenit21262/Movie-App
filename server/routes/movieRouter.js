@@ -13,6 +13,7 @@ import {
   getTMDBUpcoming,
   getTopRatedMovies,
   getTMDBMovieDetails,
+  getGenreStats, 
 } from "../controllers/movieController.js";
 import userAuth from "../middlewares/userAuth.js";
 
@@ -27,7 +28,8 @@ movieRouter.get("/tmdb/search", searchTMDBMovies);
 movieRouter.get("/tmdb/:tmdbId", getTMDBMovieDetails);
 
 // Database endpoints
-movieRouter.get("/", getAllMovies);
+movieRouter.get("/genres/stats", getGenreStats); // Get genre statistics
+movieRouter.get("/", getAllMovies); // Supports ?genre= filter
 movieRouter.get("/tmdb-id/:tmdbId", getMovieByTMDBId);
 movieRouter.get("/:id", getMovieById);
 

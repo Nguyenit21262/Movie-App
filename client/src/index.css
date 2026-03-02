@@ -28,7 +28,7 @@
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
     
-    background-color: #000000; 
+    background-color: var(--color-neutral-900); 
     color: #D1D5DB; /* text-neutral-300 */
   }
 }

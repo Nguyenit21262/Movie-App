@@ -1,75 +1,81 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Clock, Monitor } from "lucide-react";
 import { getRoomInfo } from "../assets/assets";
 import time from "../lib/time";
 
-const DataSelect = ({ dateTime, id }) => {
+const DataSelect = ({ dateTime = {}, id }) => {
   const navigate = useNavigate();
   const showtimesRef = useRef(null);
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedShowtime, setSelectedShowtime] = useState(null);
 
-  /* Scroll đến showtimes khi chọn ngày */
+  /* Memo dates */
+  const dates = useMemo(() => Object.keys(dateTime), [dateTime]);
+
+  /* Memo showtimes */
+  const showtimes = useMemo(() => {
+    return selectedDate ? dateTime[selectedDate] || [] : [];
+  }, [selectedDate, dateTime]);
+
+  /* Auto scroll */
   useEffect(() => {
     if (selectedDate && showtimesRef.current) {
       showtimesRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [selectedDate]);
 
-  const showtimes = selectedDate ? dateTime[selectedDate] || [] : [];
-
-  const onBook = () => {
-    if (!selectedDate || !selectedShowtime)
-      return toast("Please select date & showtime");
+  const onBook = useCallback(() => {
+    if (!selectedDate || !selectedShowtime) {
+      toast("Please select date & showtime");
+      return;
+    }
 
     const date = new Date(selectedDate).toISOString().split("T")[0];
     navigate(`/theaters/${id}/${date}?showtime=${selectedShowtime.id}`);
-    scrollTo(0, 0);
-  };
+    window.scrollTo(0, 0);
+  }, [selectedDate, selectedShowtime, navigate, id]);
+
+  if (!dates.length) return null;
 
   return (
-    <div className="pt-30 bg-black">
-      {/* DATE SELECT */}
+    <div className="pt-30 bg-neutral-900 min-h-[300px] pb-16">
       <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-xl">
-        <h3 className="flex items-center justify-center text-2xl font-bold text-white mb-4">
+        <h3 className="text-center text-2xl font-bold text-white mb-4">
           Select Date & Time
         </h3>
 
-        <div className="flex items-center justify-center gap-3 overflow-x-auto pb-2">
-          {Object.keys(dateTime).map((date) => (
-            <button
-              key={date}
-              onClick={() => {
-                setSelectedDate(date);
-                setSelectedShowtime(null);
-              }}
-              className={`min-w-[70px] p-3 rounded-xl transition ${
-                selectedDate === date
-                  ? "bg-yellow-500 text-black"
-                  : "bg-zinc-800 text-gray-200 hover:bg-zinc-700"
-              }`}
-            >
-              <div className="text-lg font-bold">
-                {new Date(date).getDate()}
-              </div>
-              <div className="text-xs">
-                {new Date(date).toLocaleDateString("en-US", {
-                  weekday: "short",
-                })}
-              </div>
-            </button>
-          ))}
+        {/* DATE */}
+        <div className="flex justify-center gap-3 overflow-x-auto pb-2">
+          {dates.map((date) => {
+            const d = new Date(date);
+            return (
+              <button
+                key={date}
+                onClick={() => {
+                  setSelectedDate(date);
+                  setSelectedShowtime(null);
+                }}
+                className={`min-w-[70px] p-3 rounded-xl transition ${
+                  selectedDate === date
+                    ? "bg-yellow-500 text-black"
+                    : "bg-zinc-800 text-gray-200 hover:bg-zinc-700"
+                }`}
+              >
+                <div className="text-lg font-bold">{d.getDate()}</div>
+                <div className="text-xs">
+                  {d.toLocaleDateString("en-US", { weekday: "short" })}
+                </div>
+              </button>
+            );
+          })}
         </div>
 
         {/* SHOWTIMES */}
         {selectedDate && (
-          <div
-            ref={showtimesRef}
-            className="mt-8 border-t border-zinc-800 pt-6"
-          >
+          <div ref={showtimesRef} className="mt-8 border-t border-zinc-800 pt-6">
             <p className="text-gray-400 mb-4">
               {showtimes.length} showtimes available
             </p>
@@ -77,12 +83,14 @@ const DataSelect = ({ dateTime, id }) => {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {showtimes.map((st) => {
                 const room = getRoomInfo(st.roomId);
+                const isActive = selectedShowtime?.id === st.id;
+
                 return (
                   <div
                     key={st.id}
                     onClick={() => setSelectedShowtime(st)}
                     className={`p-4 rounded-xl cursor-pointer border transition ${
-                      selectedShowtime?.id === st.id
+                      isActive
                         ? "border-yellow-500 bg-yellow-500/10"
                         : "border-zinc-700 bg-zinc-800/60 hover:bg-zinc-700/60"
                     }`}
@@ -107,7 +115,6 @@ const DataSelect = ({ dateTime, id }) => {
               })}
             </div>
 
-            {/* BOOK BUTTON */}
             <div className="mt-8 flex justify-end">
               <button
                 onClick={onBook}

@@ -1,12 +1,18 @@
-import { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import MovieCard from "../components/MovieCard";
+import { useContext, useEffect, useState, useCallback } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { AppContent } from "../context/AppContext";
+import { TMDB_GENRES, getGenreId } from "../lib/tmdb/Genres";
+
+// Components
+import MovieCard from "../components/MovieCard";
+import Loading from "../components/Loading";
+import LazySection from "../components/LazySection";
+import axios from "axios";
 
 const Movies = () => {
   const navigate = useNavigate();
   const { backendUrl } = useContext(AppContent);
+  const [searchParams] = useSearchParams();
 
   const [movies, setMovies] = useState({
     topRated: [],
@@ -15,129 +21,150 @@ const Movies = () => {
     upcoming: [],
   });
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [selectedGenre, setSelectedGenre] = useState(null);
+  const [loadingInitial, setLoadingInitial] = useState(true);
 
   useEffect(() => {
-    const fetchMovies = async () => {
+    const genreParam = searchParams.get("genre");
+    setSelectedGenre(genreParam ? getGenreId(genreParam) : null);
+  }, [searchParams]);
+
+  // Hàm fetch đơn lẻ cho từng category
+  const fetchCategory = useCallback(
+    async (category, endpoint) => {
+      // Nếu đã có data và không có filter genre mới thì không fetch lại
+      if (movies[category].length > 0 && !selectedGenre) return;
+
       try {
-        setLoading(true);
+        const res = await axios.get(
+          `${backendUrl}/api/movies/tmdb/${endpoint}`,
+          {
+            params: { page: 1 },
+          },
+        );
+        const results = res.data.results || [];
 
-        const [
-          topRatedRes,
-          nowPlayingRes,
-          popularRes,
-          upcomingRes,
-        ] = await Promise.all([
-          axios.get(`${backendUrl}/api/movies/tmdb/top-rated`, {
-            params: { page: 1 },
-          }),
-          axios.get(`${backendUrl}/api/movies/tmdb/now-playing`, {
-            params: { page: 1 },
-          }),
-          axios.get(`${backendUrl}/api/movies/tmdb/popular`, {
-            params: { page: 1 },
-          }),
-          axios.get(`${backendUrl}/api/movies/tmdb/upcoming`, {
-            params: { page: 1 },
-          }),
-        ]);
-
-        setMovies({
-          topRated: topRatedRes.data.results || [],
-          nowPlaying: nowPlayingRes.data.results || [],
-          popular: popularRes.data.results || [],
-          upcoming: upcomingRes.data.results || [],
-        });
+        setMovies((prev) => ({ ...prev, [category]: results }));
       } catch (err) {
-        console.error(err);
-        setError("Failed to load movies");
+        console.error(`Error fetching ${category}:`, err);
       } finally {
-        setLoading(false);
+        if (category === "topRated") setLoadingInitial(false);
       }
-    };
+    },
+    [backendUrl, selectedGenre, movies],
+  );
 
-    if (backendUrl) fetchMovies();
-  }, [backendUrl]);
+  // Khởi tạo: Chỉ fetch "Top Rated" trước để hiện nội dung ngay
+  useEffect(() => {
+    if (backendUrl) {
+      fetchCategory("topRated", "top-rated");
+    }
+  }, [backendUrl, fetchCategory]);
 
-  const handleMovieClick = (movie) => {
-    navigate(`/movies/tmdb/${movie.id}`);
-    window.scrollTo(0, 0);
+  const handleMovieClick = useCallback(
+    (id) => {
+      navigate(`/movies/tmdb/${id}`);
+      window.scrollTo(0, 0);
+    },
+    [navigate],
+  );
+
+  // Lọc phim theo Genre 
+  const filterByGenre = (movieList) => {
+    if (!selectedGenre) return movieList;
+    return movieList.filter((m) => m.genre_ids?.includes(selectedGenre));
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-neutral-900 text-white">
-        Loading movies...
-      </div>
-    );
-  }
+  if (loadingInitial) return <Loading />;
 
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-neutral-900 text-red-500">
-        {error}
-      </div>
-    );
-  }
+  const genreName = selectedGenre ? TMDB_GENRES[selectedGenre] : null;
+
+
+  const sections = [
+    {
+      key: "topRated",
+      title: genreName ? `Top ${genreName}` : "Top Rated",
+      endpoint: "top-rated",
+    },
+    {
+      key: "nowPlaying",
+      title: genreName ? `${genreName} Now Playing` : "Now Playing",
+      endpoint: "now-playing",
+    },
+    {
+      key: "popular",
+      title: genreName ? `Popular ${genreName}` : "Popular Movies",
+      endpoint: "popular",
+    },
+    {
+      key: "upcoming",
+      title: genreName ? `Upcoming ${genreName}` : "Upcoming Movies",
+      endpoint: "upcoming",
+    },
+  ];
+
+  const isEmpty = sections.every(
+    (s) => filterByGenre(movies[s.key]).length === 0,
+  );
 
   return (
-    <div className="space-y-14 py-8 bg-neutral-900 min-h-screen">
-      {/* TOP RATED */}
-      <section className="px-8">
-        <h2 className="text-white text-2xl font-bold mb-6">Top Pick</h2>
-        <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {movies.topRated.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-              onClick={() => handleMovieClick(movie)}
-            />
-          ))}
+    <div className="space-y-14 py-8 mt-10 bg-neutral-900 min-h-screen">
+      {/* Header */}
+      {genreName && (
+        <div className="px-8 animate-in fade-in duration-500">
+          <h1 className="text-4xl font-bold text-white mb-2">
+            {genreName} Movies
+          </h1>
+          <button
+            onClick={() => navigate("/movies")}
+            className="text-gray-400 hover:text-yellow-400 transition text-sm flex items-center gap-2"
+          >
+            <span>←</span> Back to All Movies
+          </button>
         </div>
-      </section>
+      )}
 
-      {/* NOW PLAYING */}
-      <section className="px-8">
-        <h2 className="text-white text-2xl font-bold mb-6">Now Playing</h2>
-        <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {movies.nowPlaying.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-              onClick={() => handleMovieClick(movie)}
-            />
-          ))}
-        </div>
-      </section>
+      {/* Render Sections */}
+      {sections.map((sec, index) => (
+        <LazySection
+          key={sec.key}
+          fetchData={() =>
+            index === 0 ? null : fetchCategory(sec.key, sec.endpoint)
+          }
+        >
+          {filterByGenre(movies[sec.key]).length > 0 && (
+            <section className="px-8 animate-in slide-in-from-bottom-4 duration-700">
+              <h2 className="text-white text-2xl font-bold mb-6">
+                {sec.title}
+              </h2>
+              <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                {filterByGenre(movies[sec.key]).map((movie) => (
+                  <MovieCard
+                    key={movie.id}
+                    movie={movie}
+                    onClick={() => handleMovieClick(movie.id)}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+        </LazySection>
+      ))}
 
-      {/* POPULAR */}
-      <section className="px-8">
-        <h2 className="text-white text-2xl font-bold mb-6">Popular Movies</h2>
-        <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {movies.popular.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-              onClick={() => handleMovieClick(movie)}
-            />
-          ))}
+      {/* No Results */}
+      {isEmpty && !loadingInitial && (
+        <div className="px-8 py-20 text-center">
+          <p className="text-gray-400 text-xl mb-4">
+            No {genreName || ""} movies found
+          </p>
+          <button
+            onClick={() => navigate("/movies")}
+            className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-black font-semibold rounded-lg transition active:scale-95"
+          >
+            View All Movies
+          </button>
         </div>
-      </section>
-
-      {/* UPCOMING */}
-      <section className="px-8">
-        <h2 className="text-white text-2xl font-bold mb-6">Upcoming Movies</h2>
-        <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {movies.upcoming.map((movie) => (
-            <MovieCard
-              key={movie.id}
-              movie={movie}
-              onClick={() => handleMovieClick(movie)}
-            />
-          ))}
-        </div>
-      </section>
+      )}
     </div>
   );
 };

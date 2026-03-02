@@ -15,8 +15,6 @@ const Profile = () => {
     sex: "",
   });
 
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async () => {
@@ -49,10 +47,6 @@ const Profile = () => {
         occupation: userData.occupation || "",
         sex: userData.sex || "",
       });
-
-      if (userData.image) {
-        setImagePreview(`${backendUrl}/uploads/${userData.image}`);
-      }
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to load profile");
     } finally {
@@ -77,31 +71,9 @@ const Profile = () => {
       value = value.slice(0, 2) + "/" + value.slice(2);
     } else if (value.length > 4) {
       value =
-        value.slice(0, 2) +
-        "/" +
-        value.slice(2, 4) +
-        "/" +
-        value.slice(4, 8);
+        value.slice(0, 2) + "/" + value.slice(2, 4) + "/" + value.slice(4, 8);
     }
     setFormData((prev) => ({ ...prev, dateOfBirth: value }));
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size should be less than 5MB");
-      return;
-    }
-
-    setImage(file);
-    setImagePreview(URL.createObjectURL(file));
   };
 
   const handleSubmit = async (e) => {
@@ -117,24 +89,10 @@ const Profile = () => {
     const loadingToast = toast.loading("Updating profile...");
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("dateOfBirth", formData.dateOfBirth);
-      formDataToSend.append("currentCity", formData.currentCity);
-      formDataToSend.append("occupation", formData.occupation);
-      formDataToSend.append("sex", formData.sex);
-
-      if (image) {
-        formDataToSend.append("image", image);
-      }
-
       const { data } = await axios.put(
         `${backendUrl}/api/user/update`,
-        formDataToSend,
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
-        }
+        formData,
+        { withCredentials: true },
       );
 
       if (data.success) {
@@ -147,7 +105,6 @@ const Profile = () => {
 
         await getUserData();
         await fetchProfile();
-        setImage(null);
       } else {
         toast.update(loadingToast, {
           render: data.message || "Update failed",
@@ -173,7 +130,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex justify-center items-start pt-20 pb-20">
+    <div className="min-h-screen bg-neutral-900 text-white flex justify-center items-start pt-20 pb-20">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-2xl bg-zinc-900 border border-white/10 rounded-xl px-6 pt-5 pb-12"
@@ -182,33 +139,12 @@ const Profile = () => {
           Profile Settings
         </h2>
 
-        {/* Avatar */}
         <div className="flex justify-center mb-4">
-          <div className="relative">
-            <img
-              src={imagePreview || `${backendUrl}/uploads/userImage.png`}
-              alt="Profile"
-              className="w-24 h-24 rounded-full object-cover border-2 border-blue-500"
-            />
-
-            <label
-              htmlFor="imageUpload"
-              className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 p-1.5 rounded-full cursor-pointer"
-            >
-              ✎
-            </label>
-
-            <input
-              type="file"
-              id="imageUpload"
-              accept="image/*"
-              onChange={handleImageChange}
-              className="hidden"
-            />
+          <div className="w-24 h-24 rounded-full bg-blue-600 flex items-center justify-center text-3xl font-semibold uppercase border-2 border-blue-400">
+            {formData.name ? formData.name.charAt(0).toUpperCase() : "U"}
           </div>
         </div>
 
-        {/* Fields */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {[
             ["Full Name", "name"],
@@ -252,7 +188,6 @@ const Profile = () => {
           </div>
         </div>
 
-        {/* Save */}
         <button
           type="submit"
           className="w-full mt-6 mb-6 h-9 rounded-md bg-blue-600 hover:bg-blue-700 text-sm font-medium transition"

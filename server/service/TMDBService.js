@@ -2,9 +2,10 @@ import axios from "axios";
 
 const TMDB_BASE_URL = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p";
+const DEFAULT_LANGUAGE = "en-US";
 
 /**
- * Axios instance for TMDB
+ * Axios instance
  */
 const tmdbAxios = axios.create({
   baseURL: TMDB_BASE_URL,
@@ -12,87 +13,120 @@ const tmdbAxios = axios.create({
     Authorization: `Bearer ${process.env.TMDB_API}`,
     "Content-Type": "application/json;charset=utf-8",
   },
+  params: {
+    language: DEFAULT_LANGUAGE,
+  },
 });
 
+/**
+ * Centralized error handler
+ */
+const handleTMDBRequest = async (request) => {
+  try {
+    const { data } = await request;
+    return data;
+  } catch (error) {
+    console.error(
+      "TMDB API Error:",
+      error.response?.data || error.message,
+    );
+    throw new Error("TMDB request failed");
+  }
+};
+
 class TMDBService {
-  static async getTopRatedMovies(page = 1) {
-    const { data } = await tmdbAxios.get("/movie/top_rated", {
-      params: { language: "en-US", page },
-    });
-    return data;
+  // ===== MOVIE LIST =====
+  static getTopRatedMovies(page = 1) {
+    return handleTMDBRequest(
+      tmdbAxios.get("/movie/top_rated", { params: { page } }),
+    );
   }
 
-  static async getPopularMovies(page = 1) {
-    const { data } = await tmdbAxios.get("/movie/popular", {
-      params: { language: "en-US", page },
-    });
-    return data;
+  static getPopularMovies(page = 1) {
+    return handleTMDBRequest(
+      tmdbAxios.get("/movie/popular", { params: { page } }),
+    );
   }
 
-  static async getNowPlayingMovies(page = 1) {
-    const { data } = await tmdbAxios.get("/movie/now_playing", {
-      params: { language: "en-US", page },
-    });
-    return data;
+  static getNowPlayingMovies(page = 1) {
+    return handleTMDBRequest(
+      tmdbAxios.get("/movie/now_playing", { params: { page } }),
+    );
   }
 
-  static async getUpcomingMovies(page = 1) {
-    const { data } = await tmdbAxios.get("/movie/upcoming", {
-      params: { language: "en-US", page },
-    });
-    return data;
+  static getUpcomingMovies(page = 1) {
+    return handleTMDBRequest(
+      tmdbAxios.get("/movie/upcoming", { params: { page } }),
+    );
   }
 
-  static async getMovieDetails(tmdbId) {
-    const { data } = await tmdbAxios.get(`/movie/${tmdbId}`, {
-      params: { language: "en-US" },
-    });
-    return data;
+  // ===== GENRE DISCOVERY (QUAN TRỌNG) =====
+  static discoverByGenre(genreId, page = 1) {
+    return handleTMDBRequest(
+      tmdbAxios.get("/discover/movie", {
+        params: {
+          with_genres: genreId,
+          page,
+          sort_by: "popularity.desc",
+        },
+      }),
+    );
   }
 
-  static async getMovieCredits(tmdbId) {
-    const { data } = await tmdbAxios.get(`/movie/${tmdbId}/credits`);
-    return data;
+  // ===== SEARCH =====
+  static searchMovies(query, page = 1) {
+    return handleTMDBRequest(
+      tmdbAxios.get("/search/movie", {
+        params: { query, page },
+      }),
+    );
   }
 
-  static async getMovieKeywords(tmdbId) {
-    const { data } = await tmdbAxios.get(`/movie/${tmdbId}/keywords`);
-    return data.keywords || [];
+  // ===== DETAILS =====
+  static getMovieDetails(tmdbId) {
+    return handleTMDBRequest(
+      tmdbAxios.get(`/movie/${tmdbId}`),
+    );
   }
 
-  static async searchMovies(query, page = 1) {
-    const { data } = await tmdbAxios.get("/search/movie", {
-      params: { language: "en-US", query, page },
-    });
-    return data;
+  static getMovieCredits(tmdbId) {
+    return handleTMDBRequest(
+      tmdbAxios.get(`/movie/${tmdbId}/credits`),
+    );
   }
 
-  static async getMovieVideos(tmdbId) {
-    const { data } = await tmdbAxios.get(`/movie/${tmdbId}/videos`, {
-      params: { language: "en-US" },
-    });
-    return data;
+  static getMovieKeywords(tmdbId) {
+    return handleTMDBRequest(
+      tmdbAxios.get(`/movie/${tmdbId}/keywords`),
+    );
   }
 
-  static async getSimilarMovies(tmdbId, page = 1) {
-    const { data } = await tmdbAxios.get(`/movie/${tmdbId}/similar`, {
-      params: { language: "en-US", page },
-    });
-    return data;
+  static getMovieVideos(tmdbId) {
+    return handleTMDBRequest(
+      tmdbAxios.get(`/movie/${tmdbId}/videos`),
+    );
   }
 
-  static async getRecommendations(tmdbId, page = 1) {
-    const { data } = await tmdbAxios.get(`/movie/${tmdbId}/recommendations`, {
-      params: { language: "en-US", page },
-    });
-    return data;
+  static getSimilarMovies(tmdbId, page = 1) {
+    return handleTMDBRequest(
+      tmdbAxios.get(`/movie/${tmdbId}/similar`, { params: { page } }),
+    );
   }
 
+  static getRecommendations(tmdbId, page = 1) {
+    return handleTMDBRequest(
+      tmdbAxios.get(`/movie/${tmdbId}/recommendations`, {
+        params: { page },
+      }),
+    );
+  }
+
+  // ===== IMAGE =====
   static getImageUrl(path, size = "original") {
-    if (!path) return null;
-    return `${TMDB_IMAGE_BASE_URL}/${size}${path}`;
+    return path ? `${TMDB_IMAGE_BASE_URL}/${size}${path}` : null;
   }
 
+  // ===== FORMAT DATA =====
   static async formatMovieData(tmdbId) {
     const [details, credits, keywords] = await Promise.all([
       this.getMovieDetails(tmdbId),
@@ -101,27 +135,24 @@ class TMDBService {
     ]);
 
     return {
+      tmdb_id: details.id,
       title: details.title,
       overview: details.overview,
-      poster_path: details.poster_path || "",
-      backdrop_path: details.backdrop_path || "",
-      release_date: details.release_date
-        ? new Date(details.release_date)
-        : null,
-      original_language: details.original_language,
-      tagline: details.tagline || "",
-      genres: details.genres?.map((g) => g.name) || [],
-      keywords: keywords.map((k) => k.name),
-      casts: credits.cast.slice(0, 10).map((actor) => ({
-        actor: actor.name,
-        character: actor.character,
-        profile_path: actor.profile_path || "",
-      })),
-      vote_average: details.vote_average || 0,
+      poster_path: details.poster_path,
+      backdrop_path: details.backdrop_path,
+      release_date: details.release_date || null,
       runtime: details.runtime || 0,
-      count_rating: details.vote_count || 0,
+      vote_average: details.vote_average || 0,
+      vote_count: details.vote_count || 0,
       popularity: details.popularity || 0,
-      tmdb_id: details.id,
+      genres: details.genres?.map((g) => g.name) || [],
+      keywords: keywords.keywords?.map((k) => k.name) || [],
+      casts:
+        credits.cast?.slice(0, 10).map((c) => ({
+          actor: c.name,
+          character: c.character,
+          profile_path: c.profile_path,
+        })) || [],
     };
   }
 }

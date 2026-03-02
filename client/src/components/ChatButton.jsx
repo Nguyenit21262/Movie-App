@@ -53,7 +53,7 @@ const ChatButton = () => {
                   <h3 className="font-bold text-sm tracking-wide text-gray-100">Chat Bot</h3>
                   <div className="flex items-center space-x-1">
                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                    <span className="text-xs text-gray-400">Trực tuyến</span>
+                    <span className="text-xs text-gray-400">Online</span>
                   </div>
                 </div>
               </div>

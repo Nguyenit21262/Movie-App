@@ -1,126 +1,273 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, {
+  useEffect,
+  useState,
+  useContext,
+  useMemo,
+  useCallback,
+  memo,
+  useRef,
+} from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { AppContent } from "../context/AppContext";
-import { SearchIcon } from "lucide-react";
+import { SearchIcon, ChevronDown, Film } from "lucide-react";
+import { getGenresArray } from "../lib/tmdb/Genres";
 import axios from "axios";
+
+/* ================= SEARCH BAR ================= */
+
+const SearchBar = memo(({ onSearch }) => {
+  const [query, setQuery] = useState("");
+
+  const handleSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      if (query.trim()) onSearch(query);
+    },
+    [query, onSearch],
+  );
+
+  return (
+    <form onSubmit={handleSubmit} className="hidden md:block max-w-md">
+      <div className="relative">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search movies..."
+          className="w-full px-8 py-2 bg-gray-950 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 rounded-md"
+        />
+        <button type="submit" className="absolute right-3 top-2.5">
+          <SearchIcon className="h-5 w-5 text-gray-400 hover:text-white transition" />
+        </button>
+      </div>
+    </form>
+  );
+});
+SearchBar.displayName = "SearchBar";
+
+/* ================= GENRE DROPDOWN ================= */
+
+const GenreDropdown = memo(() => {
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+
+  const genres = useMemo(() => getGenresArray(), []);
+
+  const close = useCallback(() => setOpen(false), []);
+
+  const handleGenreClick = useCallback(
+    (e) => {
+      const genre = e.currentTarget.dataset.genre;
+      navigate(`/movies?genre=${genre}`);
+      close();
+      window.scrollTo(0, 0);
+    },
+    [navigate, close],
+  );
+
+  const handleAll = useCallback(() => {
+    navigate("/movies");
+    close();
+    window.scrollTo(0, 0);
+  }, [navigate, close]);
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-2 text-gray-300 hover:text-white transition"
+      >
+        <span>Genres</span>
+        <ChevronDown
+          className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={close} />
+
+          <div className="absolute top-full mt-2 left-0 w-[480px] bg-neutral-900 rounded-lg shadow-2xl border border-neutral-700 z-50 max-h-96 overflow-y-auto">
+            <div
+              onClick={handleAll}
+              className="px-4 py-3 hover:bg-neutral-800 cursor-pointer transition-colors text-white font-medium border-b border-neutral-700"
+            >
+              All Genres
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 gap-y-1 p-2">
+              {genres.map((g) => (
+                <div
+                  key={g.id}
+                  data-genre={g.name}
+                  onClick={handleGenreClick}
+                  className="px-3 py-2 rounded-md hover:bg-neutral-800 cursor-pointer transition-colors text-gray-300 hover:text-white text-sm"
+                >
+                  {g.name}
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+});
+
+GenreDropdown.displayName = "GenreDropdown";
+
+/* ================= NAV LINKS ================= */
+
+const NavLinks = memo(() => (
+  <div className="hidden md:flex space-x-8">
+    <Link
+      to="/movies"
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="text-gray-300 hover:text-white transition"
+    >
+      Movies
+    </Link>
+
+    <Link
+      to="/theaters"
+      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      className="text-gray-300 hover:text-white transition"
+    >
+      Theaters
+    </Link>
+
+    <GenreDropdown />
+  </div>
+));
+NavLinks.displayName = "NavLinks";
+
+/* ================= USER MENU ================= */
+
+const UserMenu = memo(({ userData, backendUrl, onLogout, onNavigate }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="relative">
+      <div
+        onClick={() => setOpen((v) => !v)}
+        className="h-9 w-9 rounded-full overflow-hidden border border-white/20 cursor-pointer"
+      >
+        <div className="w-full h-full bg-pink-600 flex items-center justify-center text-white font-semibold text-sm uppercase">
+          {userData?.name?.charAt(0) || "U"}
+        </div>
+      </div>
+
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 z-50 w-48 bg-white rounded-lg shadow-xl overflow-hidden">
+            <ul>
+              <li
+                onClick={() => onNavigate("/profile")}
+                className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
+              >
+                Profile
+              </li>
+              <li
+                onClick={() => onNavigate("/my-bookings")}
+                className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
+              >
+                My Bookings
+              </li>
+              <li
+                onClick={onLogout}
+                className="px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
+              >
+                Logout
+              </li>
+            </ul>
+          </div>
+        </>
+      )}
+    </div>
+  );
+});
+UserMenu.displayName = "UserMenu";
+
+/* ================= MAIN NAVBAR ================= */
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const [isScrolled, setIsScrolled] = useState(false);
-
   const { userData, isLoggedIn, backendUrl, setIsLoggedIn, setUserData } =
     useContext(AppContent);
 
-  const logout = async () => {
-    try {
-      axios.defaults.withCredentials = true;
-      const { data } = await axios.post(`${backendUrl}/api/auth/logout`);
+  const [scrolled, setScrolled] = useState(false);
+  const prevScroll = useRef(false);
 
+  /* Scroll optimize */
+  useEffect(() => {
+    const onScroll = () => {
+      const next = window.scrollY > 10;
+      if (prevScroll.current !== next) {
+        prevScroll.current = next;
+        setScrolled(next);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  /* Axios instance */
+  const api = useMemo(
+    () =>
+      axios.create({
+        baseURL: backendUrl,
+        withCredentials: true,
+      }),
+    [backendUrl],
+  );
+
+  const logout = useCallback(async () => {
+    try {
+      const { data } = await api.post("/api/auth/logout");
       if (data.success) {
         setIsLoggedIn(false);
         setUserData(null);
         navigate("/");
       }
-    } catch (error) {
-      console.log(error.message);
+    } catch (err) {
+      console.error("Logout error:", err.message);
     }
-  };
+  }, [api, navigate, setIsLoggedIn, setUserData]);
 
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  const handleSearch = useCallback(
+    (q) => navigate(`/movies?search=${encodeURIComponent(q)}`),
+    [navigate],
+  );
+
+  const handleNavigate = useCallback((path) => navigate(path), [navigate]);
 
   return (
     <nav
       className={`fixed top-0 left-0 z-50 w-full transition-all duration-300 ${
-        isScrolled
-          ? "backdrop-blur-lg border-b border-gray-800/50 bg-black/60"
-          : "border-b border-gray-800 bg-black"
+        scrolled ? "backdrop-blur-lg bg-black/80" : "bg-transparent"
       }`}
     >
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* LEFT */}
           <div className="flex items-center space-x-8">
-            <Link to="/" onClick={() => scrollTo(0, 0)}>
+            <Link to="/" onClick={() => window.scrollTo(0, 0)}>
               <img src={assets.logo} alt="Logo" className="h-8 sm:h-10" />
             </Link>
 
-            <div className="hidden md:block max-w-md">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search movies..."
-                  className="w-full px-8 py-2 bg-gray-950 text-white focus:outline-none focus:ring-2 focus:ring-white rounded-md"
-                />
-                <SearchIcon className="absolute right-3 top-2.5 h-5 w-5 text-gray-400" />
-              </div>
-            </div>
-
-            <div className="hidden md:flex space-x-8">
-              <Link to="/movies" className="text-gray-300 hover:text-white">
-                Movies
-              </Link>
-              <Link to="/theaters" className="text-gray-300 hover:text-white">
-                Theaters
-              </Link>
-            </div>
+            <SearchBar onSearch={handleSearch} />
+            <NavLinks />
           </div>
 
-          {/* RIGHT */}
           <div className="flex items-center space-x-4">
             {isLoggedIn && userData ? (
-              <div className="relative group">
-                {/* AVATAR */}
-                <div className="pb-0">
-                  <div className="h-9 w-9 rounded-full overflow-hidden border border-white/20 cursor-pointer">
-                    {userData.image ? (
-                      <img
-                        src={`${backendUrl}/uploads/${userData.image}?t=${Date.now()}`}
-                        alt="avatar"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = `${backendUrl}/uploads/userImage.png`;
-                        }}
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-pink-600 flex items-center justify-center text-white font-semibold">
-                        {userData.name?.[0]?.toUpperCase()}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* DROPDOWN */}
-                <div className="absolute hidden group-hover:block right-0 w-48 bg-white rounded-lg shadow-xl overflow-hidden">
-                  <ul>
-                    <li
-                      onClick={() => navigate("/profile")}
-                      className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
-                    >
-                      Profile
-                    </li>
-
-                    <li
-                      onClick={() => navigate("/my-bookings")}
-                      className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
-                    >
-                      My Bookings
-                    </li>
-
-                    <li
-                      onClick={logout}
-                      className="px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
-                    >
-                      Logout
-                    </li>
-                  </ul>
-                </div>
-              </div>
+              <UserMenu
+                userData={userData}
+                backendUrl={backendUrl}
+                onLogout={logout}
+                onNavigate={handleNavigate}
+              />
             ) : (
               <button
                 onClick={() => navigate("/login")}

@@ -61,7 +61,7 @@ const TrailersSection = ({ videos = [], movieTitle = "" }) => {
             {trailers.slice(1, 5).map((video) => (
               <div key={video.id} className="bg-neutral-900 rounded-lg overflow-hidden">
                 <ReactPlayer
-                  url={getYouTubeUrl(video.key)}
+                  src={getYouTubeUrl(video.key)}
                   controls
                   width="100%"
                   height="240px"

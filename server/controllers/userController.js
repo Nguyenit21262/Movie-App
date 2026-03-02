@@ -1,6 +1,5 @@
 import User from "../models/User.js";
-import path from "path";
-import fs from "fs";
+
 
 export const getUserData = async (req, res) => {
   try {
@@ -37,7 +36,6 @@ export const updateProfile = async (req, res) => {
     if (sex) updateData.sex = sex;
 
     if (dateOfBirth) {
-      // Expect DD/MM/YYYY format from frontend
       const [day, month, year] = dateOfBirth.split("/");
       const parsedDate = new Date(year, month - 1, day);
 
@@ -51,27 +49,11 @@ export const updateProfile = async (req, res) => {
       updateData.dateOfBirth = parsedDate;
     }
 
-    // Handle image upload
-    if (req.file) {
-      // Get old user data to delete old image
-      const oldUser = await User.findById(req.userId);
-
-      // Delete old image if it's not the default image
-      if (oldUser.image && oldUser.image !== "userImage.png") {
-        const oldImagePath = path.join(process.cwd(), "uploads", oldUser.image);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
-      }
-
-      // Save new image filename
-      updateData.image = req.file.filename;
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(req.userId, updateData, {
-      new: true,
-      runValidators: true,
-    }).select("-password");
+    const updatedUser = await User.findByIdAndUpdate(
+      req.userId,
+      updateData,
+      { new: true, runValidators: true }
+    ).select("-password");
 
     if (!updatedUser) {
       return res.status(404).json({

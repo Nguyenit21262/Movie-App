@@ -35,7 +35,7 @@ const App = () => {
 
   return (
     <>
-      <ToastContainer position="top-right" autoClose={3000} theme="dark" />
+      <ToastContainer position="top-right" autoClose={2000} theme="dark" />
 
       {!isAdminRoute &&
         !isLoginRoute &&
@@ -43,7 +43,7 @@ const App = () => {
         !isEmailVerifyRoute &&
         !isResetPasswordRoute && (
           <>
-            <Navbar />
+            <Navbar/>
             <ChatButton />
           </>
         )}
@@ -56,8 +56,7 @@ const App = () => {
         <Route path="/movies" element={<Movies />} />
         <Route path="/movies/tmdb/:id" element={<MovieDetails />} />
         <Route path="/theaters" element={<Theaters />} />
-
-        <Route path="/theaters/:id" element={<TheatersDetail />}>
+        <Route path="/theaters/tmdb/:id" element={<TheatersDetail />}>
           <Route path="trailer" element={<VideoPlay />} />
         </Route>
 
