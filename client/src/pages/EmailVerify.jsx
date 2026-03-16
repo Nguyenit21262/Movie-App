@@ -1,91 +1,9 @@
-import axios from "axios";
 import { assets } from "../assets/assets";
-import { useRef, useContext } from "react";
-import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-import { AppContent } from "../context/AppContext";
+import { useEmailVerify } from "../hooks/UseEmailverify";
 
 const EmailVerify = () => {
-  const { backendUrl } = useContext(AppContent);
-  const navigate = useNavigate();
-  const inputRefs = useRef([]);
-
-  const email = localStorage.getItem("verifyEmail");
-
-  const handleInput = (e, index) => {
-    if (e.target.value && index < 5) {
-      inputRefs.current[index + 1].focus();
-    }
-  };
-
-  const handleKeyDown = (e, index) => {
-    if (e.key === "Backspace" && !e.target.value && index > 0) {
-      inputRefs.current[index - 1].focus();
-    }
-  };
-
-  const handlePaste = (e) => {
-    const paste = e.clipboardData.getData("text").slice(0, 6);
-    paste.split("").forEach((char, index) => {
-      if (inputRefs.current[index]) {
-        inputRefs.current[index].value = char;
-      }
-    });
-  };
-
-  const onSubmitHandler = async (e) => {
-    e.preventDefault();
-
-    const otp = inputRefs.current.map((el) => el.value).join("");
-
-    if (!email) {
-      return toast.error("Email not found. Please register again.");
-    }
-
-    if (otp.length !== 6) {
-      return toast.error("Please enter a valid 6-digit OTP");
-    }
-
-    const loadingToast = toast.loading("Verifying your email...");
-
-    try {
-      axios.defaults.withCredentials = true;
-
-      const { data } = await axios.post(
-        `${backendUrl}/api/auth/verify-account`,
-        { email, otp },
-        { withCredentials: true }
-      );
-
-      if (data.success) {
-        toast.update(loadingToast, {
-          render: "Email verified successfully! Please login to continue.",
-          type: "success",
-          isLoading: false,
-          autoClose: 3000,
-        });
-
-        localStorage.removeItem("verifyEmail");
-        
-        // Redirect to login page instead of home
-        navigate("/login");
-      } else {
-        toast.update(loadingToast, {
-          render: data.message || "Verification failed",
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-        });
-      }
-    } catch (err) {
-      toast.update(loadingToast, {
-        render: err.response?.data?.message || "Verification failed",
-        type: "error",
-        isLoading: false,
-        autoClose: 3000,
-      });
-    }
-  };
+  const { email, otpProps, onSubmitHandler } = useEmailVerify();
+  const { setRef, handleInput, handleKeyDown, handlePaste } = otpProps;
 
   return (
     <div className="relative flex items-center justify-center min-h-screen overflow-hidden">
@@ -110,7 +28,7 @@ const EmailVerify = () => {
         </h1>
 
         <p className="text-center mb-6 text-indigo-300">
-          Enter the 6-digit OTP sent to your email
+          Enter the OTP sent to your email
         </p>
 
         <div className="flex justify-between mb-8" onPaste={handlePaste}>
@@ -122,7 +40,7 @@ const EmailVerify = () => {
                 type="text"
                 maxLength="1"
                 className="w-12 h-12 bg-[#333A5C] text-white text-center text-xl rounded-md outline-none"
-                ref={(el) => (inputRefs.current[index] = el)}
+                ref={(el) => setRef(el, index)}
                 onInput={(e) => handleInput(e, index)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
               />

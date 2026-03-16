@@ -66,7 +66,6 @@ const movieSchema = new mongoose.Schema(
       {
         type: String,
         trim: true,
-        index: true,
       },
     ],
 
@@ -91,7 +90,6 @@ const movieSchema = new mongoose.Schema(
       {
         type: String,
         trim: true,
-        index: true,
       },
     ],
 

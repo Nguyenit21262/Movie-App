@@ -7,45 +7,98 @@ import React, {
   memo,
   useRef,
 } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { assets } from "../assets/assets";
 import { AppContent } from "../context/AppContext";
-import { SearchIcon, ChevronDown, Film } from "lucide-react";
+import { SearchIcon, ChevronDown } from "lucide-react";
 import { getGenresArray } from "../lib/tmdb/Genres";
 import axios from "axios";
 
-/* ================= SEARCH BAR ================= */
-
-const SearchBar = memo(({ onSearch }) => {
+const SearchBar = memo(({ onSearch, backendUrl }) => {
   const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const timeoutRef = useRef(null);
+  const location = useLocation();
 
-  const handleSubmit = useCallback(
-    (e) => {
-      e.preventDefault();
-      if (query.trim()) onSearch(query);
-    },
-    [query, onSearch],
-  );
+  useEffect(() => {
+    if (!location.pathname.startsWith("/movies")) {
+      setQuery("");
+      setSuggestions([]);
+    }
+  }, [location.pathname]);
+
+  const fetchSuggestions = async (q) => {
+    try {
+      const { data } = await axios.get(
+        `${backendUrl}/api/movies/suggestions?q=${encodeURIComponent(q)}`,
+      );
+      setSuggestions(data.suggestions || []);
+    } catch (err) {
+      console.error("Suggestion error:", err);
+    }
+  };
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+
+    clearTimeout(timeoutRef.current);
+
+    if (!value.trim()) {
+      setSuggestions([]);
+      return;
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      fetchSuggestions(value);
+    }, 300);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!query.trim()) return;
+    onSearch(query);
+    setSuggestions([]);
+  };
+
+  const handleSuggestionClick = (title) => {
+    setQuery(title);
+    setSuggestions([]);
+    onSearch(title);
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="hidden md:block max-w-md">
-      <div className="relative">
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search movies..."
-          className="w-full px-8 py-2 bg-gray-950 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 rounded-md"
-        />
-        <button type="submit" className="absolute right-3 top-2.5">
-          <SearchIcon className="h-5 w-5 text-gray-400 hover:text-white transition" />
-        </button>
-      </div>
-    </form>
+    <div className="hidden md:block max-w-md relative">
+      <form onSubmit={handleSubmit}>
+        <div className="relative">
+          <input
+            value={query}
+            onChange={handleChange}
+            placeholder="Search movies..."
+            className="w-full px-8 py-2 bg-gray-950 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 rounded-md"
+          />
+          <button type="submit" className="absolute right-3 top-2.5">
+            <SearchIcon className="h-5 w-5 text-gray-400 hover:text-white transition" />
+          </button>
+        </div>
+      </form>
+
+      {suggestions.length > 0 && (
+        <div className="absolute top-full mt-2 w-full bg-neutral-900 border border-neutral-700 rounded-lg shadow-xl z-50">
+          {suggestions.map((title, i) => (
+            <div
+              key={i}
+              onClick={() => handleSuggestionClick(title)}
+              className="px-4 py-2 text-sm text-gray-300 hover:bg-neutral-800 hover:text-white cursor-pointer"
+            >
+              {title}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 });
-SearchBar.displayName = "SearchBar";
-
-/* ================= GENRE DROPDOWN ================= */
 
 const GenreDropdown = memo(() => {
   const navigate = useNavigate();
@@ -114,10 +167,6 @@ const GenreDropdown = memo(() => {
   );
 });
 
-GenreDropdown.displayName = "GenreDropdown";
-
-/* ================= NAV LINKS ================= */
-
 const NavLinks = memo(() => (
   <div className="hidden md:flex space-x-8">
     <Link
@@ -139,11 +188,8 @@ const NavLinks = memo(() => (
     <GenreDropdown />
   </div>
 ));
-NavLinks.displayName = "NavLinks";
 
-/* ================= USER MENU ================= */
-
-const UserMenu = memo(({ userData, backendUrl, onLogout, onNavigate }) => {
+const UserMenu = memo(({ userData, onLogout, onNavigate }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -187,9 +233,6 @@ const UserMenu = memo(({ userData, backendUrl, onLogout, onNavigate }) => {
     </div>
   );
 });
-UserMenu.displayName = "UserMenu";
-
-/* ================= MAIN NAVBAR ================= */
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -199,7 +242,6 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const prevScroll = useRef(false);
 
-  /* Scroll optimize */
   useEffect(() => {
     const onScroll = () => {
       const next = window.scrollY > 10;
@@ -213,7 +255,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  /* Axios instance */
   const api = useMemo(
     () =>
       axios.create({
@@ -256,7 +297,7 @@ const Navbar = () => {
               <img src={assets.logo} alt="Logo" className="h-8 sm:h-10" />
             </Link>
 
-            <SearchBar onSearch={handleSearch} />
+            <SearchBar onSearch={handleSearch} backendUrl={backendUrl} />
             <NavLinks />
           </div>
 
@@ -264,7 +305,6 @@ const Navbar = () => {
             {isLoggedIn && userData ? (
               <UserMenu
                 userData={userData}
-                backendUrl={backendUrl}
                 onLogout={logout}
                 onNavigate={handleNavigate}
               />
