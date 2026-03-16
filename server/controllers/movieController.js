@@ -94,10 +94,6 @@ export const getTopRatedMovies = createTMDBListHandler("top_rated");
 export const getTMDBNowPlaying = createTMDBListHandler("now_playing");
 export const getTMDBUpcoming = createTMDBListHandler("upcoming");
 
-// ─────────────────────────────────────────────
-// IMPORT (BATCH)
-// ─────────────────────────────────────────────
-
 export const importMoviesFromTMDB = async (req, res) => {
   try {
     const { category = "popular", pages = 1 } = req.body;
@@ -129,10 +125,6 @@ export const importMoviesFromTMDB = async (req, res) => {
     });
   }
 };
-
-// ─────────────────────────────────────────────
-// DATABASE QUERIES
-// ─────────────────────────────────────────────
 
 export const getAllMovies = async (req, res) => {
   try {
@@ -267,14 +259,6 @@ export const deleteMovie = async (req, res) => {
   }
 };
 
-// ─────────────────────────────────────────────
-// TMDB SINGLE MOVIE
-// ─────────────────────────────────────────────
-
-/**
- * Ensure movie tồn tại trong DB trước khi user comment/rating.
- * Nếu chưa có → fetch TMDB đầy đủ và lưu.
- */
 export const ensureMovieExists = async (req, res) => {
   try {
     const { tmdbId } = req.params;
@@ -296,9 +280,6 @@ export const ensureMovieExists = async (req, res) => {
   }
 };
 
-/**
- * Add single movie từ TMDB vào DB theo tmdbId.
- */
 export const addMovieFromTMDB = async (req, res) => {
   try {
     const { tmdbId } = req.body;
@@ -333,9 +314,7 @@ export const addMovieFromTMDB = async (req, res) => {
   }
 };
 
-/**
- * Search movies từ TMDB + background save kết quả.
- */
+
 export const searchTMDBMovies = async (req, res) => {
   try {
     const { query, page = 1 } = req.query;
@@ -364,10 +343,6 @@ export const searchTMDBMovies = async (req, res) => {
   }
 };
 
-/**
- * Lấy đầy đủ thông tin movie từ TMDB (details, credits, videos, recommendations).
- * Tái sử dụng details đã fetch để lưu DB — không gọi thêm API.
- */
 export const getTMDBMovieDetails = async (req, res) => {
   try {
     const { tmdbId } = req.params;

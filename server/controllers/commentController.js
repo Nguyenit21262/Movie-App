@@ -1,13 +1,5 @@
 import Comment from "../models/Comment.js";
 
-// ─────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────
-
-/**
- * movieId trong tất cả routes = tmdb_id (Number)
- * Schema Comment.movie lưu tmdb_id → query trực tiếp, không cần join Movie
- */
 const parseTmdbId = (movieId) => parseInt(movieId, 10);
 
 const validateContent = (content) => {
@@ -16,15 +8,6 @@ const validateContent = (content) => {
   return null;
 };
 
-// ─────────────────────────────────────────────
-// CONTROLLERS
-// ─────────────────────────────────────────────
-
-/**
- * GET /api/movies/:movieId/comments
- * Fetch tất cả comments của movie rồi build tree trong memory.
- * Hỗ trợ unlimited depth (reply của reply của reply...).
- */
 export const getMovieComments = async (req, res) => {
   try {
     const tmdbId = parseTmdbId(req.params.movieId);
@@ -61,11 +44,6 @@ export const getMovieComments = async (req, res) => {
   }
 };
 
-/**
- * POST /api/movies/:movieId/comments
- * Thêm comment hoặc reply
- * Body: { content, parentId? }
- */
 export const addComment = async (req, res) => {
   try {
     const tmdbId = parseTmdbId(req.params.movieId);
@@ -100,11 +78,6 @@ export const addComment = async (req, res) => {
   }
 };
 
-/**
- * PUT /api/movies/:movieId/comments/:commentId
- * Cập nhật nội dung comment (chỉ owner)
- * Body: { content }
- */
 export const updateComment = async (req, res) => {
   try {
     const { commentId } = req.params;
@@ -137,14 +110,6 @@ export const updateComment = async (req, res) => {
   }
 };
 
-/**
- * DELETE /api/movies/:movieId/comments/:commentId
- * Xóa comment:
- * - Owner của comment có thể xóa
- * - Owner của parent comment có thể xóa reply
- * - Nếu xóa parent → xóa tất cả replies
- * - Nếu xóa reply → gỡ khỏi replies array của parent
- */
 export const deleteComment = async (req, res) => {
   try {
     const { commentId } = req.params;
@@ -184,10 +149,6 @@ export const deleteComment = async (req, res) => {
   }
 };
 
-/**
- * GET /api/movies/:movieId/comments/count
- * Đếm số comment của một movie (theo tmdb_id)
- */
 export const getCommentCount = async (req, res) => {
   try {
     const tmdbId = parseTmdbId(req.params.movieId);
@@ -199,10 +160,7 @@ export const getCommentCount = async (req, res) => {
   }
 };
 
-/**
- * GET /api/user/comments
- * Lấy tất cả comments của user đang đăng nhập
- */
+
 export const getUserComments = async (req, res) => {
   try {
     const userId = req.userId;

@@ -7,229 +7,259 @@ import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { backendUrl, setIsLoggedIn, getUserData } = useContext(AppContent);
+  const { backendUrl, getUserData } = useContext(AppContent);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [form, setForm] = useState({ email: "", password: "" });
   const [otp, setOtp] = useState("");
+  const [showOtpInput, setShowOtpInput] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const validateLoginForm = () => {
+    if (!form.email.trim() || !form.password.trim()) {
+      toast.error("Please fill in all fields");
+      return false;
+    }
+    if (form.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return false;
+    }
+    return true;
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (!validateLoginForm()) return;
 
-    if (!email || !password) {
-      return toast.error("Please fill in all fields");
-    }
-
-    if (password.length < 6) {
-      return toast.error("Password must be at least 6 characters long");
-    }
-
-    const loadingToast = toast.loading("Logging in...");
-
+    setLoading(true);
     try {
-      axios.defaults.withCredentials = true;
-
-      const { data } = await axios.post(`${backendUrl}/api/auth/login`, {
-        email,
-        password,
-      });
+      const { data } = await axios.post(`${backendUrl}/api/auth/login`, form);
 
       if (data.success && data.require2FA) {
-        toast.update(loadingToast, {
-          render: "OTP sent to your email. Please check your inbox.",
-          type: "success",
-          isLoading: false,
-          autoClose: 3000,
-        });
+        toast.success("OTP sent to your email");
         setShowOtpInput(true);
       } else {
-        toast.update(loadingToast, {
-          render: data.message || "Login failed",
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-        });
+        toast.error(data.message || "Login failed");
       }
     } catch (error) {
-      toast.update(loadingToast, {
-        render:
-          error.response?.data?.message || "Login failed. Please try again.",
-        type: "error",
-        isLoading: false,
-        autoClose: 3000,
-      });
+      toast.error(error.response?.data?.message || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
 
-    if (!otp || otp.length !== 6) {
+    if (otp.length !== 6) {
       return toast.error("Please enter a valid 6-digit OTP");
     }
 
-    const loadingToast = toast.loading("Verifying OTP...");
-
+    setLoading(true);
     try {
-      axios.defaults.withCredentials = true;
-
       const { data } = await axios.post(
         `${backendUrl}/api/auth/verify-login-otp`,
-        { email, otp },
-        { withCredentials: true },
+        { email: form.email, otp },
+        { withCredentials: true }
       );
 
-      if (data.success) {
-        toast.update(loadingToast, {
-          render: "Login successful!",
-          type: "success",
-          isLoading: false,
-          autoClose: 2000,
-        });
+      if (!data.success) {
+        toast.error(data.message || "OTP verification failed");
+        return;
+      }
 
-        // Fetch user data and set logged in state
-        await getUserData();
-        setIsLoggedIn(true);
+      const userData = await getUserData();
 
-        navigate("/");
+      if (!userData) {
+        toast.error("Failed to load user profile");
+        return;
+      }
+
+      toast.success("Login successful");
+
+      if (userData.role === "admin") {
+        window.location.href = "/admin";
       } else {
-        toast.update(loadingToast, {
-          render: data.message || "Invalid OTP",
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-        });
+        navigate("/", { replace: true });
       }
     } catch (error) {
-      toast.update(loadingToast, {
-        render: error.response?.data?.message || "OTP verification failed",
-        type: "error",
-        isLoading: false,
-        autoClose: 3000,
-      });
+      toast.error(error.response?.data?.message || "OTP verification failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="relative h-screen w-full overflow-hidden bg-black">
+      {/* Background Image */}
       <img
         src="image.png"
         alt="cinema-bg"
         className="absolute inset-0 w-full h-full object-cover opacity-60"
       />
 
+      {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/40 backdrop-blur-[2px]" />
 
+      {/* Logo */}
       <div className="absolute top-6 left-6 z-20 flex items-center">
         <img src={assets.logo} alt="Cinema Logo" className="h-12 w-auto" />
       </div>
 
+      {/* Form Container */}
       <div className="relative z-10 flex items-center justify-center h-full">
         {!showOtpInput ? (
-          // Login Form
-          <form
-            onSubmit={handleLogin}
-            className="w-[400px] bg-black/75 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-10 shadow-[0_0_60px_rgba(99,102,241,0.2)] flex flex-col items-center"
-          >
-            <h2 className="text-4xl font-bold text-white tracking-wide mb-8">
-              Sign in
-            </h2>
-
-            <div className="w-full flex flex-col gap-4">
-              <input
-                type="email"
-                placeholder="Email Address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
-              />
-
-              <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
-              />
-
-              <div className="flex justify-end">
-                <span
-                  onClick={() => navigate("/reset-password")}
-                  className="text-sm text-indigo-400 hover:underline cursor-pointer"
-                >
-                  Forgot Password?
-                </span>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="mt-6 w-full h-11 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold tracking-wide shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
-            >
-              Continue
-            </button>
-
-            <p className="text-gray-400 text-sm mt-6">
-              Don't have an account?
-              <span
-                onClick={() => navigate("/register")}
-                className="ml-1 text-yellow-500 font-medium hover:underline cursor-pointer"
-              >
-                Sign up
-              </span>
-            </p>
-          </form>
+          <LoginForm
+            form={form}
+            loading={loading}
+            handleChange={handleChange}
+            handleLogin={handleLogin}
+            navigate={navigate}
+          />
         ) : (
-          // OTP Verification Form
-          <form
-            onSubmit={handleVerifyOtp}
-            className="w-[400px] bg-black/75 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-10 shadow-[0_0_60px_rgba(99,102,241,0.2)] flex flex-col items-center"
-          >
-            <h2 className="text-3xl font-bold text-white tracking-wide mb-4">
-              Verify 2FA
-            </h2>
-
-            <p className="text-center text-indigo-300 text-sm mb-8">
-              Enter the 6-digit OTP sent to {email}
-            </p>
-
-            <div className="w-full flex flex-col gap-4">
-              <input
-                type="text"
-                placeholder="Enter 6-digit OTP"
-                value={otp}
-                onChange={(e) =>
-                  setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
-                }
-                maxLength={6}
-                className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 text-center placeholder-gray-500 focus:border-indigo-500 outline-none transition-all tracking-widest text-xl"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="mt-6 w-full h-11 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold tracking-wide shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
-            >
-              Verify & Login
-            </button>
-
-            <p className="text-gray-400 text-sm mt-6">
-              Didn't receive the code?
-              <span
-                onClick={() => {
-                  setShowOtpInput(false);
-                  setOtp("");
-                }}
-                className="ml-1 text-indigo-400 font-medium hover:underline cursor-pointer"
-              >
-                Back to Login
-              </span>
-            </p>
-          </form>
+          <OtpForm
+            email={form.email}
+            otp={otp}
+            setOtp={setOtp}
+            loading={loading}
+            handleVerifyOtp={handleVerifyOtp}
+            setShowOtpInput={setShowOtpInput}
+          />
         )}
       </div>
     </div>
+  );
+};
+
+const LoginForm = ({ form, loading, handleChange, handleLogin, navigate }) => (
+  <form
+    onSubmit={handleLogin}
+    className="w-[400px] bg-black/75 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-10 shadow-[0_0_60px_rgba(59,130,246,0.25)] flex flex-col items-center"
+  >
+    <h2 className="text-4xl font-bold text-white tracking-wide mb-8">
+      Sign in
+    </h2>
+
+    <div className="w-full flex flex-col gap-4">
+      <input
+        type="email"
+        name="email"
+        placeholder="Email Address"
+        value={form.email}
+        onChange={handleChange}
+        disabled={loading}
+        className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-blue-500 outline-none transition-all disabled:opacity-50"
+      />
+
+      <input
+        type="password"
+        name="password"
+        placeholder="Password"
+        value={form.password}
+        onChange={handleChange}
+        disabled={loading}
+        className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-blue-500 outline-none transition-all disabled:opacity-50"
+      />
+
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => navigate("/reset-password")}
+          className="text-sm text-blue-400 hover:text-blue-300 hover:underline transition-colors"
+        >
+          Forgot Password?
+        </button>
+      </div>
+    </div>
+
+    <button
+      type="submit"
+      disabled={loading}
+      className="mt-6 w-full h-11 rounded-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white font-semibold tracking-wide shadow-lg shadow-blue-600/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+      {loading ? "Loading..." : "Continue"}
+    </button>
+
+    <p className="text-gray-400 text-sm mt-6">
+      Don't have an account?
+      <button
+        type="button"
+        onClick={() => navigate("/register")}
+        className="ml-1 text-yellow-500 font-medium hover:text-yellow-400 hover:underline transition-colors"
+      >
+        Sign up
+      </button>
+    </p>
+  </form>
+);
+
+const OtpForm = ({
+  email,
+  otp,
+  setOtp,
+  loading,
+  handleVerifyOtp,
+  setShowOtpInput,
+}) => {
+  const handleOtpChange = (e) => {
+    const value = e.target.value.replace(/\D/g, "").slice(0, 6);
+    setOtp(value);
+  };
+
+  const handleBackToLogin = () => {
+    setShowOtpInput(false);
+    setOtp("");
+  };
+
+  return (
+    <form
+      onSubmit={handleVerifyOtp}
+      className="w-[400px] bg-black/75 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-10 shadow-[0_0_60px_rgba(59,130,246,0.25)] flex flex-col items-center"
+    >
+      <h2 className="text-3xl font-bold text-white tracking-wide mb-4">
+        Verify OTP
+      </h2>
+
+      <p className="text-center text-blue-300 text-sm mb-8">
+        Enter the OTP sent to{" "}
+        <span className="font-semibold text-white">{email}</span>
+      </p>
+
+      <input
+        type="text"
+        placeholder="Enter OTP"
+        value={otp}
+        onChange={handleOtpChange}
+        disabled={loading}
+        maxLength={6}
+        autoFocus
+        className="w-full h-12 rounded-md bg-black/40 border border-white/10 px-5 text-sm text-gray-200 text-center placeholder-gray-500 focus:border-blue-500 outline-none transition-all tracking-widest text-xl disabled:opacity-50"
+      />
+
+      <button
+        type="submit"
+        disabled={loading || otp.length !== 6}
+        className="mt-6 w-full h-11 rounded-md bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white font-semibold tracking-wide shadow-lg shadow-blue-600/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {loading ? "Verifying..." : "Verify & Login"}
+      </button>
+
+      <p className="text-gray-400 text-sm mt-6">
+        Didn't receive the code?
+        <button
+          type="button"
+          onClick={handleBackToLogin}
+          disabled={loading}
+          className="ml-1 text-blue-400 font-medium hover:text-blue-300 hover:underline transition-colors disabled:opacity-50"
+        >
+          Back to Login
+        </button>
+      </p>
+    </form>
   );
 };
 

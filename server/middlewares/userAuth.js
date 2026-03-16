@@ -1,17 +1,9 @@
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-/**
- * Middleware xác thực người dùng dựa trên JWT Token từ Cookie.
- * Kiểm tra quyền truy cập trước khi cho phép vào các route yêu cầu đăng nhập.
- * @param {Object} req - Express request object.
- * @param {Object} res - Express response object.
- * @param {Function} next - Express next middleware function.
- */
-const userAuth = (req, res, next) => {
-  // 1. Trích xuất token từ cookies của trình duyệt
+const userAuth = async (req, res, next) => {
   const { token } = req.cookies;
 
-  // 2. Kiểm tra sự tồn tại của token
   if (!token) {
     return res.status(401).json({
       success: false,
@@ -20,18 +12,20 @@ const userAuth = (req, res, next) => {
   }
 
   try {
-    // 3. Giải mã và kiểm tra tính hợp lệ của token bằng Secret Key
     const tokenDecode = jwt.verify(token, process.env.JWT_SECRET);
 
-    // 4. Nếu giải mã thành công và có thông tin ID người dùng
     if (tokenDecode.id) {
-      /**
-       * Gán userId vào req để các controller tiếp theo có thể sử dụng
-       * trực tiếp mà không cần client gửi lên, tăng tính bảo mật.
-       */
-      req.userId = tokenDecode.id;
+      const user = await User.findById(tokenDecode.id).select('-password');
 
-      // Cho phép request đi tiếp tới Controller hoặc Middleware tiếp theo
+      if (!user) {
+        return res.status(401).json({
+          success: false,
+          message: "Unauthorized: User not found. Please login again.",
+        });
+      }
+
+      req.userId = tokenDecode.id;
+      req.user = user;
       next();
     } else {
       return res.status(401).json({
@@ -40,15 +34,43 @@ const userAuth = (req, res, next) => {
       });
     }
   } catch (error) {
-    console.error("JWT Verify Error:", error.name);
-    console.error("Details:", error.message);
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: Token has expired. Please login again.",
+      });
+    }
 
-    // 5. Xử lý trường hợp token sai, hết hạn hoặc bị can thiệp
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized: Invalid token. Please login again.",
+      });
+    }
+
     return res.status(401).json({
       success: false,
       message: "Unauthorized: Invalid or expired token. Please login again.",
     });
   }
+};
+
+export const adminAuth = (req, res, next) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized: Please login first.",
+    });
+  }
+
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      message: "Forbidden: Admin access required.",
+    });
+  }
+
+  next();
 };
 
 export default userAuth;

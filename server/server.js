@@ -9,6 +9,7 @@ import authRouter from "./routes/authRoutes.js";
 import userRouter from "./routes/userRoutes.js";
 import movieRouter from "./routes/movieRouter.js";
 import commentRoutes from "./routes/commentRoutes.js";
+import showRouter from "./routes/showRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -37,6 +38,7 @@ app.use("/api/user", userRouter);
 
 app.use("/api/movies/:movieId/comments", commentRoutes);
 app.use("/api/movies", movieRouter);
+app.use("/api/shows", showRouter);
 
 // Health check
 app.get("/", (req, res) => {
