@@ -1,5 +1,4 @@
 import React, {
-  useEffect,
   useState,
   useContext,
   useMemo,
@@ -7,31 +6,22 @@ import React, {
   memo,
   useRef,
 } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { AppContent } from "../context/AppContent";
 import { assets } from "../assets/assets";
-import { AppContent } from "../context/AppContext";
 import { SearchIcon, ChevronDown } from "lucide-react";
 import { getGenresArray } from "../lib/tmdb/Genres";
-import axios from "axios";
+import NotificationBell from "../components/NotificationBell";
+import { getMovieSuggestions } from "../api/movieApi";
 
-const SearchBar = memo(({ onSearch, backendUrl }) => {
+const SearchBar = memo(({ onSearch }) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const timeoutRef = useRef(null);
-  const location = useLocation();
-
-  useEffect(() => {
-    if (!location.pathname.startsWith("/movies")) {
-      setQuery("");
-      setSuggestions([]);
-    }
-  }, [location.pathname]);
 
   const fetchSuggestions = async (q) => {
     try {
-      const { data } = await axios.get(
-        `${backendUrl}/api/movies/suggestions?q=${encodeURIComponent(q)}`,
-      );
+      const { data } = await getMovieSuggestions(q);
       setSuggestions(data.suggestions || []);
     } catch (err) {
       console.error("Suggestion error:", err);
@@ -41,7 +31,6 @@ const SearchBar = memo(({ onSearch, backendUrl }) => {
   const handleChange = (e) => {
     const value = e.target.value;
     setQuery(value);
-
     clearTimeout(timeoutRef.current);
 
     if (!value.trim()) {
@@ -49,9 +38,7 @@ const SearchBar = memo(({ onSearch, backendUrl }) => {
       return;
     }
 
-    timeoutRef.current = setTimeout(() => {
-      fetchSuggestions(value);
-    }, 300);
+    timeoutRef.current = setTimeout(() => fetchSuggestions(value), 300);
   };
 
   const handleSubmit = (e) => {
@@ -59,12 +46,6 @@ const SearchBar = memo(({ onSearch, backendUrl }) => {
     if (!query.trim()) return;
     onSearch(query);
     setSuggestions([]);
-  };
-
-  const handleSuggestionClick = (title) => {
-    setQuery(title);
-    setSuggestions([]);
-    onSearch(title);
   };
 
   return (
@@ -75,7 +56,7 @@ const SearchBar = memo(({ onSearch, backendUrl }) => {
             value={query}
             onChange={handleChange}
             placeholder="Search movies..."
-            className="w-full px-8 py-2 bg-gray-950 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500 rounded-md"
+            className="w-full px-8 py-2 bg-gray-950 text-white focus:outline-none focus:ring-2 focus:ring-white-off rounded-md"
           />
           <button type="submit" className="absolute right-3 top-2.5">
             <SearchIcon className="h-5 w-5 text-gray-400 hover:text-white transition" />
@@ -88,7 +69,11 @@ const SearchBar = memo(({ onSearch, backendUrl }) => {
           {suggestions.map((title, i) => (
             <div
               key={i}
-              onClick={() => handleSuggestionClick(title)}
+              onClick={() => {
+                setQuery(title);
+                setSuggestions([]);
+                onSearch(title);
+              }}
               className="px-4 py-2 text-sm text-gray-300 hover:bg-neutral-800 hover:text-white cursor-pointer"
             >
               {title}
@@ -103,26 +88,9 @@ const SearchBar = memo(({ onSearch, backendUrl }) => {
 const GenreDropdown = memo(() => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-
   const genres = useMemo(() => getGenresArray(), []);
 
-  const close = useCallback(() => setOpen(false), []);
-
-  const handleGenreClick = useCallback(
-    (e) => {
-      const genre = e.currentTarget.dataset.genre;
-      navigate(`/movies?genre=${genre}`);
-      close();
-      window.scrollTo(0, 0);
-    },
-    [navigate, close],
-  );
-
-  const handleAll = useCallback(() => {
-    navigate("/movies");
-    close();
-    window.scrollTo(0, 0);
-  }, [navigate, close]);
+  const close = () => setOpen(false);
 
   return (
     <div className="relative">
@@ -130,7 +98,7 @@ const GenreDropdown = memo(() => {
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-2 text-gray-300 hover:text-white transition"
       >
-        <span>Genres</span>
+        Genres
         <ChevronDown
           className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
         />
@@ -139,11 +107,14 @@ const GenreDropdown = memo(() => {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={close} />
-
           <div className="absolute top-full mt-2 left-0 w-[480px] bg-neutral-900 rounded-lg shadow-2xl border border-neutral-700 z-50 max-h-96 overflow-y-auto">
             <div
-              onClick={handleAll}
-              className="px-4 py-3 hover:bg-neutral-800 cursor-pointer transition-colors text-white font-medium border-b border-neutral-700"
+              onClick={() => {
+                navigate("/movies");
+                close();
+                window.scrollTo(0, 0);
+              }}
+              className="px-4 py-3 hover:bg-neutral-800 cursor-pointer text-white font-medium border-b border-neutral-700"
             >
               All Genres
             </div>
@@ -152,9 +123,12 @@ const GenreDropdown = memo(() => {
               {genres.map((g) => (
                 <div
                   key={g.id}
-                  data-genre={g.name}
-                  onClick={handleGenreClick}
-                  className="px-3 py-2 rounded-md hover:bg-neutral-800 cursor-pointer transition-colors text-gray-300 hover:text-white text-sm"
+                  onClick={() => {
+                    navigate(`/movies?genre=${g.name}`);
+                    close();
+                    window.scrollTo(0, 0);
+                  }}
+                  className="px-3 py-2 rounded-md hover:bg-neutral-800 cursor-pointer text-gray-300 hover:text-white text-sm"
                 >
                   {g.name}
                 </div>
@@ -196,38 +170,66 @@ const UserMenu = memo(({ userData, onLogout, onNavigate }) => {
     <div className="relative">
       <div
         onClick={() => setOpen((v) => !v)}
-        className="h-9 w-9 rounded-full overflow-hidden border border-white/20 cursor-pointer"
+        className="h-9 w-9 rounded-full border border-white/20 cursor-pointer bg-pink-600 flex items-center justify-center text-white font-semibold text-sm uppercase"
       >
-        <div className="w-full h-full bg-pink-600 flex items-center justify-center text-white font-semibold text-sm uppercase">
-          {userData?.name?.charAt(0) || "U"}
-        </div>
+        {userData?.name?.charAt(0) || "U"}
       </div>
 
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-50 w-48 bg-white rounded-lg shadow-xl overflow-hidden">
-            <ul>
-              <li
-                onClick={() => onNavigate("/profile")}
+
+          {userData?.role === "admin" ? (
+            <div className="absolute right-0 z-50 w-48 bg-white rounded-lg shadow-xl overflow-hidden">
+              <div
+                onClick={() => {
+                  onNavigate("/admin");
+                  setOpen(false);
+                }}
                 className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
               >
-                Profile
-              </li>
-              <li
-                onClick={() => onNavigate("/my-bookings")}
-                className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
-              >
-                My Bookings
-              </li>
-              <li
+                Dashboard
+              </div>
+
+              {/* <div
                 onClick={onLogout}
                 className="px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
               >
                 Logout
-              </li>
-            </ul>
-          </div>
+              </div> */}
+            </div>
+          ) : (
+            <div className="absolute right-0 z-50 w-48 bg-white rounded-lg shadow-xl overflow-hidden">
+              <ul>
+                <li
+                  onClick={() => {
+                    onNavigate("/profile");
+                    setOpen(false);
+                  }}
+                  className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
+                >
+                  Profile
+                </li>
+
+                <li
+                  onClick={() => {
+                    onNavigate("/my-bookings");
+                    setOpen(false);
+                  }}
+                  className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
+                >
+                  My Bookings
+                </li>
+
+                <li
+                  onClick={onLogout}
+                  className="px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 cursor-pointer"
+                >
+                  Logout
+                </li>
+              </ul>
+            </div>
+          )}
         </>
       )}
     </div>
@@ -236,13 +238,12 @@ const UserMenu = memo(({ userData, onLogout, onNavigate }) => {
 
 const Navbar = () => {
   const navigate = useNavigate();
-  const { userData, isLoggedIn, backendUrl, setIsLoggedIn, setUserData } =
-    useContext(AppContent);
+  const { userData, isLoggedIn, logoutUser } = useContext(AppContent);
 
   const [scrolled, setScrolled] = useState(false);
   const prevScroll = useRef(false);
 
-  useEffect(() => {
+  React.useEffect(() => {
     const onScroll = () => {
       const next = window.scrollY > 10;
       if (prevScroll.current !== next) {
@@ -255,34 +256,14 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const api = useMemo(
-    () =>
-      axios.create({
-        baseURL: backendUrl,
-        withCredentials: true,
-      }),
-    [backendUrl],
-  );
-
   const logout = useCallback(async () => {
     try {
-      const { data } = await api.post("/api/auth/logout");
-      if (data.success) {
-        setIsLoggedIn(false);
-        setUserData(null);
-        navigate("/");
-      }
+      await logoutUser();
+      navigate("/");
     } catch (err) {
       console.error("Logout error:", err.message);
     }
-  }, [api, navigate, setIsLoggedIn, setUserData]);
-
-  const handleSearch = useCallback(
-    (q) => navigate(`/movies?search=${encodeURIComponent(q)}`),
-    [navigate],
-  );
-
-  const handleNavigate = useCallback((path) => navigate(path), [navigate]);
+  }, [logoutUser, navigate]);
 
   return (
     <nav
@@ -297,16 +278,23 @@ const Navbar = () => {
               <img src={assets.logo} alt="Logo" className="h-8 sm:h-10" />
             </Link>
 
-            <SearchBar onSearch={handleSearch} backendUrl={backendUrl} />
+            <SearchBar
+              onSearch={(q) =>
+                navigate(`/movies?search=${encodeURIComponent(q)}`)
+              }
+            />
+
             <NavLinks />
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
+            {isLoggedIn && userData && <NotificationBell />}
+
             {isLoggedIn && userData ? (
               <UserMenu
                 userData={userData}
                 onLogout={logout}
-                onNavigate={handleNavigate}
+                onNavigate={(path) => navigate(path)}
               />
             ) : (
               <button

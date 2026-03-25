@@ -1,8 +1,8 @@
 import { assets } from "../assets/assets";
-import { useEmailVerify } from "../hooks/UseEmailverify";
+import { useEmailVerify } from "../hooks/useEmailVerify";
 
 const EmailVerify = () => {
-  const { email, otpProps, onSubmitHandler } = useEmailVerify();
+  const { otpProps, onSubmitHandler } = useEmailVerify();
   const { setRef, handleInput, handleKeyDown, handlePaste } = otpProps;
 
   return (

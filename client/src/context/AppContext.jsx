@@ -1,73 +1,69 @@
-import { useState, createContext, useEffect } from "react";
-import axios from "axios";
-
-export const AppContent = createContext();
+import { useState, useEffect, useCallback } from "react";
+import { API_BASE_URL } from "../api/httpClient";
+import { logoutUserRequest } from "../api/authApi";
+import { getCurrentUser } from "../api/userApi";
+import { AppContent } from "./AppContent";
 
 export const AppContextProvider = ({ children }) => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const backendUrl = API_BASE_URL;
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // set cookie credentials
-  axios.defaults.withCredentials = true;
-
-  const getUserData = async () => {
+  const getUserData = useCallback(async () => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/user/data`);
+      const { data } = await getCurrentUser();
 
       if (data.success) {
         setUserData(data.userData);
-        return data.userData; // return user object
+        setIsLoggedIn(true);
+        return data.userData;
       }
 
-      return null;
-    } catch (error) {
-      console.error("Get user data error:", error);
       setUserData(null);
+      setIsLoggedIn(false);
+      return null;
+    } catch {
+      setUserData(null);
+      setIsLoggedIn(false);
       return null;
     }
-  };
-  const getAuthState = async () => {
+  }, []);
+
+  const getAuthState = useCallback(async () => {
     try {
       setLoading(true);
-
-      const { data } = await axios.get(`${backendUrl}/api/auth/is-auth`);
-
-      if (data.success) {
-        setIsLoggedIn(true);
-        await getUserData();
-      } else {
-        setIsLoggedIn(false);
-        setUserData(null);
-      }
-    } catch (error) {
-      console.error("Auth state error:", error);
-      setIsLoggedIn(false);
-      setUserData(null);
+      await getUserData();
     } finally {
       setLoading(false);
     }
+  }, [getUserData]);
+
+  const logoutUser = async () => {
+    try {
+      await logoutUserRequest();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setUserData(null);
+      setIsLoggedIn(false);
+    }
   };
 
-  // run when app start
   useEffect(() => {
     getAuthState();
-  }, []);
+  }, [getAuthState]);
 
   const value = {
     backendUrl,
-
     isLoggedIn,
     setIsLoggedIn,
-
     userData,
     setUserData,
-
     getUserData,
     getAuthState,
-
+    logoutUser,
     loading,
   };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext, useCallback } from "react";
-import { useNavigate } from "react-router-dom"; 
-import { AppContent } from "../context/AppContext";
+import { useNavigate } from "react-router-dom";
+import { AppContent } from "../context/AppContent";
 import HeroSection from "../components/HeroSection";
 import HorizontalScollCard from "../components/HorizontalScollCard";
 import Loading from "../components/Loading";
@@ -13,23 +13,26 @@ import {
 } from "../services/movieService";
 
 const Home = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { backendUrl } = useContext(AppContent);
-  
+
   const [movieData, setMovieData] = useState({
     nowPlaying: [],
     topRated: [],
     popular: [],
     upcoming: [],
   });
-  
+
   const [loading, setLoading] = useState({ nowPlaying: true });
 
   // Hàm điều hướng dùng chung
-  const handleNavigate = useCallback((id) => {
-    navigate(`/movies/tmdb/${id}`);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [navigate]);
+  const handleNavigate = useCallback(
+    (id) => {
+      navigate(`/movies/tmdb/${id}`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [navigate],
+  );
 
   const loadCategory = useCallback(
     async (category, fetchFn) => {
@@ -45,7 +48,7 @@ const Home = () => {
         if (category === "nowPlaying") setLoading({ nowPlaying: false });
       }
     },
-    [backendUrl, movieData]
+    [backendUrl, movieData],
   );
 
   useEffect(() => {
@@ -64,28 +67,27 @@ const Home = () => {
       <HeroSection />
 
       <div className="flex flex-col gap-10 pb-10">
-        {/* Section 1: Hiện ngay lập tức (Critical Section) */}
         {loading.nowPlaying ? (
           <Loading />
         ) : (
           <HorizontalScollCard
             heading="Now Playing"
             data={movieData.nowPlaying}
-            onItemClick={(movie) => handleNavigate(movie.id)} 
+            onItemClick={(movie) => handleNavigate(movie.id)}
           />
         )}
 
         {/* Các Section Lazy Load tiếp theo */}
         {sections.map((section) => (
-          <LazySection 
-            key={section.key} 
+          <LazySection
+            key={section.key}
             fetchData={() => loadCategory(section.key, section.fetchFn)}
           >
             {movieData[section.key].length > 0 && (
-              <HorizontalScollCard 
-                heading={section.title} 
-                data={movieData[section.key]} 
-                onItemClick={(movie) => handleNavigate(movie.id)} 
+              <HorizontalScollCard
+                heading={section.title}
+                data={movieData[section.key]}
+                onItemClick={(movie) => handleNavigate(movie.id)}
               />
             )}
           </LazySection>

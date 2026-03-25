@@ -1,10 +1,21 @@
 import React, { useEffect, useState, useContext } from "react";
-import axios from "axios";
 import { toast } from "react-toastify";
-import { AppContent } from "../context/AppContext";
+import { AppContent } from "../context/AppContent";
+import { useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Calendar,
+  MapPin,
+  Briefcase,
+  Users,
+} from "lucide-react";
+import { getCurrentUser, updateUserProfile } from "../api/userApi";
 
 const Profile = () => {
-  const { backendUrl, getUserData } = useContext(AppContent);
+  const { getUserData } = useContext(AppContent);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -19,36 +30,33 @@ const Profile = () => {
 
   const fetchProfile = async () => {
     try {
-      const { data } = await axios.get(`${backendUrl}/api/user/data`, {
-        withCredentials: true,
-      });
+      const { data } = await getCurrentUser();
 
       if (!data.success) {
         toast.error(data.message || "Unauthorized");
         return;
       }
 
-      const userData = data.userData;
+      const user = data.userData;
 
-      let formattedDate = "";
-      if (userData.dateOfBirth) {
-        const date = new Date(userData.dateOfBirth);
-        const day = String(date.getDate()).padStart(2, "0");
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const year = date.getFullYear();
-        formattedDate = `${day}/${month}/${year}`;
+      let dob = "";
+      if (user.dateOfBirth) {
+        const d = new Date(user.dateOfBirth);
+        dob = `${String(d.getDate()).padStart(2, "0")}/${String(
+          d.getMonth() + 1,
+        ).padStart(2, "0")}/${d.getFullYear()}`;
       }
 
       setFormData({
-        name: userData.name || "",
-        email: userData.email || "",
-        dateOfBirth: formattedDate,
-        currentCity: userData.currentCity || "",
-        occupation: userData.occupation || "",
-        sex: userData.sex || "",
+        name: user.name || "",
+        email: user.email || "",
+        dateOfBirth: dob,
+        currentCity: user.currentCity || "",
+        occupation: user.occupation || "",
+        sex: user.sex || "",
       });
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to load profile");
+    } catch {
+      toast.error("Failed to load profile");
     } finally {
       setLoading(false);
     }
@@ -56,65 +64,53 @@ const Profile = () => {
 
   useEffect(() => {
     fetchProfile();
-  }, [backendUrl]);
+  }, []);
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleDobChange = (e) => {
     let value = e.target.value.replace(/[^\d]/g, "");
+
     if (value.length >= 3 && value.length <= 4) {
       value = value.slice(0, 2) + "/" + value.slice(2);
     } else if (value.length > 4) {
       value =
         value.slice(0, 2) + "/" + value.slice(2, 4) + "/" + value.slice(4, 8);
     }
+
     setFormData((prev) => ({ ...prev, dateOfBirth: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      formData.dateOfBirth &&
-      !/^\d{2}\/\d{2}\/\d{4}$/.test(formData.dateOfBirth)
-    ) {
-      return toast.error("Date must be DD/MM/YYYY");
-    }
-
     const loadingToast = toast.loading("Updating profile...");
 
     try {
-      const { data } = await axios.put(
-        `${backendUrl}/api/user/update`,
-        formData,
-        { withCredentials: true },
-      );
+      const { data } = await updateUserProfile(formData);
 
       if (data.success) {
         toast.update(loadingToast, {
           render: "Profile updated",
           type: "success",
           isLoading: false,
-          autoClose: 3000,
+          autoClose: 2000,
         });
 
         await getUserData();
-        await fetchProfile();
       } else {
         toast.update(loadingToast, {
-          render: data.message || "Update failed",
+          render: "Update failed",
           type: "error",
           isLoading: false,
         });
       }
-    } catch (error) {
+    } catch {
       toast.update(loadingToast, {
-        render: error.response?.data?.message || "Update failed",
+        render: "Update failed",
         type: "error",
         isLoading: false,
       });
@@ -123,80 +119,162 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="h-screen flex items-center justify-center bg-black text-white">
+      <div className="min-h-screen flex items-center justify-center bg-blue-50">
         <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white flex justify-center items-start pt-20 pb-20">
-      <form
-        onSubmit={handleSubmit}
-        className="w-full max-w-2xl bg-zinc-900 border border-white/10 rounded-xl px-6 pt-5 pb-12"
-      >
-        <h2 className="text-xl font-semibold mb-4 text-center">
-          Profile Settings
-        </h2>
-
-        <div className="flex justify-center mb-4">
-          <div className="w-24 h-24 rounded-full bg-blue-600 flex items-center justify-center text-3xl font-semibold uppercase border-2 border-blue-400">
-            {formData.name ? formData.name.charAt(0).toUpperCase() : "U"}
-          </div>
+    <div className="min-h-screen bg-blue-50">
+      {/* Navbar */}
+      <nav className="bg-white border-b">
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center">
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center gap-2 text-gray-700 hover:text-blue-600"
+          >
+            <ArrowLeft size={18} />
+            Back
+          </button>
         </div>
+      </nav>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {[
-            ["Full Name", "name"],
-            ["Email", "email", true],
-            ["Date of Birth", "dateOfBirth", false, handleDobChange],
-            ["City", "currentCity"],
-            ["Occupation", "occupation"],
-          ].map(([label, name, disabled, customChange], i) => (
-            <div key={i} className="flex flex-col gap-1">
-              <label className="text-xs text-gray-400">{label}</label>
-              <input
-                type="text"
-                name={name}
-                value={formData[name]}
-                disabled={disabled}
-                onChange={customChange || handleChange}
-                maxLength={name === "dateOfBirth" ? 10 : undefined}
-                className={`h-9 rounded-md px-3 text-sm outline-none border border-white/10
-                  ${
-                    disabled
-                      ? "bg-zinc-800 text-gray-500 cursor-not-allowed"
-                      : "bg-zinc-800 focus:border-blue-500"
-                  }`}
-              />
+      {/* Profile Card */}
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="bg-white rounded-xl shadow-md p-6">
+          {/* Avatar */}
+          <div className="flex flex-col items-center mb-6">
+            <div className="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white text-3xl font-semibold">
+              {formData.name ? formData.name.charAt(0).toUpperCase() : "U"}
             </div>
-          ))}
 
-          <div className="flex flex-col gap-1">
-            <label className="text-xs text-gray-400">Gender</label>
-            <select
-              name="sex"
-              value={formData.sex}
-              onChange={handleChange}
-              className="h-9 rounded-md bg-zinc-800 border border-white/10 px-3 text-sm focus:border-blue-500 outline-none"
-            >
-              <option value="">Select</option>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
+            <p className="mt-2 text-gray-700 text-sm">{formData.email}</p>
           </div>
-        </div>
 
-        <button
-          type="submit"
-          className="w-full mt-6 mb-6 h-9 rounded-md bg-blue-600 hover:bg-blue-700 text-sm font-medium transition"
-        >
-          Save
-        </button>
-      </form>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name */}
+            <Input label="Full Name" icon={<User size={16} />}>
+              <input
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="input"
+              />
+            </Input>
+
+            {/* Email */}
+            <Input label="Email" icon={<Mail size={16} />}>
+              <input
+                value={formData.email}
+                disabled
+                className="input bg-gray-100"
+              />
+            </Input>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Input label="Date of Birth" icon={<Calendar size={16} />}>
+                <input
+                  value={formData.dateOfBirth}
+                  onChange={handleDobChange}
+                  placeholder="DD/MM/YYYY"
+                  className="input"
+                />
+              </Input>
+
+              <Input label="Gender" icon={<Users size={16} />}>
+                <select
+                  name="sex"
+                  value={formData.sex}
+                  onChange={handleChange}
+                  className="input"
+                >
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </Input>
+
+              <Input label="City" icon={<MapPin size={16} />}>
+                <input
+                  name="currentCity"
+                  value={formData.currentCity}
+                  onChange={handleChange}
+                  className="input"
+                />
+              </Input>
+
+              <Input label="Occupation" icon={<Briefcase size={16} />}>
+                <input
+                  name="occupation"
+                  value={formData.occupation}
+                  onChange={handleChange}
+                  className="input"
+                />
+              </Input>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3 pt-3">
+              <button
+                type="button"
+                onClick={() => navigate("/")}
+                className="flex-1 h-10 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="flex-1 h-10 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md transition"
+              >
+                Save
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Styles */}
+      <style jsx>{`
+        .input {
+          width: 100%;
+          height: 38px;
+          padding: 0 12px;
+          border-radius: 8px;
+          border: 1px solid #e5e7eb;
+          outline: none;
+          color: #111827;
+          font-weight: 400;
+          background: white;
+        }
+
+        .input:focus {
+          border-color: #2563eb;
+          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .input::placeholder {
+          color: #9ca3af;
+        }
+
+        select.input {
+          cursor: pointer;
+        }
+      `}</style>
     </div>
   );
 };
+
+const Input = ({ label, icon, children }) => (
+  <div className="space-y-1">
+    <label className="flex items-center gap-2 text-sm text-gray-700 font-medium">
+      <span className="text-blue-600">{icon}</span>
+      {label}
+    </label>
+    {children}
+  </div>
+);
 
 export default Profile;

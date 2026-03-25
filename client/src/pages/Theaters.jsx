@@ -1,53 +1,58 @@
-import React, { useContext, useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import { AppContent } from "../context/AppContext";
 import Loading from "../components/Loading";
 import TheatersCard from "../components/TheatersCard";
 import LazySection from "../components/LazySection";
+import { fetchUpcomingMovies } from "../api/movieApi";
+import { getTheaterMovies } from "../api/showApi";
+
+const TMDB_IMAGE = "https://image.tmdb.org/t/p/w300";
 
 const Theaters = () => {
   const navigate = useNavigate();
-  const { backendUrl } = useContext(AppContent);
-
-  const [theaters, setTheaters] = useState({
-    nowPlaying: [],
-    upcoming: [],
-  });
-
+  const [nowPlayingShows, setNowPlayingShows] = useState([]);
+  const [upcomingMovies, setUpcomingMovies] = useState([]);
   const [loadingInitial, setLoadingInitial] = useState(true);
   const [error, setError] = useState(null);
 
-  // Hàm fetch phim theo category để tái sử dụng
-  const fetchCategory = useCallback(
-    async (category, endpoint) => {
-      try {
-        const res = await axios.get(
-          `${backendUrl}/api/movies/tmdb/${endpoint}`,
-          {
-            params: { page: 1 },
-          },
-        );
-        const results = res.data.results || [];
-        setTheaters((prev) => ({ ...prev, [category]: results }));
-      } catch (err) {
-        console.error(`Error fetching ${category}:`, err);
-        if (category === "nowPlaying") setError("Failed to load theater data");
-      } finally {
-        if (category === "nowPlaying") setLoadingInitial(false);
+  const fetchNowPlayingShows = useCallback(async () => {
+    try {
+      const { data } = await getTheaterMovies();
+      if (data.success) {
+        setNowPlayingShows(data.shows); // Movie[] từ DB
+      } else {
+        setError("Failed to load theater data");
       }
+    } catch (err) {
+      console.error("Error fetching shows:", err);
+      setError("Failed to load theater data");
+    } finally {
+      setLoadingInitial(false);
+    }
+  }, []);
+
+  const fetchUpcoming = useCallback(async () => {
+    try {
+      const res = await fetchUpcomingMovies(1);
+      setUpcomingMovies(res.data.results || []);
+    } catch (err) {
+      console.error("Error fetching upcoming:", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchNowPlayingShows();
+  }, [fetchNowPlayingShows]);
+
+  const handleShowClick = useCallback(
+    (movie) => {
+      navigate(`/theaters/${movie._id}`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     },
-    [backendUrl],
+    [navigate],
   );
 
-  // Khởi tạo: Chỉ tải Now Playing trước
-  useEffect(() => {
-    if (backendUrl) {
-      fetchCategory("nowPlaying", "now-playing");
-    }
-  }, [backendUrl, fetchCategory]);
-
-  const handleTheaterClick = useCallback(
+  const handleUpcomingClick = useCallback(
     (id) => {
       navigate(`/theaters/tmdb/${id}`);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -80,40 +85,58 @@ const Theaters = () => {
           <h2 className="text-white text-3xl font-bold tracking-tight">
             Now Playing
           </h2>
-          <span className="h-px flex-1 bg-neutral-800 ml-6 hidden md:block"></span>
+          <span className="h-px flex-1 bg-neutral-800 ml-6 hidden md:block" />
         </div>
 
-        {theaters.nowPlaying.length > 0 ? (
+        {nowPlayingShows.length > 0 ? (
           <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-            {theaters.nowPlaying.map((movie) => (
+            {nowPlayingShows.map((movie) => (
               <TheatersCard
-                key={movie.id}
-                movie={movie}
-                onClick={() => handleTheaterClick(movie.id)}
+                key={movie._id}
+                movie={{
+                  ...movie,
+                  poster_path: `${TMDB_IMAGE}${movie.poster_path}`,
+                }}
+                movieDbId={movie._id}
+                onClick={() => handleShowClick(movie)}
               />
             ))}
           </div>
         ) : (
-          <p className="text-gray-500 italic">No movies currently playing</p>
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-16 h-16 rounded-full bg-neutral-800 flex items-center justify-center mb-4">
+              <span className="text-2xl">🎬</span>
+            </div>
+            <p className="text-gray-400 text-lg font-medium">
+              No shows available
+            </p>
+            <p className="text-gray-600 text-sm mt-1">
+              Admin has not scheduled any shows yet
+            </p>
+          </div>
         )}
       </section>
 
-      <LazySection fetchData={() => fetchCategory("upcoming", "upcoming")}>
+      {/* ── UPCOMING — từ TMDB ── */}
+      <LazySection fetchData={fetchUpcoming}>
         <section className="px-6 md:px-12 animate-in fade-in duration-1000">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-white text-3xl font-bold tracking-tight">
               Upcoming Movies
             </h2>
-            <span className="h-px flex-1 bg-neutral-800 ml-6 hidden md:block"></span>
+            <span className="h-px flex-1 bg-neutral-800 ml-6 hidden md:block" />
           </div>
 
-          {theaters.upcoming.length > 0 ? (
+          {upcomingMovies.length > 0 ? (
             <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-              {theaters.upcoming.map((movie) => (
+              {upcomingMovies.map((movie) => (
                 <TheatersCard
                   key={movie.id}
-                  movie={movie}
-                  onClick={() => handleTheaterClick(movie.id)}
+                  movie={{
+                    ...movie,
+                    poster_path: `${TMDB_IMAGE}${movie.poster_path}`,
+                  }}
+                  onClick={() => handleUpcomingClick(movie.id)}
                 />
               ))}
             </div>

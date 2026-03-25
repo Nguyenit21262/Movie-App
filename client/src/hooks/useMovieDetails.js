@@ -2,8 +2,9 @@
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { useAbortableRequest } from "./useAbortableRequest";
+import { getMovieDetails } from "../api/movieApi";
 
-export const useMovieDetails = (backendUrl, id) => {
+export const useMovieDetails = (id) => {
   const { createSignal } = useAbortableRequest();
 
   const [state, setState] = useState({
@@ -16,14 +17,11 @@ export const useMovieDetails = (backendUrl, id) => {
   });
 
   const fetchMovie = useCallback(async () => {
-    if (!backendUrl || !id) return;
+    if (!id) return;
 
     try {
       setState((s) => ({ ...s, loading: true }));
-      const { data } = await axios.get(
-        `${backendUrl}/api/movies/tmdb/${id}`,
-        { signal: createSignal() }
-      );
+      const { data } = await getMovieDetails(id, { signal: createSignal() });
 
       if (data?.success) {
         setState({
@@ -44,7 +42,7 @@ export const useMovieDetails = (backendUrl, id) => {
         }));
       }
     }
-  }, [backendUrl, id, createSignal]);
+  }, [id, createSignal]);
 
   useEffect(() => {
     fetchMovie();

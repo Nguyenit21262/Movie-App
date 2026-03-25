@@ -16,16 +16,13 @@ import TheatersDetail from "./pages/TheatersDetail";
 import VideoPlay from "./components/VideoPlay";
 import SeatLayout from "./pages/SeatLayout";
 import MyBookings from "./pages/MyBookings";
-import Favorite from "./pages/Favorite";
 
-// Admin pages
 import Layout from "./pages/admin/Layout";
 import DashBoard from "./pages/admin/DashBoard";
 import AddMovies from "./pages/admin/AddMovies";
 import ListMovies from "./pages/admin/ListMovies";
 import ListBooking from "./pages/admin/ListBooking";
 
-// Auth pages
 import Login from "./pages/Login";
 import Register from "./pages/Resigter";
 import EmailVerify from "./pages/EmailVerify";
@@ -34,21 +31,18 @@ import Profile from "./pages/Profile";
 
 const App = () => {
   const location = useLocation();
-  
-  const isAdminRoute = location.pathname.startsWith("/admin");
-  const isLoginRoute = location.pathname === "/login";
-  const isRegisterRoute = location.pathname === "/register";
-  const isEmailVerifyRoute = location.pathname === "/email-verify";
-  const isResetPasswordRoute = location.pathname === "/reset-password";
-  const isProfileRoute = location.pathname === "/profile";
+
+  const hiddenLayoutRoutes = [
+    "/login",
+    "/register",
+    "/email-verify",
+    "/reset-password",
+    "/profile",
+  ];
 
   const hideNavbarAndFooter =
-    isAdminRoute ||
-    isLoginRoute ||
-    isRegisterRoute ||
-    isEmailVerifyRoute ||
-    isResetPasswordRoute ||
-    isProfileRoute;
+    location.pathname.startsWith("/admin") ||
+    hiddenLayoutRoutes.includes(location.pathname);
 
   return (
     <>
@@ -62,67 +56,36 @@ const App = () => {
       )}
 
       <Routes>
-        {/* Public routes */}
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/email-verify" element={<EmailVerify />} />
         <Route path="/reset-password" element={<ResetPassword />} />
-        
         <Route path="/movies" element={<Movies />} />
         <Route path="/movies/tmdb/:id" element={<MovieDetails />} />
         <Route path="/theaters" element={<Theaters />} />
+
         <Route path="/theaters/tmdb/:id" element={<TheatersDetail />}>
           <Route path="trailer" element={<VideoPlay />} />
         </Route>
 
-        {/* Protected routes - require login */}
-        <Route
-          path="/theaters/:id/:date"
-          element={
-            <ProtectedRoute>
-              <SeatLayout />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/my-bookings"
-          element={
-            <ProtectedRoute>
-              <MyBookings />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/favorite"
-          element={
-            <ProtectedRoute>
-              <Favorite />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/theaters/:id" element={<TheatersDetail />}>
+          <Route path="trailer" element={<VideoPlay />} />
+        </Route>
 
-        {/* Admin routes - require admin role */}
-        <Route
-          path="/admin/*"
-          element={
-            <ProtectedRoute requireAdmin={true}>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<DashBoard />} />
-          <Route path="add-movies" element={<AddMovies />} />
-          <Route path="list-movies" element={<ListMovies />} />
-          <Route path="list-bookings" element={<ListBooking />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/theaters/:id/:date" element={<SeatLayout />} />
+          <Route path="/my-bookings" element={<MyBookings />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
+
+        <Route element={<ProtectedRoute requireAdmin />}>
+          <Route path="/admin" element={<Layout />}>
+            <Route index element={<DashBoard />} />
+            <Route path="add-movies" element={<AddMovies />} />
+            <Route path="list-movies" element={<ListMovies />} />
+            <Route path="list-bookings" element={<ListBooking />} />
+          </Route>
         </Route>
       </Routes>
 

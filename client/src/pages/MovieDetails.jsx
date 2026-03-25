@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowRight,
@@ -9,7 +9,6 @@ import {
   MessageCircle,
 } from "lucide-react";
 
-import { AppContent } from "../context/AppContext";
 import { useMovieDetails } from "../hooks/useMovieDetails";
 import { getTMDBPosterUrl, getTMDBBackdropUrl } from "../lib/tmdb/tmdbConfig";
 import timeFormat from "../lib/timeFormat";
@@ -19,7 +18,6 @@ import MovieReview from "../components/MovieReview";
 import Loading from "../components/Loading";
 
 const MovieDetails = () => {
-  const { backendUrl } = useContext(AppContent);
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -29,7 +27,7 @@ const MovieDetails = () => {
     videos,
     recommendations,
     loading,
-  } = useMovieDetails(backendUrl, id);
+  } = useMovieDetails(id);
 
   const rating = useMemo(
     () => movie?.vote_average ? (movie.vote_average / 2).toFixed(1) : null,

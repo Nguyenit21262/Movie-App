@@ -1,13 +1,18 @@
-import axios from "axios";
+import {
+  fetchNowPlayingMovies,
+  fetchPopularMovies,
+  fetchTopRatedMovies,
+  fetchUpcomingMovies,
+} from "../api/movieApi";
 
-export const fetchTopRated = (backendUrl, page = 1) =>
-  axios.get(`${backendUrl}/api/movies/tmdb/top-rated`, { params: { page } });
+export const fetchTopRated = (_backendUrl, page = 1) =>
+  fetchTopRatedMovies(page);
 
-export const fetchNowPlaying = (backendUrl, page = 2) =>
-  axios.get(`${backendUrl}/api/movies/tmdb/now-playing`, { params: { page } });
+export const fetchNowPlaying = (_backendUrl, page = 2) =>
+  fetchNowPlayingMovies(page);
 
-export const fetchPopular = (backendUrl, page = 3) =>
-  axios.get(`${backendUrl}/api/movies/tmdb/popular`, { params: { page } });
+export const fetchPopular = (_backendUrl, page = 3) =>
+  fetchPopularMovies(page);
 
-export const fetchUpcoming = (backendUrl, page = 4) =>
-  axios.get(`${backendUrl}/api/movies/tmdb/upcoming`, { params: { page } });
+export const fetchUpcoming = (_backendUrl, page = 4) =>
+  fetchUpcomingMovies(page);

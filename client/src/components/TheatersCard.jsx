@@ -3,17 +3,27 @@ import { useNavigate } from "react-router-dom";
 import { PlayCircle, Ticket, Calendar } from "lucide-react";
 import { getTMDBPosterUrl, getPlaceholderImage } from "../lib/tmdb/tmdbConfig";
 
-const TheatersCard = ({ movie, onClick }) => {
+const TheatersCard = ({ movie, onClick, movieDbId }) => {
   const navigate = useNavigate();
 
   const handleTrailerClick = (e) => {
     e.stopPropagation();
-    navigate(`/theaters/tmdb/${movie.id}/trailer`);
+
+    if (movieDbId) {
+      navigate(`/theaters/${movieDbId}/trailer`);
+    } else {
+      navigate(`/theaters/tmdb/${movie.id}/trailer`);
+    }
   };
 
   const handleTicketsClick = (e) => {
     e.stopPropagation();
-    navigate(`/theaters/${movie.id}/today`);
+
+    if (movieDbId) {
+      navigate(`/theaters/${movieDbId}/today`);
+    } else {
+      navigate(`/theaters/tmdb/${movie.id}/today`);
+    }
   };
 
   return (
@@ -36,7 +46,6 @@ const TheatersCard = ({ movie, onClick }) => {
           <p className="text-lg text-white font-semibold line-clamp-2">
             {movie.title}
           </p>
-
           <div className="flex items-center gap-2 text-sm text-neutral-300">
             <Calendar size={16} />
             <span>{movie.release_date?.split("-")[0]}</span>

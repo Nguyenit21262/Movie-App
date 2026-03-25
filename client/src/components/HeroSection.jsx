@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useContext, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { AppContent } from "../context/AppContext";
 import {
   Play,
   Star,
@@ -9,10 +8,10 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import axios from "axios";
 import Loading from "./Loading";
 import { getTMDBBackdropUrl, getTMDBPosterUrl } from "../lib/tmdb/tmdbConfig";
 import timeFormat from "../lib/timeFormat";
+import { fetchUpcomingMovies } from "../api/movieApi";
 
 const SLIDE_INTERVAL = 5000;
 const FEATURED_LIMIT = 5;
@@ -28,8 +27,6 @@ const preloadImage = (url) => {
 
 const HeroSection = () => {
   const navigate = useNavigate();
-  const { backendUrl } = useContext(AppContent);
-
   const [movies, setMovies] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -38,18 +35,13 @@ const HeroSection = () => {
 
   /* -------------------- Fetch Movies -------------------- */
   useEffect(() => {
-    if (!backendUrl) return;
-
     const controller = new AbortController();
     let isMounted = true;
 
     const fetchMovies = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`${backendUrl}/api/movies/tmdb/upcoming`, {
-          params: { page: 1 },
-          signal: controller.signal,
-        });
+        const res = await fetchUpcomingMovies(1, { signal: controller.signal });
 
         const results = res.data?.results || [];
         if (!results.length) {
@@ -76,7 +68,7 @@ const HeroSection = () => {
           }
         });
       } catch (err) {
-        if (axios.isCancel(err)) return;
+        if (err?.name === "CanceledError") return;
         console.error("HeroSection fetch error:", err);
         if (isMounted) setLoading(false);
       }
@@ -88,7 +80,7 @@ const HeroSection = () => {
       isMounted = false;
       controller.abort();
     };
-  }, [backendUrl]);
+  }, []);
 
   /* -------------------- Handlers (Dùng useCallback) -------------------- */
   const nextSlide = useCallback(() => {

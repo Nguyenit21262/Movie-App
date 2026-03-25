@@ -1,9 +1,7 @@
-import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { toast } from "react-toastify";
-import { AppContent } from "../context/AppContext";
 import { useOtpInput } from "./useOtpInput";
+import { verifyAccount } from "../api/authApi";
 
 /**
  * useEmailVerify
@@ -16,7 +14,6 @@ import { useOtpInput } from "./useOtpInput";
  *   otpProps: { setRef, handleInput, handleKeyDown, handlePaste }
  */
 export const useEmailVerify = () => {
-  const { backendUrl } = useContext(AppContent);
   const navigate = useNavigate();
   const { setRef, handleInput, handleKeyDown, handlePaste, getValue } = useOtpInput(6);
 
@@ -31,12 +28,7 @@ export const useEmailVerify = () => {
 
     const loadingToast = toast.loading("Verifying your email...");
     try {
-      axios.defaults.withCredentials = true;
-      const { data } = await axios.post(
-        `${backendUrl}/api/auth/verify-account`,
-        { email, otp },
-        { withCredentials: true }
-      );
+      const { data } = await verifyAccount({ email, otp });
 
       if (data.success) {
         toast.update(loadingToast, {

@@ -1,104 +1,152 @@
-import React, { useState, useEffect, useContext, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useParams, Outlet, useLocation } from "react-router-dom";
-import axios from "axios";
 import {
   ArrowRight,
-  Heart,
   PlayCircleIcon,
   Clock,
   Calendar,
   Tag,
-  Star,
 } from "lucide-react";
-import { AppContent } from "../context/AppContext";
+
 import { getTMDBPosterUrl, getTMDBBackdropUrl } from "../lib/tmdb/tmdbConfig";
 import timeFormat from "../lib/timeFormat";
 import DataSelect from "../components/DataSelect";
 import TheatersCard from "../components/TheatersCard";
 import Loading from "../components/Loading";
-
-const mockShowtimes = {
-  "2026-02-05": [
-    { id: 1, time: "10:30", roomId: 1, price: 8 },
-    { id: 2, time: "14:00", roomId: 2, price: 10 },
-  ],
-  "2026-02-06": [{ id: 3, time: "18:30", roomId: 1, price: 12 }],
-};
+import { getMovieDetails } from "../api/movieApi";
+import { getShowMovieById } from "../api/showApi";
 
 const TheatersDetail = () => {
   const navigate = useNavigate();
-  const { backendUrl } = useContext(AppContent);
   const { id } = useParams();
-  const { hash } = useLocation();
+  const location = useLocation();
+  const isTmdbRoute = location.pathname.includes("/theaters/tmdb/");
+  const hash = location.hash;
 
   const [data, setData] = useState({
     movie: null,
     videos: [],
     recommendations: [],
   });
-  const [loading, setLoading] = useState(true);
-  const [isFavorite, setIsFavorite] = useState(false);
 
-  // Fetch Data tập trung
+  const [dateTime, setDateTime] = useState({});
+  const [loading, setLoading] = useState(true);
+
+  const fetchTmdbMovie = useCallback(async (controller) => {
+    const response = await getMovieDetails(id, { signal: controller.signal });
+
+    const res = response.data;
+
+    if (res?.success) {
+      setData({
+        movie: res.movie,
+        videos: res.videos || [],
+        recommendations: res.recommendations || [],
+      });
+
+      setDateTime({});
+    }
+  }, [id]);
+
+  const fetchLocalMovie = useCallback(async (controller) => {
+    const response = await getShowMovieById(id, { signal: controller.signal });
+
+    const res = response.data;
+
+    if (res?.success) {
+      const normalizedGenres =
+        res.movie.genres?.map((genre) =>
+          typeof genre === "string" ? { name: genre } : genre,
+        ) || [];
+
+      setData({
+        movie: {
+          ...res.movie,
+          genres: normalizedGenres,
+        },
+        videos: [],
+        recommendations: [],
+      });
+
+      setDateTime(res.dateTime || {});
+    }
+  }, [id]);
+
   useEffect(() => {
-    if (!backendUrl || !id) return;
+    if (!id) return;
 
     const controller = new AbortController();
-    const fetchData = async () => {
+
+    const fetchMovieData = async () => {
       try {
         setLoading(true);
-        const { data: res } = await axios.get(
-          `${backendUrl}/api/movies/tmdb/${id}`,
-          { signal: controller.signal }
-        );
 
-        if (res?.success) {
-          setData({
-            movie: res.movie,
-            videos: res.videos || [],
-            recommendations: res.recommendations || [],
-          });
+        if (isTmdbRoute) {
+          await fetchTmdbMovie(controller);
+        } else {
+          await fetchLocalMovie(controller);
         }
-      } catch (e) {
-        if (!axios.isCancel(e)) console.error(e);
+      } catch (error) {
+        if (error?.name !== "CanceledError") {
+          console.error("Failed to fetch movie detail:", error);
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-    return () => controller.abort();
-  }, [id, backendUrl]);
+    fetchMovieData();
 
-  // Xử lý Scroll và Hash
+    return () => {
+      controller.abort();
+    };
+  }, [fetchLocalMovie, fetchTmdbMovie, id, isTmdbRoute]);
+
   useEffect(() => {
-    if (!loading && data.movie) {
-      if (hash) {
-        const el = document.getElementById(hash.replace("#", ""));
-        el?.scrollIntoView({ behavior: "smooth" });
-      } else {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
+    if (loading || !data.movie) return;
+
+    if (hash) {
+      const targetElement = document.getElementById(hash.replace("#", ""));
+      targetElement?.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [hash, loading, data.movie, id]);
 
-  // Memoize Trailer và Recommendations
+  const movie = data.movie;
+
   const trailerVideo = useMemo(() => {
-    return data.videos.find((v) => v.type === "Trailer" && v.site === "YouTube") || data.videos[0];
+    if (!data.videos.length) return null;
+
+    const youtubeTrailer = data.videos.find(
+      (video) => video.type === "Trailer" && video.site === "YouTube",
+    );
+
+    return youtubeTrailer || data.videos[0];
   }, [data.videos]);
 
-  const displayedRecs = useMemo(() => data.recommendations.slice(0, 4), [data.recommendations]);
+  const displayedRecs = useMemo(() => {
+    return data.recommendations.slice(0, 4);
+  }, [data.recommendations]);
 
-  if (loading) return <Loading />;
-  if (!data.movie) return <div className="min-h-screen bg-neutral-900 flex items-center justify-center text-white">Movie not found.</div>;
+  const hasShowtime = Object.keys(dateTime).length > 0;
+  const hasRecommendations = displayedRecs.length > 0;
 
-  const { movie } = data;
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (!movie) {
+    return (
+      <div className="min-h-screen bg-neutral-900 flex items-center justify-center text-white">
+        Movie not found.
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white">
-      {/* Hero Section */}
       <div className="relative w-full h-[600px] md:h-[700px] overflow-hidden">
-        {/* Backdrop Image with Overlay */}
         <div className="absolute inset-0">
           <img
             src={getTMDBBackdropUrl(movie.backdrop_path, "w1280")}
@@ -108,10 +156,8 @@ const TheatersDetail = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/60 to-transparent" />
         </div>
 
-        {/* Content Info */}
         <div className="relative h-full flex items-end px-6 md:px-16 lg:px-40 pb-16">
           <div className="flex flex-col md:flex-row gap-10 max-w-7xl mx-auto w-full items-center md:items-end">
-            {/* Poster */}
             <div className="shrink-0 group relative">
               <img
                 src={getTMDBPosterUrl(movie.poster_path, "w500")}
@@ -120,18 +166,11 @@ const TheatersDetail = () => {
               />
             </div>
 
-            {/* Meta Detail */}
             <div className="flex flex-col gap-4 flex-1">
               <div className="flex flex-wrap gap-2">
                 <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-xs font-bold tracking-widest uppercase">
                   {movie.original_language}
                 </span>
-                {movie.vote_average > 0 && (
-                  <span className="flex items-center gap-1.5 px-3 py-1 bg-yellow-500 text-black rounded-full text-xs font-bold">
-                    <Star className="w-3.5 h-3.5 fill-current" />
-                    {(movie.vote_average / 2).toFixed(1)} / 5
-                  </span>
-                )}
               </div>
 
               <h1 className="text-4xl md:text-6xl font-extrabold leading-tight drop-shadow-lg">
@@ -140,13 +179,26 @@ const TheatersDetail = () => {
 
               <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-300 text-sm md:text-base font-medium">
                 {movie.runtime > 0 && (
-                  <span className="flex items-center gap-2"><Clock className="w-4 h-4 text-yellow-500" />{timeFormat(movie.runtime)}</span>
+                  <span className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-yellow-500" />
+                    {timeFormat(movie.runtime)}
+                  </span>
                 )}
+
                 {movie.release_date && (
-                  <span className="flex items-center gap-2"><Calendar className="w-4 h-4 text-yellow-500" />{new Date(movie.release_date).getFullYear()}</span>
+                  <span className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-yellow-500" />
+                    {new Date(movie.release_date).getFullYear()}
+                  </span>
                 )}
+
                 {movie.genres?.length > 0 && (
-                  <span className="flex items-center gap-2"><Tag className="w-4 h-4 text-yellow-500" />{movie.genres.map(g => g.name).join(", ")}</span>
+                  <span className="flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-yellow-500" />
+                    {movie.genres
+                      .map((genre) => genre.name ?? genre)
+                      .join(", ")}
+                  </span>
                 )}
               </div>
 
@@ -164,36 +216,43 @@ const TheatersDetail = () => {
                     Watch Trailer
                   </button>
                 )}
-                <button 
-                  onClick={() => setIsFavorite(!isFavorite)}
-                  className={`p-4 rounded-2xl transition-all border ${isFavorite ? 'bg-red-500 border-red-500 text-white' : 'bg-white/5 border-white/10 text-white hover:bg-white/10'}`}
-                >
-                  <Heart className={isFavorite ? "fill-current" : ""} />
-                </button>
+
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Booking Section */}
       <div id="booking" className="px-6 md:px-16 lg:px-40 py-16 bg-neutral-900">
         <div className="max-w-7xl mx-auto border-t border-white/5 pt-16">
           <h2 className="text-3xl font-bold mb-8">Select Showtimes</h2>
-          <DataSelect dateTime={mockShowtimes} id={movie.id} />
+
+          {hasShowtime ? (
+            <DataSelect dateTime={dateTime} id={id} />
+          ) : (
+            <p className="text-gray-500 italic">
+              {isTmdbRoute
+                ? "This movie is not yet scheduled."
+                : "No upcoming shows available."}
+            </p>
+          )}
         </div>
       </div>
 
-      {/* Recommendations */}
-      {displayedRecs.length > 0 && (
+      {hasRecommendations && (
         <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-40 pb-32">
           <div className="flex justify-between items-center mb-10">
             <h3 className="text-2xl font-bold">You May Also Like</h3>
+
             <button
-              onClick={() => { navigate("/theaters"); window.scrollTo(0, 0); }}
+              onClick={() => {
+                navigate("/theaters");
+                window.scrollTo(0, 0);
+              }}
               className="group flex items-center gap-2 text-gray-400 hover:text-yellow-500 transition-colors font-medium"
             >
-              View All <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              View All
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
 
@@ -209,12 +268,13 @@ const TheatersDetail = () => {
         </div>
       )}
 
-      {/* Trailer Modal / Sub-routes */}
       <Outlet
         context={{
           showData: {
             ...movie,
-            videoUrl: trailerVideo ? `https://www.youtube.com/embed/${trailerVideo.key}` : null,
+            videoUrl: trailerVideo
+              ? `https://www.youtube.com/embed/${trailerVideo.key}`
+              : null,
           },
         }}
       />

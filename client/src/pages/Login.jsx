@@ -1,13 +1,15 @@
 import React, { useState, useContext } from "react";
 import { assets } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
-import { AppContent } from "../context/AppContext";
-import axios from "axios";
+import { useLocation } from "react-router-dom";
+import { AppContent } from "../context/AppContent";
 import { toast } from "react-toastify";
+import { loginUser, verifyLoginOtp } from "../api/authApi";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { backendUrl, getUserData } = useContext(AppContent);
+  const location = useLocation();
+  const { getUserData } = useContext(AppContent);
 
   const [form, setForm] = useState({ email: "", password: "" });
   const [otp, setOtp] = useState("");
@@ -37,7 +39,7 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post(`${backendUrl}/api/auth/login`, form);
+      const { data } = await loginUser(form);
 
       if (data.success && data.require2FA) {
         toast.success("OTP sent to your email");
@@ -61,18 +63,14 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const { data } = await axios.post(
-        `${backendUrl}/api/auth/verify-login-otp`,
-        { email: form.email, otp },
-        { withCredentials: true }
-      );
+      const { data } = await verifyLoginOtp({ email: form.email, otp });
 
       if (!data.success) {
         toast.error(data.message || "OTP verification failed");
         return;
       }
 
-      const userData = await getUserData();
+      const userData = await getUserData(); // cập nhật context
 
       if (!userData) {
         toast.error("Failed to load user profile");
@@ -81,10 +79,13 @@ const Login = () => {
 
       toast.success("Login successful");
 
+      // Phân quyền redirect
       if (userData.role === "admin") {
-        window.location.href = "/admin";
+        navigate("/admin", { replace: true });
       } else {
-        navigate("/", { replace: true });
+        // Quay về trang trước đó nếu có, không thì về Home
+        const from = location.state?.from?.pathname || "/";
+        navigate(from, { replace: true });
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "OTP verification failed");

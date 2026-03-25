@@ -1,14 +1,11 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { assets } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
-import { AppContent } from "../context/AppContext";
-import axios from "axios";
 import { toast } from "react-toastify";
+import { registerUser } from "../api/authApi";
 
 const Register = () => {
   const navigate = useNavigate();
-  const { backendUrl } = useContext(AppContent);
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -60,9 +57,7 @@ const Register = () => {
     const loadingToast = toast.loading("Creating your account...");
 
     try {
-      axios.defaults.withCredentials = true;
-
-      const { data } = await axios.post(`${backendUrl}/api/auth/register`, {
+      const { data } = await registerUser({
         name,
         email,
         password,

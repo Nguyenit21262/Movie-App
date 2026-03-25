@@ -9,10 +9,7 @@ const saveOneMovieToDB = async (tmdbId) => {
   return Movie.create(formatted);
 };
 
-/**
- * Lưu nhiều movies vào DB từ danh sách TMDB results.
- * Chạy tuần tự để tránh rate limit TMDB.
- */
+
 const saveMoviesToDB = async (tmdbMovies) => {
   const results = { saved: 0, skipped: 0 };
 
@@ -29,10 +26,6 @@ const saveMoviesToDB = async (tmdbMovies) => {
   return results;
 };
 
-/**
- * Lưu movie vào DB khi đã có sẵn details object (tái sử dụng data, không gọi thêm API).
- * Dùng trong getTMDBMovieDetails khi details đã được fetch cho response.
- */
 const saveMovieFromDetails = async (details, credits, keywords) => {
   const existing = await Movie.findOne({ tmdb_id: details.id });
   if (existing) return null;
@@ -41,19 +34,13 @@ const saveMovieFromDetails = async (details, credits, keywords) => {
   return Movie.create(formatted);
 };
 
-/**
- * Wrapper chạy save trong background — không block response, không throw.
- */
+
 const backgroundSave = (promise, label) => {
   promise.catch((err) =>
     console.error(`Background save error (${label}):`, err.message),
   );
 };
 
-// ─────────────────────────────────────────────
-// TMDB LIST ENDPOINTS
-// Tất cả có cùng pattern: fetch → background save → trả về
-// ─────────────────────────────────────────────
 
 const TMDB_LIST_FETCHERS = {
   popular: TMDBService.getPopularMovies.bind(TMDBService),
@@ -62,10 +49,7 @@ const TMDB_LIST_FETCHERS = {
   upcoming: TMDBService.getUpcomingMovies.bind(TMDBService),
 };
 
-/**
- * Factory tạo handler cho các TMDB list endpoint.
- * Tránh lặp code giữa getTMDBPopular / getTopRatedMovies / v.v.
- */
+
 const createTMDBListHandler = (category) => async (req, res) => {
   try {
     const { page = 1 } = req.query;

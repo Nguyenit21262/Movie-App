@@ -1,7 +1,6 @@
-import { useEffect, useContext, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
-import { AppContent } from "../context/AppContext";
 import { TMDB_GENRES, getGenreId } from "../lib/tmdb/Genres";
 
 import MovieCard from "../components/MovieCard";
@@ -9,11 +8,10 @@ import Loading from "../components/Loading";
 import LazySection from "../components/LazySection";
 
 import { useMovieCategories } from "../hooks/useMovieCategories";
+import { searchMovies as searchMoviesRequest } from "../api/movieApi";
 
 const Movies = () => {
   const navigate = useNavigate();
-  const { backendUrl } = useContext(AppContent);
-
   const [searchParams] = useSearchParams();
 
   const {
@@ -22,7 +20,7 @@ const Movies = () => {
     fetchCategory,
     fetchMultiple,
     filterByGenre,
-  } = useMovieCategories(backendUrl);
+  } = useMovieCategories();
 
   const [searchMovies, setSearchMovies] = useState([]);
   const [loadingSearch, setLoadingSearch] = useState(false);
@@ -63,28 +61,22 @@ const Movies = () => {
   );
 
   useEffect(() => {
-    if (!backendUrl || searchQuery) return;
+    if (searchQuery) return;
 
     fetchMultiple([
       { key: "topRated", endpoint: "top-rated" },
       { key: "nowPlaying", endpoint: "now-playing" },
     ]);
-  }, [backendUrl, fetchMultiple, searchQuery]);
+  }, [fetchMultiple, searchQuery]);
 
   useEffect(() => {
-    if (!backendUrl || !searchQuery) return;
+    if (!searchQuery) return;
 
     const fetchSearchMovies = async () => {
       try {
         setLoadingSearch(true);
 
-        const res = await fetch(
-          `${backendUrl}/api/movies/search?q=${encodeURIComponent(searchQuery)}`
-        );
-
-        if (!res.ok) throw new Error("Search request failed");
-
-        const data = await res.json();
+        const { data } = await searchMoviesRequest(searchQuery);
 
         const normalized =
           data.movies?.map((m) => ({
@@ -102,7 +94,7 @@ const Movies = () => {
     };
 
     fetchSearchMovies();
-  }, [searchQuery, backendUrl]);
+  }, [searchQuery]);
 
   const handleMovieClick = (id) => {
     navigate(`/movies/tmdb/${id}`);

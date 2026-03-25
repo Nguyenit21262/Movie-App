@@ -7,11 +7,16 @@ import React, {
   useMemo,
 } from "react";
 import { SendHorizontal, Reply, Trash2, Pencil, X, Check } from "lucide-react";
-import axios from "axios";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { AppContent } from "../context/AppContext";
+import { AppContent } from "../context/AppContent";
 import useCommentTree from "../hooks/useCommentTree";
+import {
+  createMovieComment,
+  deleteMovieComment,
+  getMovieComments,
+  updateMovieComment,
+} from "../api/commentApi";
 
 const Avatar = ({ name, size = "md", color = "bg-blue-500" }) => (
   <div
@@ -25,7 +30,6 @@ const CommentNode = ({
   comment,
   depth,
   tmdbId,
-  backendUrl,
   isLoggedIn,
   userData,
   tree,
@@ -45,22 +49,19 @@ const CommentNode = ({
     try {
       let res;
       if (type === "reply") {
-        res = await axios.post(
-          `${backendUrl}/api/movies/${tmdbId}/comments`,
-          { content: payload, parentId: comment._id },
-          { withCredentials: true },
-        );
+        res = await createMovieComment(tmdbId, {
+          content: payload,
+          parentId: comment._id,
+        });
         if (res.data.success) {
           tree.handleAdd(comment._id, res.data.comment);
           setReplyText("");
           setReplyOpen(false);
         }
       } else if (type === "edit") {
-        res = await axios.put(
-          `${backendUrl}/api/movies/${tmdbId}/comments/${comment._id}`,
-          { content: payload },
-          { withCredentials: true },
-        );
+        res = await updateMovieComment(tmdbId, comment._id, {
+          content: payload,
+        });
         if (res.data.success) {
           tree.handleEdit(comment._id, payload);
           setEditing(false);
@@ -76,16 +77,13 @@ const CommentNode = ({
   const confirmDelete = async () => {
     if (!window.confirm("Delete this comment?")) return;
     try {
-      const res = await axios.delete(
-        `${backendUrl}/api/movies/${tmdbId}/comments/${comment._id}`,
-        { withCredentials: true },
-      );
+      const res = await deleteMovieComment(tmdbId, comment._id);
       if (res.data.success) {
         tree.handleDelete(comment._id);
         toast.info("Comment deleted successfully"); // Only toast on delete
       }
-    } catch (err) {
-      console.error("Delete error");
+    } catch (error) {
+      console.error("Delete error", error);
     }
   };
 
@@ -204,7 +202,6 @@ const CommentNode = ({
           comment={child}
           depth={depth + 1}
           tmdbId={tmdbId}
-          backendUrl={backendUrl}
           isLoggedIn={isLoggedIn}
           userData={userData}
           tree={tree}
@@ -216,7 +213,7 @@ const CommentNode = ({
 
 const MovieReview = () => {
   const { id: tmdbId } = useParams();
-  const { userData, isLoggedIn, backendUrl } = useContext(AppContent);
+  const { userData, isLoggedIn } = useContext(AppContent);
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [loading, setLoading] = useState(false);
@@ -225,34 +222,30 @@ const MovieReview = () => {
 
   const fetchComments = useCallback(async () => {
     try {
-      const res = await axios.get(
-        `${backendUrl}/api/movies/${tmdbId}/comments`,
-      );
+      const res = await getMovieComments(tmdbId);
       if (res.data.success) setComments(res.data.comments ?? []);
-    } catch (err) {
-      console.error("Fetch error");
+    } catch (error) {
+      console.error("Fetch error", error);
     }
-  }, [tmdbId, backendUrl]);
+  }, [tmdbId]);
 
   useEffect(() => {
     if (tmdbId) fetchComments();
-  }, [fetchComments]);
+  }, [fetchComments, tmdbId]);
 
   const submitMainComment = async () => {
     if (!newComment.trim() || loading) return;
     setLoading(true);
     try {
-      const res = await axios.post(
-        `${backendUrl}/api/movies/${tmdbId}/comments`,
-        { content: newComment.trim() },
-        { withCredentials: true },
-      );
+      const res = await createMovieComment(tmdbId, {
+        content: newComment.trim(),
+      });
       if (res.data.success) {
         setComments((prev) => [{ ...res.data.comment, children: [] }, ...prev]);
         setNewComment("");
       }
-    } catch (err) {
-      console.error("Submit error");
+    } catch (error) {
+      console.error("Submit error", error);
     } finally {
       setLoading(false);
     }
@@ -305,7 +298,6 @@ const MovieReview = () => {
             comment={c}
             depth={0}
             tmdbId={tmdbId}
-            backendUrl={backendUrl}
             isLoggedIn={isLoggedIn}
             userData={userData}
             tree={tree}

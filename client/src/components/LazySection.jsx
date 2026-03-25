@@ -12,7 +12,7 @@ const LazySection = ({ children, fetchData }) => {
           observer.disconnect(); // Chỉ fetch 1 lần duy nhất
         }
       },
-      { rootMargin: "200px" }, // Kích hoạt sớm 200px trước khi hiện ra
+      { rootMargin: "200px" }, 
     );
 
     if (containerRef.current) observer.observe(containerRef.current);

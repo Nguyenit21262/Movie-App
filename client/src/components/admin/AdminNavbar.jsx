@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 import { SearchIcon, LogOutIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import NotificationBell from "../NotificationBell";
+import { AppContent } from "../../context/AppContent";
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
+  const { logoutUser } = useContext(AppContent);
+
   return (
     <header
       className="
@@ -26,26 +30,27 @@ const AdminNavbar = () => {
       </div>
 
       {/* Right actions */}
-      <button
-        className="
-          flex items-center gap-2
-          text-sm text-red-600
-          hover:bg-red-50
-          px-3 py-2 rounded-md
-          transition duration-200
-        "
-      >
-        <LogOutIcon className="w-4 h-4" />
-        <span
-          onClick={() => {
+      <div className="flex items-center gap-3">
+        <NotificationBell />
+
+        <button
+          onClick={async () => {
+            await logoutUser();
             navigate("/login");
             scrollTo(0, 0);
           }}
-          className="hidden md:inline"
+          className="
+            flex items-center gap-2
+            text-sm text-red-600
+            hover:bg-red-50
+            px-3 py-2 rounded-md
+            transition duration-200
+          "
         >
-          Logout
-        </span>
-      </button>
+          <LogOutIcon className="w-4 h-4" />
+          <span className="hidden md:inline">Logout</span>
+        </button>
+      </div>
     </header>
   );
 };

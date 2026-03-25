@@ -1,59 +1,58 @@
 import { useState, useRef, useCallback } from "react";
-import axios from "axios";
+import {
+  fetchNowPlayingMovies,
+  fetchPopularMovies,
+  fetchTopRatedMovies,
+  fetchUpcomingMovies,
+} from "../api/movieApi";
 
-export const useMovieCategories = (backendUrl) => {
+const endpointMap = {
+  "top-rated": fetchTopRatedMovies,
+  "now-playing": fetchNowPlayingMovies,
+  popular: fetchPopularMovies,
+  upcoming: fetchUpcomingMovies,
+};
+
+export const useMovieCategories = () => {
   const [movies, setMovies] = useState({
     topRated: [],
     nowPlaying: [],
     popular: [],
     upcoming: [],
   });
-
   const [loadingInitial, setLoadingInitial] = useState(true);
-
   const fetchedRef = useRef(new Set());
 
-  const fetchCategory = useCallback(
-    async (category, endpoint) => {
-      if (!backendUrl) return;
+  const fetchCategory = useCallback(async (category, endpoint) => {
+    if (fetchedRef.current.has(category)) return;
 
-      // tránh duplicate request
-      if (fetchedRef.current.has(category)) return;
+    const fetcher = endpointMap[endpoint];
+    if (!fetcher) return;
 
-      fetchedRef.current.add(category);
+    fetchedRef.current.add(category);
 
-      try {
-        const res = await axios.get(
-          `${backendUrl}/api/movies/tmdb/${endpoint}`,
-          { params: { page: 1 } }
-        );
+    try {
+      const res = await fetcher(1);
 
-        setMovies((prev) => ({
-          ...prev,
-          [category]: res.data.results || [],
-        }));
-      } catch (err) {
-        console.error(`Fetch ${category} error`, err);
+      setMovies((prev) => ({
+        ...prev,
+        [category]: res.data.results || [],
+      }));
+    } catch (err) {
+      console.error(`Fetch ${category} error`, err);
+      fetchedRef.current.delete(category);
+    } finally {
+      setLoadingInitial(false);
+    }
+  }, []);
 
-        // allow retry
-        fetchedRef.current.delete(category);
-      } finally {
-        setLoadingInitial(false);
-      }
-    },
-    [backendUrl]
-  );
-
-  // fetch nhiều category song song
   const fetchMultiple = useCallback(
     async (categories) => {
       await Promise.all(
-        categories.map(({ key, endpoint }) =>
-          fetchCategory(key, endpoint)
-        )
+        categories.map(({ key, endpoint }) => fetchCategory(key, endpoint)),
       );
     },
-    [fetchCategory]
+    [fetchCategory],
   );
 
   const filterByGenre = useCallback((list, genreId) => {

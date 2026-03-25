@@ -1,11 +1,11 @@
 import screenImage from "./screenImage.svg";
-import profile from "./profile.png";
+
 import logo from "./logo.png";
 
 export const assets = {
   logo,
   screenImage,
-  profile,
+ 
 };
 
 export const dummyTrailers = [

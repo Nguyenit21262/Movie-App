@@ -2,8 +2,6 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Clock, Monitor } from "lucide-react";
-import { getRoomInfo } from "../assets/assets";
-import time from "../lib/time";
 
 const DataSelect = ({ dateTime = {}, id }) => {
   const navigate = useNavigate();
@@ -12,15 +10,13 @@ const DataSelect = ({ dateTime = {}, id }) => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedShowtime, setSelectedShowtime] = useState(null);
 
-  /* Memo dates */
-  const dates = useMemo(() => Object.keys(dateTime), [dateTime]);
+  const dates = useMemo(() => Object.keys(dateTime).sort(), [dateTime]);
 
-  /* Memo showtimes */
+  // dateTime từ DB: { "2025-01-01": [{ time, showId, showPrice }] }
   const showtimes = useMemo(() => {
     return selectedDate ? dateTime[selectedDate] || [] : [];
   }, [selectedDate, dateTime]);
 
-  /* Auto scroll */
   useEffect(() => {
     if (selectedDate && showtimesRef.current) {
       showtimesRef.current.scrollIntoView({ behavior: "smooth" });
@@ -32,25 +28,26 @@ const DataSelect = ({ dateTime = {}, id }) => {
       toast("Please select date & showtime");
       return;
     }
-
-    const date = new Date(selectedDate).toISOString().split("T")[0];
-    navigate(`/theaters/${id}/${date}?showtime=${selectedShowtime.id}`);
+    // Navigate đến SeatLayout với showId
+    navigate(
+      `/theaters/${id}/${selectedDate}?showId=${selectedShowtime.showId}`,
+    );
     window.scrollTo(0, 0);
   }, [selectedDate, selectedShowtime, navigate, id]);
 
   if (!dates.length) return null;
 
   return (
-    <div className="pt-30 bg-neutral-900 min-h-[300px] pb-16">
+    <div className="pt-5 bg-neutral-900 min-h-[200px] pb-16">
       <div className="p-8 bg-zinc-900 border border-zinc-800 rounded-xl">
-        <h3 className="text-center text-2xl font-bold text-white mb-4">
+        <h3 className="text-center text-xl font-bold text-white mb-4">
           Select Date & Time
         </h3>
 
         {/* DATE */}
         <div className="flex justify-center gap-3 overflow-x-auto pb-2">
           {dates.map((date) => {
-            const d = new Date(date);
+            const d = new Date(date + "T00:00:00");
             return (
               <button
                 key={date}
@@ -58,7 +55,7 @@ const DataSelect = ({ dateTime = {}, id }) => {
                   setSelectedDate(date);
                   setSelectedShowtime(null);
                 }}
-                className={`min-w-[70px] p-3 rounded-xl transition ${
+                className={`h-16 min-w-[50px] p-3 rounded-xl transition ${
                   selectedDate === date
                     ? "bg-yellow-500 text-black"
                     : "bg-zinc-800 text-gray-200 hover:bg-zinc-700"
@@ -75,41 +72,41 @@ const DataSelect = ({ dateTime = {}, id }) => {
 
         {/* SHOWTIMES */}
         {selectedDate && (
-          <div ref={showtimesRef} className="mt-8 border-t border-zinc-800 pt-6">
-            <p className="text-gray-400 mb-4">
+          <div
+            ref={showtimesRef}
+            className="mt-8 border-t border-zinc-800 pt-6"
+          >
+            <p className="text-white mb-4">
               {showtimes.length} showtimes available
             </p>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {showtimes.map((st) => {
-                const room = getRoomInfo(st.roomId);
-                const isActive = selectedShowtime?.id === st.id;
+                const isActive = selectedShowtime?.showId === st.showId;
+                const showTime = new Date(st.time);
 
                 return (
                   <div
-                    key={st.id}
+                    key={st.showId}
                     onClick={() => setSelectedShowtime(st)}
-                    className={`p-4 rounded-xl cursor-pointer border transition ${
+                    className={`p-2 rounded-lg cursor-pointer border transition ${
                       isActive
-                        ? "border-yellow-500 bg-yellow-500/10"
+                        ? "border-yellow-500 bg-yellow-400/10"
                         : "border-zinc-700 bg-zinc-800/60 hover:bg-zinc-700/60"
                     }`}
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <Clock className="w-4 h-4 text-yellow-500" />
-                      <span className="text-xl font-bold text-gray-100">
-                        {time(st.time)}
+                    <div className="flex items-center gap-1 mb-1">
+                      <Clock className="w-3 h-3" />
+                      <span className="text-sm font-semibold text-white">
+                        {showTime.toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
                       </span>
                     </div>
 
-                    <div className="text-sm text-gray-300 flex items-center gap-2">
-                      <Monitor className="w-4 h-4" />
-                      {room.name}
-                    </div>
-
-                    <div className="text-sm text-gray-400 mt-1">
-                      {room.type} • ${st.price}
-                    </div>
+                    <div className="text-xs text-gray-400">${st.showPrice}</div>
                   </div>
                 );
               })}
@@ -126,7 +123,7 @@ const DataSelect = ({ dateTime = {}, id }) => {
                 }`}
               >
                 {selectedShowtime
-                  ? `Book - $${selectedShowtime.price}`
+                  ? `Book — $${selectedShowtime.showPrice}`
                   : "Select a Showtime"}
               </button>
             </div>

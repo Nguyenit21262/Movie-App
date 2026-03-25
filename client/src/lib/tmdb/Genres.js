@@ -36,7 +36,7 @@ export const getGenreName = (genreId) => {
  */
 export const getGenreId = (genreName) => {
   const entry = Object.entries(TMDB_GENRES).find(
-    ([id, name]) => name === genreName
+    ([, name]) => name === genreName
   );
   return entry ? Number(entry[0]) : null;
 };

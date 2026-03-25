@@ -7,9 +7,12 @@ import mongoose from "mongoose";
 
 import authRouter from "./routes/authRoutes.js";
 import userRouter from "./routes/userRoutes.js";
+import adminRouter from "./routes/adminRoutes.js";
 import movieRouter from "./routes/movieRouter.js";
 import commentRoutes from "./routes/commentRoutes.js";
 import showRouter from "./routes/showRoutes.js";
+import bookingRouter from "./routes/bookingRoutes.js";
+import notificationRouter from "./routes/notificationRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -35,10 +38,13 @@ app.use(
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/admin", adminRouter);
 
 app.use("/api/movies/:movieId/comments", commentRoutes);
 app.use("/api/movies", movieRouter);
-app.use("/api/shows", showRouter);
+app.use("/api/show", showRouter);
+app.use("/api/bookings", bookingRouter);
+app.use("/api/notifications", notificationRouter);
 
 // Health check
 app.get("/", (req, res) => {
@@ -47,17 +53,6 @@ app.get("/", (req, res) => {
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-
-  if (err.message === "Only image files are allowed!") {
-    return res.status(400).json({ success: false, message: err.message });
-  }
-
-  if (err.code === "LIMIT_FILE_SIZE") {
-    return res.status(400).json({
-      success: false,
-      message: "File size too large. Maximum size is 5MB",
-    });
-  }
 
   res.status(500).json({ success: false, message: "Something went wrong!" });
 });

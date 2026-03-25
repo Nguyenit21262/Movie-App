@@ -1,22 +1,19 @@
-import React from "react";
-import { assets } from "../../assets/assets";
+import React, { useContext } from "react";
 import {
   LayoutDashboardIcon,
   ListCollapseIcon,
   ListIcon,
   PlusSquareIcon,
+  HomeIcon,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
-
+import { AppContent } from "../../context/AppContent";
 
 const AdminSidebar = () => {
-  const user = {
-    firstName: "Admin",
-    lastName: "User",
-    imageUrl: assets.profile,
-  };
+  const { userData } = useContext(AppContent);
 
   const adminNavlinks = [
+    { name: "Home", path: "/", icon: HomeIcon },
     { name: "Dashboard", path: "/admin", icon: LayoutDashboardIcon },
     { name: "Add Movies", path: "/admin/add-movies", icon: PlusSquareIcon },
     { name: "List Movies", path: "/admin/list-movies", icon: ListIcon },
@@ -25,6 +22,7 @@ const AdminSidebar = () => {
       path: "/admin/list-bookings",
       icon: ListCollapseIcon,
     },
+    
   ];
 
   return (
@@ -41,14 +39,12 @@ const AdminSidebar = () => {
   "
     >
       {/* USER */}
-      <img
-        className="h-9 md:h-14 w-9 md:w-14 rounded-full"
-        src={user.imageUrl}
-        alt="sidebar"
-      />
+      <div className="h-9 md:h-14 w-9 md:w-14 rounded-full bg-white flex items-center justify-center text-blue font-bold text-lg">
+        {userData?.avatar || "U"}
+      </div>
 
       <p className="mt-2 text-base text-white max-md:hidden">
-        {user.firstName} {user.lastName}
+        Admin{userData ? userData.name : " Loading..."}
       </p>
 
       {/* NAV LINKS */}

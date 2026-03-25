@@ -1,5 +1,5 @@
 import User from "../models/User.js";
-
+import Booking from "../models/Booking.js";
 
 export const getUserData = async (req, res) => {
   try {
@@ -49,11 +49,10 @@ export const updateProfile = async (req, res) => {
       updateData.dateOfBirth = parsedDate;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.userId,
-      updateData,
-      { new: true, runValidators: true }
-    ).select("-password");
+    const updatedUser = await User.findByIdAndUpdate(req.userId, updateData, {
+      new: true,
+      runValidators: true,
+    }).select("-password");
 
     if (!updatedUser) {
       return res.status(404).json({
@@ -156,3 +155,29 @@ export const getAllUsers = async (req, res) => {
     });
   }
 };
+
+//api to get all user bookings
+export const getUserBookings = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const bookings = await Booking.find({ user: userId })
+      .populate({
+        path: "show",
+        populate: { path: "movie" },
+      })
+      .sort({ createdAt: -1 });
+    res.json({
+      success: true,
+      bookings,
+    });
+  } catch (error) {
+    console.error("Get user bookings error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+//
