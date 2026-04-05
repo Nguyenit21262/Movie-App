@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   ArrowRight,
@@ -8,18 +8,26 @@ import {
   Tag,
   MessageCircle,
 } from "lucide-react";
+import { toast } from "react-toastify";
 
-import { useMovieDetails } from "../hooks/useMovieDetails";
+import { AppContent } from "../context/AppContent";
+import { useMovieDetails } from "../hooks";
 import { getTMDBPosterUrl, getTMDBBackdropUrl } from "../lib/tmdb/tmdbConfig";
 import timeFormat from "../lib/timeFormat";
 import MovieCard from "../components/MovieCard";
 import TrailersSection from "../components/TrailersSection";
 import MovieReview from "../components/MovieReview";
 import Loading from "../components/Loading";
+import RatingModal from "../components/RatingModal";
+import { getMyMovieRating, submitMovieRating } from "../api/ratingApi";
 
 const MovieDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { isLoggedIn } = useContext(AppContent);
+  const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  const [userRating, setUserRating] = useState(null);
+  const [submittingRating, setSubmittingRating] = useState(false);
 
   const {
     movie,
@@ -29,9 +37,46 @@ const MovieDetails = () => {
     loading,
   } = useMovieDetails(id);
 
+  const [movieStats, setMovieStats] = useState(null);
+
+  useEffect(() => {
+    if (movie) {
+      setMovieStats({
+        vote_average: movie.vote_average,
+        count_rating: movie.count_rating,
+      });
+    }
+  }, [movie]);
+
+  useEffect(() => {
+    if (!isLoggedIn || !id) {
+      setUserRating(null);
+      return;
+    }
+
+    const fetchUserRating = async () => {
+      try {
+        const { data } = await getMyMovieRating(id);
+        if (data.success) {
+          setUserRating(data.userRating);
+          if (data.movieRating) {
+            setMovieStats(data.movieRating);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load user rating:", error);
+      }
+    };
+
+    fetchUserRating();
+  }, [id, isLoggedIn]);
+
   const rating = useMemo(
-    () => movie?.vote_average ? (movie.vote_average / 2).toFixed(1) : null,
-    [movie]
+    () =>
+      movieStats?.vote_average
+        ? (movieStats.vote_average / 2).toFixed(1)
+        : null,
+    [movieStats]
   );
 
   const castList = useMemo(
@@ -46,6 +91,41 @@ const MovieDetails = () => {
 
   if (loading) return <Loading />;
   if (!movie) return null;
+
+  const handleOpenRatingModal = () => {
+    if (!isLoggedIn) {
+      toast.info("Please login to rate this movie");
+      navigate("/login");
+      return;
+    }
+
+    setRatingModalOpen(true);
+  };
+
+  const handleSubmitRating = async (selectedRating) => {
+    try {
+      setSubmittingRating(true);
+
+      const { data } = await submitMovieRating(id, selectedRating);
+
+      if (data.success) {
+        setUserRating(data.userRating);
+        setMovieStats(data.movieRating);
+        setRatingModalOpen(false);
+        toast.success(data.message || "Rating saved successfully");
+
+        if (data.mlUpdate?.message) {
+          toast.info(data.mlUpdate.message, { autoClose: 2500 });
+        }
+      } else {
+        toast.error(data.message || "Failed to save rating");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to save rating");
+    } finally {
+      setSubmittingRating(false);
+    }
+  };
 
   return (
     <div className="bg-neutral-900 min-h-screen">
@@ -74,6 +154,9 @@ const MovieDetails = () => {
                   {rating}
                 </span>
               )}
+              {movieStats?.count_rating > 0 && (
+                <span>{movieStats.count_rating} ratings</span>
+              )}
               {movie.runtime > 0 && <span>{timeFormat(movie.runtime)}</span>}
               {movie.release_date && (
                 <span>{new Date(movie.release_date).getFullYear()}</span>
@@ -96,6 +179,13 @@ const MovieDetails = () => {
               >
                 <PlayCircleIcon /> Watch Trailer
               </a>
+              <button
+                onClick={handleOpenRatingModal}
+                className="px-6 py-3 bg-gray-800 rounded-lg font-semibold text-white flex items-center gap-2 hover:bg-gray-700 transition"
+              >
+                <StarIcon className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                {userRating ? `Your Rating: ${userRating}/5` : "Rate Movie"}
+              </button>
               <button className="p-3 bg-gray-800 rounded-full">
                 <Heart />
               </button>
@@ -160,6 +250,14 @@ const MovieDetails = () => {
       <div id="comment">
         <MovieReview movieId={id} />
       </div>
+
+      <RatingModal
+        isOpen={ratingModalOpen}
+        onClose={() => setRatingModalOpen(false)}
+        onSubmit={handleSubmitRating}
+        initialRating={userRating || 0}
+        submitting={submittingRating}
+      />
     </div>
   );
 };

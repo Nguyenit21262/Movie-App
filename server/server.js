@@ -13,6 +13,7 @@ import commentRoutes from "./routes/commentRoutes.js";
 import showRouter from "./routes/showRoutes.js";
 import bookingRouter from "./routes/bookingRoutes.js";
 import notificationRouter from "./routes/notificationRoutes.js";
+import chatRouter from "./routes/chatRoutes.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -45,6 +46,7 @@ app.use("/api/movies", movieRouter);
 app.use("/api/show", showRouter);
 app.use("/api/bookings", bookingRouter);
 app.use("/api/notifications", notificationRouter);
+app.use("/api/chat", chatRouter);
 
 // Health check
 app.get("/", (req, res) => {

@@ -24,7 +24,7 @@ import ListMovies from "./pages/admin/ListMovies";
 import ListBooking from "./pages/admin/ListBooking";
 
 import Login from "./pages/Login";
-import Register from "./pages/Resigter";
+import Register from "./pages/Register";
 import EmailVerify from "./pages/EmailVerify";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";

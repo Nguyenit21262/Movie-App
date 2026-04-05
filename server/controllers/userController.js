@@ -179,5 +179,3 @@ export const getUserBookings = async (req, res) => {
     });
   }
 };
-
-//

@@ -1,12 +1,31 @@
 import Movie from "../models/Movie.js";
 import TMDBService from "../service/TMDBService.js";
+import { getPersonalizedRecommendations } from "../service/recommendationService.js";
+
+const isDuplicateKeyError = (error) => error?.code === 11000;
+
+const normalizeMoviePayload = (formatted) => ({
+  ...formatted,
+  overview: formatted?.overview || "",
+  poster_path: formatted?.poster_path || "",
+  backdrop_path: formatted?.backdrop_path || "",
+  tagline: formatted?.tagline || "",
+  genres: formatted?.genres || [],
+  keywords: formatted?.keywords || [],
+  casts: formatted?.casts || [],
+});
 
 const saveOneMovieToDB = async (tmdbId) => {
-  const existing = await Movie.findOne({ tmdb_id: tmdbId });
-  if (existing) return null;
-
   const formatted = await TMDBService.formatMovieData(tmdbId);
-  return Movie.create(formatted);
+  const normalized = normalizeMoviePayload(formatted);
+
+  const result = await Movie.updateOne(
+    { tmdb_id: tmdbId },
+    { $setOnInsert: normalized },
+    { upsert: true },
+  );
+
+  return result.upsertedCount ? normalized : null;
 };
 
 
@@ -18,6 +37,10 @@ const saveMoviesToDB = async (tmdbMovies) => {
       const saved = await saveOneMovieToDB(tmdbMovie.id);
       saved ? results.saved++ : results.skipped++;
     } catch (err) {
+      if (isDuplicateKeyError(err)) {
+        results.skipped++;
+        continue;
+      }
       console.error(`Failed to save movie ${tmdbMovie.id}:`, err.message);
       results.skipped++;
     }
@@ -27,11 +50,17 @@ const saveMoviesToDB = async (tmdbMovies) => {
 };
 
 const saveMovieFromDetails = async (details, credits, keywords) => {
-  const existing = await Movie.findOne({ tmdb_id: details.id });
-  if (existing) return null;
+  const formatted = normalizeMoviePayload(
+    TMDBService.formatFromDetails(details, credits, keywords),
+  );
 
-  const formatted = TMDBService.formatFromDetails(details, credits, keywords);
-  return Movie.create(formatted);
+  const result = await Movie.updateOne(
+    { tmdb_id: details.id },
+    { $setOnInsert: formatted },
+    { upsert: true },
+  );
+
+  return result.upsertedCount ? formatted : null;
 };
 
 
@@ -47,6 +76,8 @@ const TMDB_LIST_FETCHERS = {
   top_rated: TMDBService.getTopRatedMovies.bind(TMDBService),
   now_playing: TMDBService.getNowPlayingMovies.bind(TMDBService),
   upcoming: TMDBService.getUpcomingMovies.bind(TMDBService),
+  trending_day: (page) => TMDBService.getTrendingMovies("day", page),
+  trending_week: (page) => TMDBService.getTrendingMovies("week", page),
 };
 
 
@@ -77,6 +108,8 @@ export const getTMDBPopular = createTMDBListHandler("popular");
 export const getTopRatedMovies = createTMDBListHandler("top_rated");
 export const getTMDBNowPlaying = createTMDBListHandler("now_playing");
 export const getTMDBUpcoming = createTMDBListHandler("upcoming");
+export const getTMDBTrendingDay = createTMDBListHandler("trending_day");
+export const getTMDBTrendingWeek = createTMDBListHandler("trending_week");
 
 export const importMoviesFromTMDB = async (req, res) => {
   try {
@@ -127,7 +160,7 @@ export const getAllMovies = async (req, res) => {
     const [movies, count] = await Promise.all([
       Movie.find(query)
         .sort(sort)
-        .limit(limit * 1)
+        .limit(parseInt(limit, 10))
         .skip((page - 1) * limit)
         .exec(),
       Movie.countDocuments(query),
@@ -327,17 +360,47 @@ export const searchTMDBMovies = async (req, res) => {
   }
 };
 
+export const discoverTMDBMoviesByGenre = async (req, res) => {
+  try {
+    const { genreId, page = 1 } = req.query;
+
+    if (!genreId) {
+      return res.status(400).json({
+        success: false,
+        message: "genreId is required",
+      });
+    }
+
+    const results = await TMDBService.discoverByGenre(genreId, page);
+
+    backgroundSave(saveMoviesToDB(results.results), `discover:${genreId}`);
+
+    return res.status(200).json({
+      success: true,
+      results: results.results,
+      totalPages: results.total_pages,
+      currentPage: results.page,
+    });
+  } catch (error) {
+    console.error("Discover TMDB movies by genre error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to discover movies by genre",
+    });
+  }
+};
+
 export const getTMDBMovieDetails = async (req, res) => {
   try {
     const { tmdbId } = req.params;
 
-    const [details, credits, keywords, videos, recommendations] =
+    const details = await TMDBService.getMovieDetails(tmdbId);
+    const [credits, keywords, videos, recommendations] =
       await Promise.all([
-        TMDBService.getMovieDetails(tmdbId),
-        TMDBService.getMovieCredits(tmdbId),
-        TMDBService.getMovieKeywords(tmdbId),
-        TMDBService.getMovieVideos(tmdbId),
-        TMDBService.getRecommendations(tmdbId),
+        TMDBService.getMovieCredits(tmdbId, { optional: true }),
+        TMDBService.getMovieKeywords(tmdbId, { optional: true }),
+        TMDBService.getMovieVideos(tmdbId, { optional: true }),
+        TMDBService.getRecommendations(tmdbId, 1, { optional: true }),
       ]);
 
     backgroundSave(
@@ -356,9 +419,9 @@ export const getTMDBMovieDetails = async (req, res) => {
     return res.status(200).json({
       success: true,
       movie: details,
-      credits,
-      videos: videos.results,
-      recommendations: recommendations.results,
+      credits: credits || { cast: [], crew: [] },
+      videos: videos?.results || [],
+      recommendations: recommendations?.results || [],
     });
   } catch (error) {
     console.error("Get TMDB movie details error:", error);
@@ -434,6 +497,32 @@ export const searchMovieSuggestions = async (req, res) => {
       success: false,
       message: "Failed to fetch suggestions",
       error: error.message,
+    });
+  }
+};
+
+// Personalized recommendations cho user đã đăng nhập
+export const getRecommendations = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit, 10) || 20;
+    const question = (req.query.q || "").trim();
+
+    const { recommendations } = await getPersonalizedRecommendations({
+      user: req.user,
+      question,
+      limit,
+    });
+
+    return res.json({
+      success: true,
+      recommendations,
+      total: recommendations.length,
+    });
+  } catch (error) {
+    console.error("getRecommendations error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch recommendations",
     });
   }
 };

@@ -49,9 +49,11 @@ const TheatersDetail = () => {
   }, [id]);
 
   const fetchLocalMovie = useCallback(async (controller) => {
-    const response = await getShowMovieById(id, { signal: controller.signal });
+    const [showResponse] = await Promise.all([
+      getShowMovieById(id, { signal: controller.signal }),
+    ]);
 
-    const res = response.data;
+    const res = showResponse.data;
 
     if (res?.success) {
       const normalizedGenres =
@@ -59,13 +61,37 @@ const TheatersDetail = () => {
           typeof genre === "string" ? { name: genre } : genre,
         ) || [];
 
+      let tmdbExtras = {
+        videos: [],
+        recommendations: [],
+      };
+
+      if (res.movie.tmdb_id) {
+        try {
+          const tmdbResponse = await getMovieDetails(res.movie.tmdb_id, {
+            signal: controller.signal,
+          });
+
+          if (tmdbResponse.data?.success) {
+            tmdbExtras = {
+              videos: tmdbResponse.data.videos || [],
+              recommendations: tmdbResponse.data.recommendations || [],
+            };
+          }
+        } catch (error) {
+          if (error?.name !== "CanceledError") {
+            console.error("Failed to fetch TMDB trailer data:", error);
+          }
+        }
+      }
+
       setData({
         movie: {
           ...res.movie,
           genres: normalizedGenres,
         },
-        videos: [],
-        recommendations: [],
+        videos: tmdbExtras.videos,
+        recommendations: tmdbExtras.recommendations,
       });
 
       setDateTime(res.dateTime || {});
@@ -122,7 +148,15 @@ const TheatersDetail = () => {
       (video) => video.type === "Trailer" && video.site === "YouTube",
     );
 
-    return youtubeTrailer || data.videos[0];
+    const youtubeTeaser = data.videos.find(
+      (video) => video.type === "Teaser" && video.site === "YouTube",
+    );
+
+    const firstYoutubeVideo = data.videos.find(
+      (video) => video.site === "YouTube" && video.key,
+    );
+
+    return youtubeTrailer || youtubeTeaser || firstYoutubeVideo || null;
   }, [data.videos]);
 
   const displayedRecs = useMemo(() => {

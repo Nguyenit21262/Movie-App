@@ -84,6 +84,7 @@ const Profile = () => {
     setFormData((prev) => ({ ...prev, dateOfBirth: value }));
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -119,20 +120,20 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-neutral-900">
         <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-blue-50">
+    <div className="min-h-screen bg-neutral-900 text-gray-100">
       {/* Navbar */}
-      <nav className="bg-white border-b">
+      <nav className="bg-neutral-900 border-b border-neutral-800">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center">
           <button
             onClick={() => navigate("/")}
-            className="flex items-center gap-2 text-gray-700 hover:text-blue-600"
+            className="flex items-center gap-2 text-gray-300 hover:text-white"
           >
             <ArrowLeft size={18} />
             Back
@@ -142,14 +143,14 @@ const Profile = () => {
 
       {/* Profile Card */}
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="bg-neutral-800 rounded-xl shadow-xl p-6 border border-neutral-700">
           {/* Avatar */}
           <div className="flex flex-col items-center mb-6">
             <div className="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-white text-3xl font-semibold">
               {formData.name ? formData.name.charAt(0).toUpperCase() : "U"}
             </div>
 
-            <p className="mt-2 text-gray-700 text-sm">{formData.email}</p>
+            <p className="mt-2 text-gray-400 text-sm">{formData.email}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -168,7 +169,7 @@ const Profile = () => {
               <input
                 value={formData.email}
                 disabled
-                className="input bg-gray-100"
+                className="input bg-neutral-900 opacity-70"
               />
             </Input>
 
@@ -220,7 +221,7 @@ const Profile = () => {
               <button
                 type="button"
                 onClick={() => navigate("/")}
-                className="flex-1 h-10 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+                className="flex-1 h-10 rounded-lg border border-neutral-600 text-gray-300 hover:bg-neutral-700 transition"
               >
                 Cancel
               </button>
@@ -243,16 +244,16 @@ const Profile = () => {
           height: 38px;
           padding: 0 12px;
           border-radius: 8px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid #404040;
           outline: none;
-          color: #111827;
+          color: #f3f4f6;
           font-weight: 400;
-          background: white;
+          background: #262626;
         }
 
         .input:focus {
-          border-color: #2563eb;
-          box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
         }
 
         .input::placeholder {
@@ -269,8 +270,8 @@ const Profile = () => {
 
 const Input = ({ label, icon, children }) => (
   <div className="space-y-1">
-    <label className="flex items-center gap-2 text-sm text-gray-700 font-medium">
-      <span className="text-blue-600">{icon}</span>
+    <label className="flex items-center gap-2 text-sm text-gray-300 font-medium">
+      <span className="text-blue-500">{icon}</span>
       {label}
     </label>
     {children}

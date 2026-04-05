@@ -32,7 +32,7 @@ const movieSchema = new mongoose.Schema(
 
     overview: {
       type: String,
-      required: true,
+      default: "",
     },
 
     poster_path: {

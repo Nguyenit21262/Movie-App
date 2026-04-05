@@ -6,7 +6,7 @@ import React, {
   memo,
   useRef,
 } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AppContent } from "../context/AppContent";
 import { assets } from "../assets/assets";
 import { SearchIcon, ChevronDown } from "lucide-react";
@@ -18,6 +18,13 @@ const SearchBar = memo(({ onSearch }) => {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const timeoutRef = useRef(null);
+  const location = useLocation();
+
+  React.useEffect(() => {
+    setQuery("");
+    setSuggestions([]);
+  }, [location.pathname, location.search]);
+
 
   const fetchSuggestions = async (q) => {
     try {

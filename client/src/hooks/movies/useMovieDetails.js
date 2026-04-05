@@ -1,8 +1,7 @@
-// hooks/useMovieDetails.js
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
-import { useAbortableRequest } from "./useAbortableRequest";
-import { getMovieDetails } from "../api/movieApi";
+import { getMovieDetails } from "../../api/movieApi";
+import { useAbortableRequest } from "../core/useAbortableRequest";
 
 export const useMovieDetails = (id) => {
   const { createSignal } = useAbortableRequest();
@@ -20,7 +19,7 @@ export const useMovieDetails = (id) => {
     if (!id) return;
 
     try {
-      setState((s) => ({ ...s, loading: true }));
+      setState((current) => ({ ...current, loading: true }));
       const { data } = await getMovieDetails(id, { signal: createSignal() });
 
       if (data?.success) {
@@ -33,12 +32,12 @@ export const useMovieDetails = (id) => {
           error: null,
         });
       }
-    } catch (err) {
-      if (!axios.isCancel(err)) {
-        setState((s) => ({
-          ...s,
+    } catch (error) {
+      if (!axios.isCancel(error)) {
+        setState((current) => ({
+          ...current,
           loading: false,
-          error: err,
+          error,
         }));
       }
     }

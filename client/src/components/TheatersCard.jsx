@@ -20,9 +20,9 @@ const TheatersCard = ({ movie, onClick, movieDbId }) => {
     e.stopPropagation();
 
     if (movieDbId) {
-      navigate(`/theaters/${movieDbId}/today`);
+      navigate(`/theaters/${movieDbId}#booking`);
     } else {
-      navigate(`/theaters/tmdb/${movie.id}/today`);
+      navigate(`/theaters/tmdb/${movie.id}#booking`);
     }
   };
 

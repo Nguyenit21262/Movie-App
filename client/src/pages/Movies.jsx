@@ -7,7 +7,7 @@ import MovieCard from "../components/MovieCard";
 import Loading from "../components/Loading";
 import LazySection from "../components/LazySection";
 
-import { useMovieCategories } from "../hooks/useMovieCategories";
+import { useMovieCategories } from "../hooks";
 import { searchMovies as searchMoviesRequest } from "../api/movieApi";
 
 const Movies = () => {
@@ -19,6 +19,7 @@ const Movies = () => {
     loadingInitial,
     fetchCategory,
     fetchMultiple,
+    fetchGenreDiscover,
     filterByGenre,
   } = useMovieCategories();
 
@@ -36,6 +37,11 @@ const Movies = () => {
 
   const sections = useMemo(
     () => [
+      {
+        key: "trendingWeek",
+        title: genreName ? `${genreName} Trending` : "Trending This Week",
+        endpoint: "trending-week",
+      },
       {
         key: "topRated",
         title: genreName ? `Top ${genreName}` : "Top Rated",
@@ -64,10 +70,17 @@ const Movies = () => {
     if (searchQuery) return;
 
     fetchMultiple([
+      { key: "trendingWeek", endpoint: "trending-week" },
       { key: "topRated", endpoint: "top-rated" },
       { key: "nowPlaying", endpoint: "now-playing" },
     ]);
   }, [fetchMultiple, searchQuery]);
+
+  useEffect(() => {
+    if (!selectedGenre || searchQuery) return;
+
+    fetchGenreDiscover("genreDiscover", selectedGenre);
+  }, [fetchGenreDiscover, searchQuery, selectedGenre]);
 
   useEffect(() => {
     if (!searchQuery) return;
@@ -158,10 +171,28 @@ const Movies = () => {
         </div>
       )}
 
+      {genreName && movies.genreDiscover?.length > 0 && (
+        <section className="px-8">
+          <h2 className="text-white text-2xl font-bold mb-6">
+            {genreName} Spotlight
+          </h2>
+
+          <div className="grid gap-6 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {movies.genreDiscover.map((movie) => (
+              <MovieCard
+                key={`genre-${movie.id}`}
+                movie={movie}
+                onClick={() => handleMovieClick(movie.id)}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       {sections.map((sec, index) => (
         <LazySection
           key={sec.key}
-          fetchData={() => index > 1 && fetchCategory(sec.key, sec.endpoint)}
+          fetchData={() => index > 2 && fetchCategory(sec.key, sec.endpoint)}
         >
           {filterByGenre(movies[sec.key], selectedGenre).length > 0 && (
             <section className="px-8">

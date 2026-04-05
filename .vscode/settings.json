@@ -1,4 +1,5 @@
 {
     "python.analysis.typeCheckingMode": "standard",
-    "editor.minimap.scale": 2
+    "editor.minimap.scale": 2,
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }

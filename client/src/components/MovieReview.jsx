@@ -10,7 +10,7 @@ import { SendHorizontal, Reply, Trash2, Pencil, X, Check } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AppContent } from "../context/AppContent";
-import useCommentTree from "../hooks/useCommentTree";
+import { useCommentTree } from "../hooks";
 import {
   createMovieComment,
   deleteMovieComment,

@@ -1,11 +1,7 @@
 import React, { useContext } from "react";
-import {
-  LayoutDashboardIcon,
-  ListCollapseIcon,
-  ListIcon,
-  PlusSquareIcon,
-  HomeIcon,
-} from "lucide-react";
+import { FaHome, FaFilm } from "react-icons/fa";
+import { MdDashboard, MdAddBox, MdList } from "react-icons/md";
+import { BsTicketPerforated } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
 import { AppContent } from "../../context/AppContent";
 
@@ -13,17 +9,13 @@ const AdminSidebar = () => {
   const { userData } = useContext(AppContent);
 
   const adminNavlinks = [
-    { name: "Home", path: "/", icon: HomeIcon },
-    { name: "Dashboard", path: "/admin", icon: LayoutDashboardIcon },
-    { name: "Add Movies", path: "/admin/add-movies", icon: PlusSquareIcon },
-    { name: "List Movies", path: "/admin/list-movies", icon: ListIcon },
-    {
-      name: "List Booking",
-      path: "/admin/list-bookings",
-      icon: ListCollapseIcon,
-    },
+  { name: "Home", path: "/", icon: FaHome },
+  { name: "Dashboard", path: "/admin", icon: MdDashboard },
+  { name: "Add Movies", path: "/admin/add-movies", icon: MdAddBox },
+  { name: "List Movies", path: "/admin/list-movies", icon: MdList },
+  { name: "List Booking", path: "/admin/list-bookings", icon: BsTicketPerforated },
+];
     
-  ];
 
   return (
     <aside
@@ -44,7 +36,7 @@ const AdminSidebar = () => {
       </div>
 
       <p className="mt-2 text-base text-white max-md:hidden">
-        Admin{userData ? userData.name : " Loading..."}
+       {userData ? userData.name : " Loading..."}
       </p>
 
       {/* NAV LINKS */}

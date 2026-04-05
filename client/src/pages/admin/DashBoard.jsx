@@ -133,28 +133,24 @@ const DashBoard = () => {
       title: "Total Bookings",
       value: dashboardData.totalBookings,
       icon: ChartLineIcon,
-      bg: "bg-blue-400",
       iconColor: "text-blue-600",
     },
     {
       title: "Total Revenue",
       value: `${currency} ${dashboardData.totalRevenue.toLocaleString()}`,
       icon: CircleDollarSignIcon,
-      bg: "bg-green-400",
       iconColor: "text-green-600",
     },
     {
       title: "Active Shows",
       value: dashboardData.activeShows.length,
       icon: PlayCircleIcon,
-      bg: "bg-purple-400",
       iconColor: "text-purple-600",
     },
     {
       title: "Total Users",
       value: dashboardData.totalUser,
       icon: UsersIcon,
-      bg: "bg-orange-400",
       iconColor: "text-orange-600",
     },
   ];
@@ -166,40 +162,42 @@ const DashBoard = () => {
       <Title text1="Admin" text2="Dashboard" />
 
       {/* CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
         {dashboardCards.map((card, index) => (
           <div
             key={index}
-            className={`flex items-center justify-between px-4 py-3 ${card.bg} border border-gray-200 rounded-md`}
+            className={`flex items-center justify-between p-4 ${card.bg} shadow-sm hover:shadow-md transition-shadow border border-gray-100 rounded-lg`}
           >
             <div>
-              <p className="text-sm text-gray-600">{card.title}</p>
-              <p className="text-xl font-semibold text-gray-900 mt-1">
+              <p className="text-xs font-medium text-gray-700 opacity-90">
+                {card.title}
+              </p>
+              <p className="text-lg font-bold text-gray-900 mt-0.5">
                 {card.value}
               </p>
             </div>
-            <card.icon className={`w-6 h-6 ${card.iconColor}`} />
+            <div className={`p-2 rounded-full bg-white bg-opacity-30`}>
+              <card.icon className={`w-5 h-5 ${card.iconColor}`} />
+            </div>
           </div>
         ))}
       </div>
 
-      <div className="mt-8 border border-gray-200 rounded-md bg-white overflow-hidden">
-        {/* Header */}
-        <div className="px-4 py-3 border-b bg-gray-50">
-          <h2 className="text-base font-semibold text-gray-800">
-            Active Movies
-          </h2>
-        </div>
+      {/* Header */}
+      <div className=" mt-6 px-4 py-3 border-b bg-gray-50 rounded-lg flex items-center justify-between">
+        <h2 className="text-sm font-bold text-gray-800">Active Movies</h2>
+      </div>
 
+      <div className="mt-1 border border-gray-200 rounded-lg bg-white shadow-sm overflow-hidden">
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs">
             <thead className="bg-gray-50">
-              <tr className="text-gray-600">
-                <th className="px-4 py-2 text-left font-medium">Movie</th>
-                <th className="px-4 py-2 text-left font-medium">Showtimes</th>
-                <th className="px-4 py-2 text-left font-medium">Price</th>
-                <th className="px-4 py-2 text-left font-medium">Action</th>
+              <tr className="text-gray-500 text-[11px] uppercase tracking-wider border-b border-gray-200">
+                <th className="px-4 py-2 text-left font-semibold">Movie</th>
+                <th className="px-4 py-2 text-left font-semibold">Showtimes</th>
+                <th className="px-4 py-2 text-left font-semibold">Price</th>
+                <th className="px-4 py-2 text-left font-semibold">Action</th>
               </tr>
             </thead>
 
@@ -217,9 +215,12 @@ const DashBoard = () => {
                   const hasMore = shows.length > 2;
 
                   return (
-                    <tr key={movie._id} className="align-top">
+                    <tr
+                      key={movie._id}
+                      className="align-middle border-b last:border-0 hover:bg-gray-50/50 transition-colors"
+                    >
                       {/* Movie */}
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-2.5">
                         <div className="flex items-center gap-3">
                           <img
                             src={
@@ -227,10 +228,10 @@ const DashBoard = () => {
                                 ? `${TMDB_POSTER}${movie.poster_path}`
                                 : "/no-image.png"
                             }
-                            className="w-12 h-16 object-cover rounded border"
+                            className="w-10 h-14 object-cover rounded shadow-sm border border-gray-200"
                           />
                           <div>
-                            <p className="font-medium text-gray-800">
+                            <p className="font-semibold text-gray-900 text-xs">
                               {movie.title}
                             </p>
                           </div>
@@ -238,10 +239,13 @@ const DashBoard = () => {
                       </td>
 
                       {/* Showtimes */}
-                      <td className="px-4 py-3">
-                        <div className="flex flex-col gap-1">
+                      <td className="px-4 py-2.5">
+                        <div className="flex flex-col gap-1.5">
                           {visibleShows.map((show) => (
-                            <div key={show._id}>
+                            <div
+                              key={show._id}
+                              className="flex items-center min-h-[26px]"
+                            >
                               {editingId === show._id ? (
                                 <input
                                   type="datetime-local"
@@ -252,10 +256,10 @@ const DashBoard = () => {
                                       showDateTime: e.target.value,
                                     }))
                                   }
-                                  className="border px-2 py-1 rounded text-xs"
+                                  className="border border-gray-300 px-2 py-1 rounded focus:ring-1 focus:ring-blue-500 outline-none text-[11px] w-full max-w-[160px]"
                                 />
                               ) : (
-                                <span className="text-xs text-gray-700">
+                                <span className="text-[11px] font-medium text-gray-700 bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
                                   {dateFormat(show.showDateTime)}
                                 </span>
                               )}
@@ -265,17 +269,17 @@ const DashBoard = () => {
                           {hasMore && (
                             <button
                               onClick={() => toggleExpand(movie._id)}
-                              className="flex items-center gap-1 text-xs text-blue-600 mt-1 hover:text-blue-700"
+                              className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 mt-1 hover:text-blue-800 transition-colors"
                             >
                               {isExpanded ? (
                                 <>
-                                  <ChevronUpIcon className="w-3.5 h-3.5" />
+                                  <ChevronUpIcon className="w-3 h-3" />
                                   Show less
                                 </>
                               ) : (
                                 <>
-                                  <ChevronDownIcon className="w-3.5 h-3.5" />Show more
-                                  
+                                  <ChevronDownIcon className="w-3 h-3" />
+                                  Show more
                                 </>
                               )}
                             </button>
@@ -284,10 +288,13 @@ const DashBoard = () => {
                       </td>
 
                       {/* Price */}
-                      <td className="px-4 py-3">
-                        <div className="flex flex-col gap-1">
+                      <td className="px-4 py-2.5">
+                        <div className="flex flex-col gap-1.5">
                           {visibleShows.map((show) => (
-                            <div key={show._id}>
+                            <div
+                              key={show._id}
+                              className="flex items-center min-h-[26px]"
+                            >
                               {editingId === show._id ? (
                                 <input
                                   type="number"
@@ -298,10 +305,10 @@ const DashBoard = () => {
                                       showPrice: e.target.value,
                                     }))
                                   }
-                                  className="border px-2 py-1 rounded w-20 text-xs"
+                                  className="border border-gray-300 px-2 py-1 rounded focus:ring-1 focus:ring-blue-500 outline-none text-[11px] w-20"
                                 />
                               ) : (
-                                <span className="text-xs font-medium text-gray-800">
+                                <span className="text-xs font-bold text-gray-900">
                                   {currency} {show.showPrice}
                                 </span>
                               )}
@@ -311,22 +318,25 @@ const DashBoard = () => {
                       </td>
 
                       {/* Actions */}
-                      <td className="px-4 py-3">
-                        <div className="flex flex-col gap-1">
+                      <td className="px-4 py-2.5">
+                        <div className="flex flex-col gap-1.5">
                           {visibleShows.map((show) => (
-                            <div key={show._id} className="flex gap-1">
+                            <div
+                              key={show._id}
+                              className="flex gap-1.5 items-center min-h-[26px]"
+                            >
                               {editingId === show._id ? (
                                 <>
                                   <button
                                     onClick={() => handleUpdate(show._id)}
                                     disabled={saving}
-                                    className="px-2 py-1 text-xs bg-green-100 text-green-700 rounded"
+                                    className="px-2 py-1 text-[11px] font-medium bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors"
                                   >
                                     Save
                                   </button>
                                   <button
                                     onClick={cancelEdit}
-                                    className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded"
+                                    className="px-2 py-1 text-[11px] font-medium bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
                                   >
                                     Cancel
                                   </button>
@@ -335,14 +345,16 @@ const DashBoard = () => {
                                 <>
                                   <button
                                     onClick={() => startEdit(show)}
-                                    className="flex items-center gap-1 px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                                    className="p-1 text-blue-600 bg-blue-50 rounded hover:bg-blue-100 transition-colors"
+                                    title="Edit"
                                   >
                                     <PencilIcon className="w-3.5 h-3.5" />
                                   </button>
 
                                   <button
                                     onClick={() => handleDelete(show._id)}
-                                    className="flex items-center gap-1 px-2 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200"
+                                    className="p-1 text-red-600 bg-red-50 rounded hover:bg-red-100 transition-colors"
+                                    title="Delete"
                                   >
                                     <Trash2Icon className="w-3.5 h-3.5" />
                                   </button>

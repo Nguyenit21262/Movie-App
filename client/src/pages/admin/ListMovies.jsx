@@ -47,7 +47,7 @@ const ListMovies = () => {
   if (loading) return <Loading />;
 
   return (
-    <div className="p-5">
+    <div className="p-5 ">
       <Title text1="List" text2="Show" />
 
       <div className="max-w-4xl mt-6 overflow-x-auto shadow-sm">

@@ -2,6 +2,7 @@ import {
   fetchNowPlayingMovies,
   fetchPopularMovies,
   fetchTopRatedMovies,
+  fetchTrendingMovies,
   fetchUpcomingMovies,
 } from "../api/movieApi";
 
@@ -16,3 +17,6 @@ export const fetchPopular = (_backendUrl, page = 3) =>
 
 export const fetchUpcoming = (_backendUrl, page = 4) =>
   fetchUpcomingMovies(page);
+
+export const fetchTrending = (_backendUrl, page = 1) =>
+  fetchTrendingMovies("week", page);
