@@ -37,7 +37,7 @@ const App = () => {
     "/register",
     "/email-verify",
     "/reset-password",
-    "/profile",
+    // "/profile",
   ];
 
   const hideNavbarAndFooter =

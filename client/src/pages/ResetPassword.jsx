@@ -108,7 +108,7 @@ const ResetPassword = () => {
   };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-black">
+    <div className="relative min-h-screen w-full overflow-hidden bg-black">
       <img
         src="image.png"
         alt="cinema-bg"
@@ -121,12 +121,12 @@ const ResetPassword = () => {
         <img src={assets.logo} alt="Cinema Logo" className="h-12 w-auto" />
       </div>
 
-      <div className="relative z-10 flex items-center justify-center h-full">
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
         {!showOtpInput ? (
           // Email Input Form
           <form
             onSubmit={handleSendOtp}
-            className="w-[400px] bg-black/75 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-10 shadow-[0_0_60px_rgba(99,102,241,0.2)] flex flex-col items-center"
+            className="flex w-full max-w-[400px] flex-col items-center rounded-2xl border border-white/10 bg-black/75 px-6 py-10 backdrop-blur-md shadow-[0_0_60px_rgba(99,102,241,0.2)] sm:px-8"
           >
             <h2 className="text-3xl font-bold text-white tracking-wide mb-4">
               Reset Password
@@ -167,7 +167,7 @@ const ResetPassword = () => {
           // OTP and New Password Form
           <form
             onSubmit={handleResetPassword}
-            className="w-[400px] bg-black/75 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-10 shadow-[0_0_60px_rgba(99,102,241,0.2)] flex flex-col items-center"
+            className="flex w-full max-w-[400px] flex-col items-center rounded-2xl border border-white/10 bg-black/75 px-6 py-10 backdrop-blur-md shadow-[0_0_60px_rgba(99,102,241,0.2)] sm:px-8"
           >
             <h2 className="text-3xl font-bold text-white tracking-wide mb-4">
               Reset Password

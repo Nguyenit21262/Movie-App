@@ -180,7 +180,7 @@ const TheatersDetail = () => {
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white">
-      <div className="relative w-full h-[600px] md:h-[700px] overflow-hidden">
+      <div className="relative h-[520px] w-full overflow-hidden md:h-[700px]">
         <div className="absolute inset-0">
           <img
             src={getTMDBBackdropUrl(movie.backdrop_path, "w1280")}
@@ -190,13 +190,13 @@ const TheatersDetail = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/60 to-transparent" />
         </div>
 
-        <div className="relative h-full flex items-end px-6 md:px-16 lg:px-40 pb-16">
+        <div className="relative flex h-full items-end px-4 pb-10 sm:px-6 md:px-16 md:pb-16 lg:px-40">
           <div className="flex flex-col md:flex-row gap-10 max-w-7xl mx-auto w-full items-center md:items-end">
             <div className="shrink-0 group relative">
               <img
                 src={getTMDBPosterUrl(movie.poster_path, "w500")}
                 alt={movie.title}
-                className="rounded-2xl h-[400px] md:h-[480px] w-auto object-cover shadow-2xl border border-white/10 transition-transform duration-500 group-hover:scale-[1.02]"
+                className="h-[320px] w-auto rounded-2xl border border-white/10 object-cover shadow-2xl transition-transform duration-500 group-hover:scale-[1.02] sm:h-[400px] md:h-[480px]"
               />
             </div>
 
@@ -240,7 +240,7 @@ const TheatersDetail = () => {
                 {movie.overview}
               </p>
 
-              <div className="flex items-center gap-4 mt-6">
+              <div className="mt-6 flex flex-wrap items-center gap-4">
                 {trailerVideo && (
                   <button
                     onClick={() => navigate("trailer")}
@@ -257,7 +257,7 @@ const TheatersDetail = () => {
         </div>
       </div>
 
-      <div id="booking" className="px-6 md:px-16 lg:px-40 py-16 bg-neutral-900">
+      <div id="booking" className="bg-neutral-900 px-4 py-16 sm:px-6 md:px-16 lg:px-40">
         <div className="max-w-7xl mx-auto border-t border-white/5 pt-16">
           <h2 className="text-3xl font-bold mb-8">Select Showtimes</h2>
 
@@ -274,7 +274,7 @@ const TheatersDetail = () => {
       </div>
 
       {hasRecommendations && (
-        <div className="max-w-7xl mx-auto px-6 md:px-16 lg:px-40 pb-32">
+        <div className="mx-auto max-w-7xl px-4 pb-32 sm:px-6 md:px-16 lg:px-40">
           <div className="flex justify-between items-center mb-10">
             <h3 className="text-2xl font-bold">You May Also Like</h3>
 
@@ -290,7 +290,7 @@ const TheatersDetail = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 md:gap-8">
             {displayedRecs.map((item) => (
               <TheatersCard
                 key={item.id}

@@ -17,11 +17,6 @@ const HorizontalScollCard = ({
   const handlePrevious = () => {
     contaierRef.current.scrollLeft -= 245;
   };
-
-  // Add console logging to debug
-  console.log(`${heading} - Data:`, data);
-
-  // Check if data is valid
   if (!Array.isArray(data)) {
     console.error(`${heading} - Data is not an array:`, data);
     return null;
@@ -41,7 +36,7 @@ const HorizontalScollCard = ({
           className="
             grid grid-flow-col auto-cols-[230px]
             gap-2
-            overflow-x-scroll
+            overflow-x-auto
             scrollbar-none
             pb-2
             scroll-smooth
@@ -49,7 +44,6 @@ const HorizontalScollCard = ({
         >
           {data.length > 0 ? (
             data.map((item, index) => {
-              // Skip if item is undefined or null
               if (!item) {
                 console.warn(`${heading} - Item at index ${index} is undefined`);
                 return null;

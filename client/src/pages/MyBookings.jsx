@@ -28,7 +28,7 @@ const MyBookings = () => {
   if (loading) return <Loading />;
 
   return (
-    <div className="relative px-6 md:px-16 lg:px-40 pt-30 md:pt-40 min-h-[80vh]">
+    <div className="relative min-h-[80vh] px-4 pt-24 sm:px-6 md:px-16 md:pt-40 lg:px-40">
       <h1 className="text-lg font-semibold mb-6 text-white">My Bookings</h1>
 
       {bookings.length === 0 ? (
@@ -41,7 +41,7 @@ const MyBookings = () => {
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse rounded-xl overflow-hidden bg-[#0f0f0f] border border-white/10">
+          <table className="w-full min-w-[760px] border-collapse overflow-hidden rounded-sm border border-white/10 bg-[#0f0f0f]">
             <thead className="bg-[#161616]">
               <tr className="text-left text-sm text-gray-400">
                 <th className="px-4 py-4">Movie</th>
@@ -65,11 +65,11 @@ const MyBookings = () => {
                     className="border-t border-white/5 text-sm text-gray-300 hover:bg-white/5 transition-colors"
                   >
                     <td className="px-4 py-4 flex items-center gap-3">
-                      <img
+                      {/* <img
                         src={`${TMDB_IMAGE}${movie.poster_path}`}
                         alt={movie.title}
                         className="w-20 h-12 object-cover rounded-md"
-                      />
+                      /> */}
                       <span className="font-medium text-white">
                         {movie.title}
                       </span>
@@ -97,7 +97,7 @@ const MyBookings = () => {
 
                     <td className="px-4 py-4 text-right">
                       {!item.isPaid ? (
-                        <button className="bg-blue-600 hover:bg-blue-700 px-5 rounded-full font-medium text-white transition-all">
+                        <button className="rounded-full bg-blue-600 px-5 py-1.5 font-medium text-white transition-all hover:bg-blue-700">
                           Pay
                         </button>
                       ) : (

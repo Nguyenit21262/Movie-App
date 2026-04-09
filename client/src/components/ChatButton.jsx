@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Film, MessageCircle, Send, Sparkles, X } from "lucide-react";
+import { MessageCircle, Send, Sparkles, X } from "lucide-react";
 import { AppContent } from "../context/AppContent";
-import { getChatHistory, streamChat } from "../api/chatApi";
+import { getChatHistory, streamChat, clearChatHistory } from "../api/chatApi";
 
 const ChatButton = () => {
   const { isLoggedIn, loading } = useContext(AppContent);
@@ -181,6 +181,18 @@ const ChatButton = () => {
     }
   };
 
+  const handleClearChat = async () => {
+    if (!window.confirm("Bạn có chắc muốn xoá toàn bộ lịch sử trò chuyện và bắt đầu hội thoại mới?")) return;
+    try {
+      if (isLoggedIn) {
+        await clearChatHistory();
+      }
+      setMessages([]);
+    } catch (error) {
+      console.error("Failed to clear chat:", error);
+    }
+  };
+
   const handleKeyDown = (event) => {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
@@ -189,7 +201,7 @@ const ChatButton = () => {
   };
 
   return (
-    <div className="fixed right-5 bottom-6 z-50">
+    <div className="fixed right-4 bottom-6 z-50 sm:right-5">
       <button
         id="chat-button"
         onClick={() => setIsOpen((prev) => !prev)}
@@ -207,24 +219,34 @@ const ChatButton = () => {
       {isOpen && (
         <div
           ref={chatWindowRef}
-          className="absolute right-0 bottom-20 flex h-[32rem] w-[20rem] flex-col overflow-hidden rounded-lg border border-blue-100 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.18)] sm:w-[25rem]"
+          className="fixed inset-x-3 bottom-24 flex h-[min(32rem,calc(100vh-8rem))] w-auto flex-col overflow-hidden rounded-lg border border-blue-100 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.18)] sm:absolute sm:right-0 sm:bottom-20 sm:left-auto sm:h-[32rem] sm:w-[25rem]"
         >
-          <div className="relative overflow-hidden  bg-blue px-5 py-4 text-white">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.35),transparent_38%)]" />
+          <div className="relative overflow-hidden bg-blue px-4 py-4 text-white sm:px-5">
+            <div className="absolute inset-0]" />
             <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div>
-                  <h3 className="text-sm font-bold tracking-[0.18em] uppercase">
+                  <h3 className="text-sm font-bold uppercase">
                     Movie Chat
                   </h3>
                 </div>
               </div>
-              <button
-                onClick={() => setIsOpen(false)}
-                className="rounded-full p-2 text-white/85 transition-colors hover:bg-white/15 hover:text-white"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                {messages.length > 0 && (
+                  <button
+                    onClick={handleClearChat}
+                    className="rounded-full bg-white/20 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-white/30"
+                  >
+                    New Chat
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="rounded-full p-2 text-white/85 transition-colors hover:bg-white/15 hover:text-white"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -234,9 +256,9 @@ const ChatButton = () => {
           >
             {!messages.length ? (
               <div className="flex h-full flex-col justify-between">
-                <div className="rounded-[24px] border border-blue-100 bg-white/90 p-4 text-sm leading-6 text-slate-600 shadow-[0_10px_25px_rgba(148,163,184,0.12)]">
-                  <div className="mb-3 flex items-center gap-2 text-blue-600">
-                    <Sparkles className="h-4 w-4" />
+                <div className="rounded-lg border border-neutral-200 bg-white/90 p-4 text-sm leading-6 text-slate-600 shadow-[0_10px_25px_rgba(148,163,184,0.12)]">
+                  <div className="mb-3 flex items-center gap-2 text-blue">
+                    
                     <span className="font-semibold">Movie assistant</span>
                   </div>
                   {loading
@@ -281,10 +303,10 @@ const ChatButton = () => {
                         }`}
                       >
                         {showTyping ? (
-                          <div className="flex items-center gap-1 ">
-                            <span className="h-2 w-2 animate-pulse rounded-full bg-blue-400 [animation-delay:0ms]" />
-                            <span className="h-2 w-2 animate-pulse rounded-full bg-blue-300 [animation-delay:120ms]" />
-                            <span className="h-2 w-2 animate-pulse rounded-full bg-blue-200 [animation-delay:240ms]" />
+                          <div className="flex items-center gap-1">
+                            <span className="h-2 w-2 animate-pulse rounded-full bg-neutral-700 [animation-delay:0ms]" />
+                            <span className="h-2 w-2 animate-pulse rounded-full bg-neutral-600 [animation-delay:120ms]" />
+                            <span className="h-2 w-2 animate-pulse rounded-full bg-neutral-500 [animation-delay:240ms]" />
                           </div>
                         ) : (
                           message.content
@@ -298,7 +320,7 @@ const ChatButton = () => {
           </div>
 
           <div className="border-t border-blue-100 bg-white px-4 py-4">
-            <div className="rounded-[18px]  bg-blue-50/70 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+            <div className="rounded-[18px] bg-blue-50/70 p-2">
               <div className="flex items-end gap-2 rounded-[18px] bg-white px-2 py-1">
                 <input
                   type="text"
@@ -314,7 +336,7 @@ const ChatButton = () => {
                   disabled={sending || !input.trim()}
                   className="flex h-8 w-8 items-center justify-center rounded-2xl text-white transition-all hover:scale-[1.03] disabled:cursor-not-allowed disabled:opacity-45"
                 >
-                  <Send className="h-4.5 w-4.5 text-blue" />
+                  <Send className="h-4.5 w-4.5 text-neutral-700" />
                 </button>
               </div>
             </div>

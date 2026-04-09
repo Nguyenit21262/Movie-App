@@ -97,7 +97,7 @@ const Register = () => {
   };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-black">
+    <div className="relative min-h-screen w-full overflow-hidden bg-black">
       <img
         src="image.png"
         alt="cinema-bg"
@@ -110,10 +110,10 @@ const Register = () => {
         <img src={assets.logo} alt="Cinema Logo" className="h-12 w-auto" />
       </div>
 
-      <div className="relative z-10 flex items-center justify-center h-full">
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
         <form
           onSubmit={handleSubmit}
-          className="md:w-[700px] w-[340px] bg-black/75 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-10 shadow-[0_0_60px_rgba(99,102,241,0.2)] flex flex-col items-center"
+          className="flex w-full max-w-[700px] flex-col items-center rounded-2xl border border-white/10 bg-black/75 px-5 py-10 backdrop-blur-md shadow-[0_0_60px_rgba(99,102,241,0.2)] sm:px-8"
         >
           <h2 className="text-4xl font-bold text-white tracking-wide">
             Sign up

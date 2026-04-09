@@ -20,7 +20,7 @@ const AdminNavbar = () => {
       "
     >
       {/* Search box */}
-      <div className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-md w-48 md:w-64">
+      <div className="flex w-40 items-center gap-2 rounded-md bg-gray-100 px-3 py-2 sm:w-48 md:w-64">
         <SearchIcon className="w-4 h-4 text-gray-400" />
         <input
           type="text"

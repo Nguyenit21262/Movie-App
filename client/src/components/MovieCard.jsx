@@ -6,7 +6,7 @@ const MovieCard = ({ movie, onClick }) => {
   return (
     <div
       onClick={onClick} 
-      className="w-[230px] aspect-[2/3.2] rounded-sm overflow-hidden relative cursor-pointer transition hover:scale-[1.04] shadow-lg hover:shadow-2xl"
+      className="relative mx-auto w-full max-w-[230px] cursor-pointer overflow-hidden rounded-sm shadow-lg transition hover:scale-[1.04] hover:shadow-2xl aspect-[2/3.2]"
     >
       {/* Rating */}
       {movie.vote_average > 0 && (

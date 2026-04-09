@@ -56,7 +56,7 @@ const SearchBar = memo(({ onSearch }) => {
   };
 
   return (
-    <div className="hidden md:block max-w-md relative">
+    <div className="relative hidden max-w-md md:block">
       <form onSubmit={handleSubmit}>
         <div className="relative">
           <input
@@ -114,7 +114,7 @@ const GenreDropdown = memo(() => {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={close} />
-          <div className="absolute top-full mt-2 left-0 w-[480px] bg-neutral-900 rounded-lg shadow-2xl border border-neutral-700 z-50 max-h-96 overflow-y-auto">
+          <div className="absolute top-full left-0 z-50 mt-2 max-h-96 w-[min(480px,calc(100vw-2rem))] overflow-y-auto rounded-lg border border-neutral-700 bg-neutral-900 shadow-2xl">
             <div
               onClick={() => {
                 navigate("/movies");
@@ -278,9 +278,9 @@ const Navbar = () => {
         scrolled ? "backdrop-blur-lg bg-black/80" : "bg-transparent"
       }`}
     >
-      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center space-x-8">
+          <div className="flex items-center space-x-4 md:space-x-8">
             <Link to="/" onClick={() => window.scrollTo(0, 0)}>
               <img src={assets.logo} alt="Logo" className="h-8 sm:h-10" />
             </Link>
@@ -294,7 +294,7 @@ const Navbar = () => {
             <NavLinks />
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             {isLoggedIn && userData && <NotificationBell />}
 
             {isLoggedIn && userData ? (
@@ -306,7 +306,7 @@ const Navbar = () => {
             ) : (
               <button
                 onClick={() => navigate("/login")}
-                className="text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-white/10 transition"
+                className="rounded-full px-4 py-2 text-sm font-medium text-white transition hover:bg-white/10 sm:px-5"
               >
                 Login
               </button>

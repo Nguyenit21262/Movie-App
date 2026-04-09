@@ -138,3 +138,13 @@ export const getChatHistory = async (req, res) => {
     });
   }
 };
+
+export const deleteChatHistory = async (req, res) => {
+  try {
+    await Chat.deleteMany({ user: req.userId });
+    res.json({ success: true, message: "Chat history cleared" });
+  } catch (error) {
+    console.error("deleteChatHistory error:", error);
+    res.status(500).json({ success: false, message: "Failed to clear chat history" });
+  }
+};

@@ -221,8 +221,8 @@ const SeatLayout = () => {
         </div>
       )}
 
-      <div className="relative z-10 flex flex-col lg:flex-row min-h-screen">
-        <div className="flex-1 flex flex-col items-center px-6 pt-24 pb-16">
+      <div className="relative z-10 flex min-h-screen flex-col lg:flex-row">
+        <div className="flex flex-1 flex-col items-center px-4 pt-24 pb-16 sm:px-6">
           {movieInfo && (
             <div className="mb-8 text-center">
               <h2 className="text-2xl font-bold text-white">
@@ -250,7 +250,7 @@ const SeatLayout = () => {
             <img src={assets.screenImage} alt="screen" className="w-full" />
           </div>
 
-          <div className="flex items-center gap-6 mb-6 text-sm text-white font-medium">
+          <div className="mb-6 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-sm font-medium text-white">
             <div className="flex items-center gap-2">
               <div className="h-6 w-6 rounded border border-white/20 bg-white/5" />
               Available
@@ -267,15 +267,17 @@ const SeatLayout = () => {
             </div>
           </div>
 
-          <div className="flex flex-col items-center text-sm text-white font-medium">
-            <div className="grid grid-cols-2 md:grid-cols-1 gap-8 md:gap-2 mb-6">
-              {groupRows[0].map((row) => renderSeats(row, 10))}
-            </div>
+          <div className="w-full overflow-x-auto">
+            <div className="mx-auto flex min-w-[34rem] flex-col items-center text-sm font-medium text-white sm:min-w-0">
+              <div className="mb-6 grid grid-cols-2 gap-8 md:grid-cols-1 md:gap-2">
+                {groupRows[0].map((row) => renderSeats(row, 10))}
+              </div>
 
-            <div className="grid grid-cols-2 gap-11">
-              {groupRows.slice(1).map((group, idx) => (
-                <div key={idx}>{group.map((row) => renderSeats(row, 8))}</div>
-              ))}
+              <div className="grid grid-cols-2 gap-8 sm:gap-11">
+                {groupRows.slice(1).map((group, idx) => (
+                  <div key={idx}>{group.map((row) => renderSeats(row, 8))}</div>
+                ))}
+              </div>
             </div>
           </div>
 

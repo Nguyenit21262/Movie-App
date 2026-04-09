@@ -10,6 +10,7 @@ const normalizeMoviePayload = (formatted) => ({
   poster_path: formatted?.poster_path || "",
   backdrop_path: formatted?.backdrop_path || "",
   tagline: formatted?.tagline || "",
+  director: formatted?.director || "",
   genres: formatted?.genres || [],
   keywords: formatted?.keywords || [],
   casts: formatted?.casts || [],

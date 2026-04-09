@@ -95,7 +95,7 @@ const Login = () => {
   };
 
   return (
-    <div className="relative h-screen w-full overflow-hidden bg-black">
+    <div className="relative min-h-screen w-full overflow-hidden bg-black">
       {/* Background Image */}
       <img
         src="image.png"
@@ -112,7 +112,7 @@ const Login = () => {
       </div>
 
       {/* Form Container */}
-      <div className="relative z-10 flex items-center justify-center h-full">
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
         {!showOtpInput ? (
           <LoginForm
             form={form}
@@ -139,7 +139,7 @@ const Login = () => {
 const LoginForm = ({ form, loading, handleChange, handleLogin, navigate }) => (
   <form
     onSubmit={handleLogin}
-    className="w-[400px] bg-black/75 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-10 shadow-[0_0_60px_rgba(59,130,246,0.25)] flex flex-col items-center"
+    className="flex w-full max-w-[400px] flex-col items-center rounded-2xl border border-white/10 bg-black/75 px-6 py-10 backdrop-blur-md shadow-[0_0_60px_rgba(59,130,246,0.25)] sm:px-8"
   >
     <h2 className="text-4xl font-bold text-white tracking-wide mb-8">
       Sign in
@@ -219,7 +219,7 @@ const OtpForm = ({
   return (
     <form
       onSubmit={handleVerifyOtp}
-      className="w-[400px] bg-black/75 backdrop-blur-md border border-white/10 rounded-2xl px-8 py-10 shadow-[0_0_60px_rgba(59,130,246,0.25)] flex flex-col items-center"
+      className="flex w-full max-w-[400px] flex-col items-center rounded-2xl border border-white/10 bg-black/75 px-6 py-10 backdrop-blur-md shadow-[0_0_60px_rgba(59,130,246,0.25)] sm:px-8"
     >
       <h2 className="text-3xl font-bold text-white tracking-wide mb-4">
         Verify OTP

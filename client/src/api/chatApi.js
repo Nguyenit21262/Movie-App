@@ -12,6 +12,15 @@ export const getChatHistory = async () => {
   return response.json();
 };
 
+export const clearChatHistory = async () => {
+  const response = await fetch(`${API_BASE_URL}/api/chat/history`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  if (!response.ok) throw new Error("Failed to clear chat history");
+  return response.json();
+};
+
 export const streamChat = async ({ question, onEvent }) => {
   const response = await fetch(`${API_BASE_URL}/api/chat/stream`, {
     method: "POST",

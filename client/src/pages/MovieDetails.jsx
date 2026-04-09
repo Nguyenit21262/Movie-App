@@ -134,20 +134,21 @@ const MovieDetails = () => {
         <img
           src={getTMDBBackdropUrl(movie.backdrop_path, "original")}
           alt={movie.title}
-          className="w-full h-[600px] object-cover"
+          className="h-[320px] w-full object-cover sm:h-[420px] lg:h-[600px]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/50 to-transparent" />
 
-        <div className="absolute bottom-0 px-16 pb-20 flex gap-10">
+        <div className="relative px-4 pb-8 sm:px-6 sm:pb-12 lg:absolute lg:bottom-0 lg:px-16 lg:pb-20">
+          <div className="-mt-20 flex flex-col gap-6 sm:-mt-24 sm:flex-row sm:items-start lg:mt-0 lg:gap-10 lg:items-end">
           <img
             src={getTMDBPosterUrl(movie.poster_path, "w500")}
-            className="w-[280px] rounded-xl shadow-2xl"
+            className="w-40 rounded-xl shadow-2xl sm:w-52 lg:w-[280px]"
           />
 
-          <div className="max-w-2xl">
-            <h1 className="text-5xl font-bold text-white">{movie.title}</h1>
+            <div className="max-w-2xl">
+              <h1 className="text-3xl font-bold text-white sm:text-4xl lg:text-5xl">{movie.title}</h1>
 
-            <div className="flex items-center gap-4 text-gray-300 mt-4">
+              <div className="mt-4 flex flex-wrap items-center gap-3 sm:gap-4 text-gray-300">
               {rating && (
                 <span className="flex items-center gap-1">
                   <StarIcon className="text-yellow-400 fill-yellow-400" />
@@ -161,37 +162,38 @@ const MovieDetails = () => {
               {movie.release_date && (
                 <span>{new Date(movie.release_date).getFullYear()}</span>
               )}
-            </div>
+              </div>
 
-            <div className="flex gap-2 mt-2 text-sm text-gray-300">
-              <Tag size={14} />
-              {movie.genres?.map((g) => g.name).join(", ")}
-            </div>
+              <div className="mt-2 flex gap-2 text-sm text-gray-300">
+                <Tag size={14} className="mt-0.5 shrink-0" />
+                <span>{movie.genres?.map((g) => g.name).join(", ")}</span>
+              </div>
 
-            <p className="text-gray-300 mt-6 leading-7">
-              {movie.overview}
-            </p>
+              <p className="mt-6 leading-7 text-gray-300">
+                {movie.overview}
+              </p>
 
-            <div className="flex gap-4 mt-6">
-              <a
-                href="#trailer"
-                className="px-6 py-3 bg-yellow-500 rounded-lg font-semibold text-black flex items-center gap-2"
-              >
-                <PlayCircleIcon /> Watch Trailer
-              </a>
-              <button
-                onClick={handleOpenRatingModal}
-                className="px-6 py-3 bg-gray-800 rounded-lg font-semibold text-white flex items-center gap-2 hover:bg-gray-700 transition"
-              >
-                <StarIcon className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                {userRating ? `Your Rating: ${userRating}/5` : "Rate Movie"}
-              </button>
-              <button className="p-3 bg-gray-800 rounded-full">
-                <Heart />
-              </button>
-              <a href="#comment" className="p-3 bg-gray-800 rounded-full">
-                <MessageCircle />
-              </a>
+              <div className="mt-6 flex flex-wrap gap-3 sm:gap-4">
+                <a
+                  href="#trailer"
+                  className="flex items-center gap-2 rounded-lg bg-yellow-500 px-6 py-3 font-semibold text-black"
+                >
+                  <PlayCircleIcon /> Watch Trailer
+                </a>
+                <button
+                  onClick={handleOpenRatingModal}
+                  className="flex items-center gap-2 rounded-lg bg-gray-800 px-6 py-3 font-semibold text-white transition hover:bg-gray-700"
+                >
+                  <StarIcon className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                  {userRating ? `Your Rating: ${userRating}/5` : "Rate Movie"}
+                </button>
+                <button className="rounded-full bg-gray-800 p-3">
+                  <Heart />
+                </button>
+                <a href="#comment" className="rounded-full bg-gray-800 p-3">
+                  <MessageCircle />
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -199,7 +201,7 @@ const MovieDetails = () => {
 
       {/* CAST */}
       {castList.length > 0 && (
-        <div className="px-16 mt-16">
+        <div className="mt-16 px-4 sm:px-6 lg:px-16">
           <h2 className="text-white text-xl mb-6">Cast</h2>
           <div className="flex gap-6 overflow-x-auto scrollbar-none pb-2">
             {castList.map((c) => (
@@ -220,7 +222,7 @@ const MovieDetails = () => {
 
       {/* RECOMMEND */}
       {recsList.length > 0 && (
-        <div className="px-16 pb-20">
+        <div className="px-4 pb-20 sm:px-6 lg:px-16">
           <div className="flex justify-between mb-8">
             <h2 className="text-white text-xl">You May Also Like</h2>
             <button
@@ -231,7 +233,7 @@ const MovieDetails = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-5 gap-x-10 gap-y-8">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 lg:gap-x-10 lg:gap-y-8">
 
             {recsList.map((m) => (
               <MovieCard

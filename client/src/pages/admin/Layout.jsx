@@ -5,7 +5,7 @@ import AdminSidebar from "../../components/admin/AdminSidebar";
 
 const Layout = () => {
   return (
-    <div className="h-screen flex bg-white-off gap-1">
+    <div className="flex min-h-screen bg-white-off gap-1">
       <AdminSidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <AdminNavbar />

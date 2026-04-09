@@ -29,7 +29,7 @@ const TheatersCard = ({ movie, onClick, movieDbId }) => {
   return (
     <div
       onClick={onClick}
-      className="w-[240px] flex flex-col gap-3 group cursor-pointer"
+      className="group mx-auto flex w-full max-w-[240px] cursor-pointer flex-col gap-3"
     >
       <div className="relative h-80 rounded-sm overflow-hidden bg-neutral-900 shadow-xl transition-transform duration-300 group-hover:scale-105">
         <img
