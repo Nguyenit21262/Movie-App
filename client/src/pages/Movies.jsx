@@ -27,11 +27,8 @@ const Movies = () => {
   const [loadingSearch, setLoadingSearch] = useState(false);
 
   const searchQuery = searchParams.get("search");
-
-  const selectedGenre = useMemo(() => {
-    const genreParam = searchParams.get("genre");
-    return genreParam ? getGenreId(genreParam) : null;
-  }, [searchParams]);
+  const genreParam = searchParams.get("genre");
+  const selectedGenre = genreParam ? getGenreId(genreParam) : null;
 
   const genreName = selectedGenre ? TMDB_GENRES[selectedGenre] : null;
 
@@ -157,7 +154,7 @@ const Movies = () => {
   return (
     <div className="space-y-14 py-8 mt-10 bg-neutral-900 min-h-screen">
       {genreName && (
-        <div className="px-8">
+        <div key={genreParam || "all-genres"} className="px-8">
           <h1 className="text-4xl font-bold text-white mb-2">
             {genreName} Movies
           </h1>

@@ -24,7 +24,7 @@ const TrailersSection = ({ videos = [], movieTitle = "" }) => {
   return (
     <div
       id="trailer"
-      className="px-6 md:px-16 lg:px-24 xl:px-44 py-20 overflow-hidden"
+      className="scroll-mt-24 overflow-hidden px-6 py-20 md:px-16 lg:px-24 xl:px-44"
     >
       <p className="text-white font-semibold text-xl mb-2 max-w-[960px] mx-auto">
         Trailers & Videos

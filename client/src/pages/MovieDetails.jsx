@@ -19,15 +19,23 @@ import TrailersSection from "../components/TrailersSection";
 import MovieReview from "../components/MovieReview";
 import Loading from "../components/Loading";
 import RatingModal from "../components/RatingModal";
+import { fetchPersonalRecommendations } from "../api/movieApi";
 import { getMyMovieRating, submitMovieRating } from "../api/ratingApi";
+import {
+  addMovieBookmark,
+  getMovieBookmarkStatus,
+  removeMovieBookmark,
+} from "../api/userApi";
 
 const MovieDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isLoggedIn } = useContext(AppContent);
+  const { isLoggedIn, invalidateTopPicks } = useContext(AppContent);
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   const [userRating, setUserRating] = useState(null);
   const [submittingRating, setSubmittingRating] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
   const {
     movie,
@@ -71,6 +79,26 @@ const MovieDetails = () => {
     fetchUserRating();
   }, [id, isLoggedIn]);
 
+  useEffect(() => {
+    if (!isLoggedIn || !id) {
+      setIsBookmarked(false);
+      return;
+    }
+
+    const fetchBookmarkStatus = async () => {
+      try {
+        const { data } = await getMovieBookmarkStatus(id);
+        if (data.success) {
+          setIsBookmarked(Boolean(data.bookmarked));
+        }
+      } catch (error) {
+        console.error("Failed to load bookmark status:", error);
+      }
+    };
+
+    fetchBookmarkStatus();
+  }, [id, isLoggedIn]);
+
   const rating = useMemo(
     () =>
       movieStats?.vote_average
@@ -88,6 +116,11 @@ const MovieDetails = () => {
     () => recommendations.slice(0, 5),
     [recommendations]
   );
+
+  const scrollToSection = (sectionId) => {
+    const targetElement = document.getElementById(sectionId);
+    targetElement?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   if (loading) return <Loading />;
   if (!movie) return null;
@@ -111,8 +144,15 @@ const MovieDetails = () => {
       if (data.success) {
         setUserRating(data.userRating);
         setMovieStats(data.movieRating);
+        invalidateTopPicks();
         setRatingModalOpen(false);
         toast.success(data.message || "Rating saved successfully");
+
+        if ((data.ratingCount || 0) >= 5) {
+          fetchPersonalRecommendations(20, true).catch((error) => {
+            console.error("Failed to refresh Top Picks after rating:", error);
+          });
+        }
 
         if (data.mlUpdate?.message) {
           toast.info(data.mlUpdate.message, { autoClose: 2500 });
@@ -124,6 +164,34 @@ const MovieDetails = () => {
       toast.error(error.response?.data?.message || "Failed to save rating");
     } finally {
       setSubmittingRating(false);
+    }
+  };
+
+  const handleToggleBookmark = async () => {
+    if (!isLoggedIn) {
+      toast.info("Please login to bookmark this movie");
+      navigate("/login");
+      return;
+    }
+
+    if (bookmarkLoading) return;
+
+    try {
+      setBookmarkLoading(true);
+      const { data } = isBookmarked
+        ? await removeMovieBookmark(id)
+        : await addMovieBookmark(id);
+
+      if (data.success) {
+        setIsBookmarked(Boolean(data.bookmarked));
+        toast.success(data.message || "Bookmark updated");
+      } else {
+        toast.error(data.message || "Failed to update bookmark");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update bookmark");
+    } finally {
+      setBookmarkLoading(false);
     }
   };
 
@@ -176,6 +244,10 @@ const MovieDetails = () => {
               <div className="mt-6 flex flex-wrap gap-3 sm:gap-4">
                 <a
                   href="#trailer"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    scrollToSection("trailer");
+                  }}
                   className="flex items-center gap-2 rounded-lg bg-yellow-500 px-6 py-3 font-semibold text-black"
                 >
                   <PlayCircleIcon /> Watch Trailer
@@ -187,10 +259,24 @@ const MovieDetails = () => {
                   <StarIcon className="h-5 w-5 text-yellow-400 fill-yellow-400" />
                   {userRating ? `Your Rating: ${userRating}/5` : "Rate Movie"}
                 </button>
-                <button className="rounded-full bg-gray-800 p-3">
-                  <Heart />
+                <button
+                  onClick={handleToggleBookmark}
+                  disabled={bookmarkLoading}
+                  className={`rounded-full bg-gray-800 p-3 transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-60 ${
+                    isBookmarked ? "text-red-500" : "text-white"
+                  }`}
+                  aria-label={isBookmarked ? "Remove bookmark" : "Add bookmark"}
+                >
+                  <Heart className={isBookmarked ? "fill-red-500" : ""} />
                 </button>
-                <a href="#comment" className="rounded-full bg-gray-800 p-3">
+                <a
+                  href="#comment"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    scrollToSection("comment");
+                  }}
+                  className="rounded-full bg-gray-800 p-3"
+                >
                   <MessageCircle />
                 </a>
               </div>
@@ -249,7 +335,7 @@ const MovieDetails = () => {
         </div>
       )}
 
-      <div id="comment">
+      <div id="comment" className="scroll-mt-24">
         <MovieReview movieId={id} />
       </div>
 

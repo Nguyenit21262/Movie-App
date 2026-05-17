@@ -2,14 +2,14 @@ import React from "react";
 import { StarIcon } from "lucide-react";
 import { getTMDBPosterUrl, getPlaceholderImage } from "../lib/tmdb/tmdbConfig";
 
-const MovieCard = ({ movie, onClick }) => {
+const MovieCard = ({ movie, onClick, className = "", showRating = true }) => {
   return (
     <div
       onClick={onClick} 
-      className="relative mx-auto w-full max-w-[230px] cursor-pointer overflow-hidden rounded-sm shadow-lg transition hover:scale-[1.04] hover:shadow-2xl aspect-[2/3.2]"
+      className={`relative mx-auto w-full max-w-[230px] cursor-pointer overflow-hidden rounded-sm shadow-lg transition hover:scale-[1.04] hover:shadow-2xl aspect-[2/3.2] ${className}`}
     >
       {/* Rating */}
-      {movie.vote_average > 0 && (
+      {showRating && movie.vote_average > 0 && (
         <div className="absolute top-3 left-3 z-10 bg-black/70 text-white px-2 py-1 rounded-full flex items-center gap-1">
           <StarIcon className="w-3 h-3 text-yellow-400 fill-yellow-400" />
           <span className="text-xs font-bold">

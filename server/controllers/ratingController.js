@@ -56,6 +56,13 @@ export const submitMovieRating = async (req, res) => {
     }
 
     const movie = await ensureMovieByTmdbId(tmdbId);
+    console.info(
+      "[ratingController] Rating request | user=%s | tmdbId=%s | movie=%s | newRating=%d",
+      String(req.userId),
+      String(tmdbId),
+      movie?.title || "Unknown title",
+      ratingValue,
+    );
 
     let rating = await Rating.findOne({
       user: req.userId,
@@ -85,6 +92,18 @@ export const submitMovieRating = async (req, res) => {
 
     rating.processed = true;
     await rating.save();
+    const ratingCount = await Rating.countDocuments({ user: req.userId });
+
+    console.info(
+      "[ratingController] Rating saved | user=%s | tmdbId=%s | movie=%s | previousRating=%s | newRating=%d | vote_average=%s | count_rating=%s",
+      String(req.userId),
+      String(tmdbId),
+      movie?.title || "Unknown title",
+      previousRating ?? "none",
+      ratingValue,
+      movie.vote_average,
+      movie.count_rating,
+    );
 
     return res.json({
       success: true,
@@ -94,6 +113,7 @@ export const submitMovieRating = async (req, res) => {
         vote_average: movie.vote_average,
         count_rating: movie.count_rating,
       },
+      ratingCount,
     });
   } catch (error) {
     console.error("submitMovieRating error:", error);

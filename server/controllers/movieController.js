@@ -1,6 +1,5 @@
 import Movie from "../models/Movie.js";
 import TMDBService from "../service/TMDBService.js";
-import { getPersonalizedRecommendations } from "../service/recommendationService.js";
 
 const isDuplicateKeyError = (error) => error?.code === 11000;
 
@@ -14,19 +13,33 @@ const normalizeMoviePayload = (formatted) => ({
   genres: formatted?.genres || [],
   keywords: formatted?.keywords || [],
   casts: formatted?.casts || [],
+  origin_country: formatted?.origin_country || [],
 });
+
+const buildMovieUpsertUpdate = (moviePayload) => {
+  if (!moviePayload.director) {
+    return { $setOnInsert: moviePayload };
+  }
+
+  const { director, ...insertPayload } = moviePayload;
+  return {
+    $setOnInsert: insertPayload,
+    $set: { director },
+  };
+};
 
 const saveOneMovieToDB = async (tmdbId) => {
   const formatted = await TMDBService.formatMovieData(tmdbId);
   const normalized = normalizeMoviePayload(formatted);
+  const update = buildMovieUpsertUpdate(normalized);
 
   const result = await Movie.updateOne(
     { tmdb_id: tmdbId },
-    { $setOnInsert: normalized },
+    update,
     { upsert: true },
   );
 
-  return result.upsertedCount ? normalized : null;
+  return result.upsertedCount || result.modifiedCount ? normalized : null;
 };
 
 
@@ -54,14 +67,15 @@ const saveMovieFromDetails = async (details, credits, keywords) => {
   const formatted = normalizeMoviePayload(
     TMDBService.formatFromDetails(details, credits, keywords),
   );
+  const update = buildMovieUpsertUpdate(formatted);
 
   const result = await Movie.updateOne(
     { tmdb_id: details.id },
-    { $setOnInsert: formatted },
+    update,
     { upsert: true },
   );
 
-  return result.upsertedCount ? formatted : null;
+  return result.upsertedCount || result.modifiedCount ? formatted : null;
 };
 
 
@@ -449,6 +463,7 @@ export const searchMovies = async (req, res) => {
         { overview: { $regex: q, $options: "i" } },
         { genres: { $regex: q, $options: "i" } },
         { keywords: { $regex: q, $options: "i" } },
+        { director: { $regex: q, $options: "i" } },
         { "casts.actor": { $regex: q, $options: "i" } },
       ],
     }).sort({ popularity: -1 });
@@ -498,32 +513,6 @@ export const searchMovieSuggestions = async (req, res) => {
       success: false,
       message: "Failed to fetch suggestions",
       error: error.message,
-    });
-  }
-};
-
-// Personalized recommendations cho user đã đăng nhập
-export const getRecommendations = async (req, res) => {
-  try {
-    const limit = parseInt(req.query.limit, 10) || 20;
-    const question = (req.query.q || "").trim();
-
-    const { recommendations } = await getPersonalizedRecommendations({
-      user: req.user,
-      question,
-      limit,
-    });
-
-    return res.json({
-      success: true,
-      recommendations,
-      total: recommendations.length,
-    });
-  } catch (error) {
-    console.error("getRecommendations error:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Failed to fetch recommendations",
     });
   }
 };

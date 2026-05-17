@@ -1,0 +1,94 @@
+[dotenv@17.2.3] injecting env (11) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+MongoDB Connected Successfully
+Server running on port 4000
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=12 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=12 | ratingsSinceLastBuild=0
+[ratingController] Rating request | user=69d726429f91bc55821ea7ab | tmdbId=479 | movie=Shaft | newRating=5
+[ratingController] Rating saved | user=69d726429f91bc55821ea7ab | tmdbId=479 | movie=Shaft | previousRating=none | newRating=5 | vote_average=6 | count_rating=1415
+[recommendations] building GCN | user=69d726429f91bc55821ea7ab | ratingCount=13 | forceRefresh=true
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=13 | ratingsSinceLastBuild=0
+[recommendations] build-in-progress, returning stale cache | user=69d726429f91bc55821ea7ab | ratingCount=13
+[recommendations] GCN built | user=69d726429f91bc55821ea7ab | ratingCount=13 | results=20
+[ratingController] Rating request | user=69d726429f91bc55821ea7ab | tmdbId=744 | movie=Top Gun | newRating=5
+[ratingController] Rating saved | user=69d726429f91bc55821ea7ab | tmdbId=744 | movie=Top Gun | previousRating=none | newRating=5 | vote_average=7.1 | count_rating=9484
+[recommendations] building GCN | user=69d726429f91bc55821ea7ab | ratingCount=14 | forceRefresh=true
+[recommendations] GCN built | user=69d726429f91bc55821ea7ab | ratingCount=14 | results=20
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] building GCN | user=69d726429f91bc55821ea7ab | ratingCount=14 | forceRefresh=true
+[recommendations] GCN built | user=69d726429f91bc55821ea7ab | ratingCount=14 | results=20
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] building GCN | user=69d726429f91bc55821ea7ab | ratingCount=14 | forceRefresh=true
+[recommendations] GCN built | user=69d726429f91bc55821ea7ab | ratingCount=14 | results=20
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] building GCN | user=69d726429f91bc55821ea7ab | ratingCount=14 | forceRefresh=true
+[recommendations] GCN built | user=69d726429f91bc55821ea7ab | ratingCount=14 | results=20
+[recommendations] building GCN | user=69d726429f91bc55821ea7ab | ratingCount=14 | forceRefresh=true
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+Chat timing | question='Horror tonight' | history_ms=44 | ai_first_chunk_ms=2368 | ai_total_ms=9482 | total_ms=9610 | provider=external-movie-ai
+Chat timing | question='Action movie' | history_ms=45 | ai_first_chunk_ms=1259 | ai_total_ms=7500 | total_ms=7601 | provider=external-movie-ai
+Email sent successfully: <32de4685-a0d6-5f74-523a-4266c2c59c65@gmail.com>
+Chat timing | question='Horror tonight' | history_ms=52 | ai_first_chunk_ms=2127 | ai_total_ms=7968 | total_ms=8086 | provider=external-movie-ai
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+Chat timing | question='Horror tonight' | history_ms=44 | ai_first_chunk_ms=1144 | ai_total_ms=5424 | total_ms=5524 | provider=external-movie-ai
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+Chat timing | question='Action movie' | history_ms=94 | ai_first_chunk_ms=2130 | ai_total_ms=9116 | total_ms=9270 | provider=external-movie-ai
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+Chat timing | question='i wanna watch a sad movie' | history_ms=50 | ai_first_chunk_ms=2054 | ai_total_ms=7763 | total_ms=8034 | provider=external-movie-ai
+Chat timing | question='who directef thoes movies' | history_ms=55 | ai_first_chunk_ms=910 | ai_total_ms=2503 | total_ms=2618 | provider=external-movie-ai
+Chat timing | question='i wanna watch a sad movie' | history_ms=50 | ai_first_chunk_ms=1860 | ai_total_ms=4160 | total_ms=4278 | provider=external-movie-ai
+Chat timing | question='who directed this movie' | history_ms=53 | ai_first_chunk_ms=1115 | ai_total_ms=1618 | total_ms=1732 | provider=external-movie-ai
+Chat timing | question='who is this main movie cast' | history_ms=50 | ai_first_chunk_ms=2507 | ai_total_ms=3652 | total_ms=3758 | provider=external-movie-ai
+Chat timing | question='show me some war movie' | history_ms=58 | ai_first_chunk_ms=1688 | ai_total_ms=8386 | total_ms=8505 | provider=external-movie-ai
+Chat timing | question='who directed those movies' | history_ms=49 | ai_first_chunk_ms=1279 | ai_total_ms=3240 | total_ms=3347 | provider=external-movie-ai
+Chat timing | question='thank you' | history_ms=52 | ai_first_chunk_ms=8 | ai_total_ms=8 | total_ms=136 | provider=external-movie-ai
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=6a06e45b6791cee583bffc18 | ratingCount=0
+Chat timing | question='Horror tonight' | history_ms=66 | ai_first_chunk_ms=4034 | ai_total_ms=9604 | total_ms=9952 | provider=external-movie-ai
+Chat timing | question='summarize the this film: Scary Stories to Tell in the Dark' | history_ms=65 | ai_first_chunk_ms=2179 | ai_total_ms=4950 | total_ms=5082 | provider=external-movie-ai
+Chat timing | question='list of upcoming film' | history_ms=101 | ai_first_chunk_ms=2580 | ai_total_ms=3339 | total_ms=3516 | provider=external-movie-ai
+Chat timing | question='list of existing films in the theaters' | history_ms=92 | ai_first_chunk_ms=2253 | ai_total_ms=3739 | total_ms=3902 | provider=external-movie-ai
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+Chat timing | question='Tôi muốn tìm một bộ phim hành động kịch tính của Christopher Nolan để xem tối na' | history_ms=56 | ai_first_chunk_ms=3203 | ai_total_ms=5203 | total_ms=5409 | provider=external-movie-ai
+Chat timing | question='Tôi muốn tìm một bộ phim hành động kịch tính của Christopher Nolan để xem tối na' | history_ms=72 | ai_first_chunk_ms=3890 | ai_total_ms=5695 | total_ms=5840 | provider=external-movie-ai
+Chat timing | question='Tôi muốn tìm một bộ phim hành động kịch tính của Christopher Nolan để xem tối na' | history_ms=49 | ai_first_chunk_ms=3674 | ai_total_ms=5493 | total_ms=5603 | provider=external-movie-ai
+Chat timing | question='Tôi muốn tìm một bộ phim hành động kịch tính của Christopher Nolan để xem tối na' | history_ms=54 | ai_first_chunk_ms=1852 | ai_total_ms=3599 | total_ms=3714 | provider=external-movie-ai
+Chat timing | question='Tôi muốn xem một phim buồn nhưng không quá nặng, khoảng 2 tiếng.' | history_ms=56 | ai_first_chunk_ms=2050 | ai_total_ms=4383 | total_ms=4501 | provider=external-movie-ai
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=14 | ratingsSinceLastBuild=0
+Chat timing | question='Cho tôi một phim viễn tưởng hack não của Nolan.' | history_ms=60 | ai_first_chunk_ms=3016 | ai_total_ms=3695 | total_ms=3828 | provider=external-movie-ai
+Chat timing | question='Cho tôi một phim viễn tưởng của Nolan.' | history_ms=59 | ai_first_chunk_ms=2492 | ai_total_ms=2878 | total_ms=3012 | provider=external-movie-ai
+Chat timing | question='1 bộ phim viễn tưởng của Christopher Nolan' | history_ms=59 | ai_first_chunk_ms=2838 | ai_total_ms=3121 | total_ms=3248 | provider=external-movie-ai
+Chat timing | question='1 bộ phim khoa học viễn tưởng của Christopher Nolan' | history_ms=60 | ai_first_chunk_ms=1907 | ai_total_ms=2250 | total_ms=2377 | provider=external-movie-ai
+Chat timing | question='1 bộ phim khoa học viễn tưởng của Christopher Nolan' | history_ms=46 | ai_first_chunk_ms=2255 | ai_total_ms=2775 | total_ms=2888 | provider=external-movie-ai
+[recommendations] building GCN | user=69d726429f91bc55821ea7ab | ratingCount=14 | forceRefresh=true
+[recommendations] GCN built | user=69d726429f91bc55821ea7ab | ratingCount=14 | results=0
+Chat timing | question='1 bộ phim khoa học viễn tưởng của Christopher Nolan Cine hiện chưa có thông tin ' | history_ms=60 | ai_first_chunk_ms=3041 | ai_total_ms=4443 | total_ms=4578 | provider=external-movie-ai
+Chat timing | question='1 bộ phim khoa học viễn tưởng của Christopher Nolan' | history_ms=64 | ai_first_chunk_ms=1882 | ai_total_ms=2551 | total_ms=2683 | provider=external-movie-ai
+Chat timing | question='Action movie' | history_ms=60 | ai_first_chunk_ms=2475 | ai_total_ms=7156 | total_ms=7297 | provider=external-movie-ai
+Chat timing | question='Tôi muốn một phim nhẹ nhàng để xem tối nay, không quá bạo lực.' | history_ms=60 | ai_first_chunk_ms=1942 | ai_total_ms=3178 | total_ms=3397 | provider=external-movie-ai
+Chat timing | question='ai là đạo diễn của phim này' | history_ms=60 | ai_first_chunk_ms=4251 | ai_total_ms=4732 | total_ms=4861 | provider=external-movie-ai
+Chat timing | question='I want a tense thriller directed by Christopher Nolan, but not a future release.' | history_ms=57 | ai_first_chunk_ms=2356 | ai_total_ms=2749 | total_ms=2877 | provider=external-movie-ai
+Chat timing | question='Recommend a funny movie for stress relief tonight.' | history_ms=55 | ai_first_chunk_ms=2125 | ai_total_ms=5015 | total_ms=5136 | provider=external-movie-ai
+[recommendations] building GCN | user=69d726429f91bc55821ea7ab | ratingCount=14 | forceRefresh=false
+[recommendations] GCN built | user=69d726429f91bc55821ea7ab | ratingCount=14 | results=0

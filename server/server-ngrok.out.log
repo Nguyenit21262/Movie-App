@@ -1,0 +1,223 @@
+
+> server@1.0.0 start
+> node server.js
+
+[dotenv@17.2.3] injecting env (11) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+MongoDB Connected Successfully
+Server running on port 4000
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+Chat timing | question='tôi muốn xem phim kinh dị' | history_ms=61 | ai_first_chunk_ms=7 | ai_total_ms=7 | total_ms=130 | provider=fallback
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+Chat timing | question='tôi muốn xem phim kinh dị' | history_ms=49 | ai_first_chunk_ms=2929 | ai_total_ms=3569 | total_ms=3673 | provider=external-movie-ai
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+Chat timing | question='Action movie' | history_ms=50 | ai_first_chunk_ms=2771 | ai_total_ms=9654 | total_ms=9765 | provider=external-movie-ai
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+Email sent successfully: <f3e1aa82-039e-38c7-61c4-ca9c893ac54a@gmail.com>
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=6 | ratingsSinceLastBuild=0
+Chat timing | question='Sci-fi with twist' | history_ms=50 | ai_first_chunk_ms=2268 | ai_total_ms=10794 | total_ms=10905 | provider=external-movie-ai
+[ratingController] Rating request | user=69d726429f91bc55821ea7ab | tmdbId=7453 | movie=The Hitchhiker's Guide to the Galaxy | newRating=3
+[ratingController] Rating saved | user=69d726429f91bc55821ea7ab | tmdbId=7453 | movie=The Hitchhiker's Guide to the Galaxy | previousRating=none | newRating=3 | vote_average=6.7 | count_rating=4184
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=7 | ratingsSinceLastBuild=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+Email sent successfully: <71867c53-2e71-4750-7efe-f01352e58c0b@gmail.com>
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+Email sent successfully: <668f1c6e-ed09-aa3e-44c0-fc92b1ce2d77@gmail.com>
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+Email sent successfully: <f6ae9f5d-73e1-0abb-1b79-e4a840de79f1@gmail.com>
+Email sent successfully: <34589351-9efc-9e97-a1c4-c5f7f84a1bd0@gmail.com>
+Email sent successfully: <1fd2a527-14b5-a4bf-28bd-0edc9f1b251f@gmail.com>
+[recommendations] cold-start | user=6a06bf566791cee583bfc671 | ratingCount=0
+Chat timing | question='hello' | history_ms=155 | ai_first_chunk_ms=8 | ai_total_ms=9 | total_ms=231 | provider=external-movie-ai
+Chat timing | question='trò chuyện bằng tiếng việt' | history_ms=50 | ai_first_chunk_ms=3177 | ai_total_ms=3941 | total_ms=4056 | provider=external-movie-ai
+Chat timing | question='tôi muốn tìm 1 bộ cổ trang - trung quốc - đánh nhau' | history_ms=51 | ai_first_chunk_ms=1018 | ai_total_ms=2926 | total_ms=3042 | provider=external-movie-ai
+[recommendations] cold-start | user=6a06bf566791cee583bfc671 | ratingCount=0
+[recommendations] cold-start | user=6a06bf566791cee583bfc671 | ratingCount=0
+[ratingController] Rating request | user=6a06bf566791cee583bfc671 | tmdbId=1305781 | movie=Blades of the Guardians: Wind Rises in the Desert | newRating=5
+[ratingController] Rating saved | user=6a06bf566791cee583bfc671 | tmdbId=1305781 | movie=Blades of the Guardians: Wind Rises in the Desert | previousRating=none | newRating=5 | vote_average=7.6 | count_rating=29
+Email sent successfully: <ff7c9e3f-72a4-cdb1-f6b2-0916638d5a9d@gmail.com>
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+Chat timing | question='gợi ý cho tôi những phim fantasy giải tỏa stress' | history_ms=56 | ai_first_chunk_ms=2581 | ai_total_ms=8138 | total_ms=8259 | provider=external-movie-ai
+Chat timing | question='Có thể loại nào để chill chill xả stress không?' | history_ms=50 | ai_first_chunk_ms=998 | ai_total_ms=6685 | total_ms=6794 | provider=external-movie-ai
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=6a06bf566791cee583bfc671 | ratingCount=1
+[recommendations] cold-start | user=6a06bf566791cee583bfc671 | ratingCount=1
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+Chat timing | question='Horror tonight' | history_ms=49 | ai_first_chunk_ms=3366 | ai_total_ms=8886 | total_ms=8996 | provider=external-movie-ai
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+Chat timing | question='Action movie' | history_ms=50 | ai_first_chunk_ms=2332 | ai_total_ms=7602 | total_ms=7708 | provider=external-movie-ai
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+Email sent successfully: <a9fd03ee-2b98-2ba8-8c56-275439c5103d@gmail.com>
+Email sent successfully: <037fe0cb-0540-11cf-355b-146a8d9ea515@gmail.com>
+Email sent successfully: <2635465e-d0e7-c7a6-f0a3-374b8ae51483@gmail.com>
+Email sent successfully: <3a64f932-59a0-4282-950d-9972d0d16dd2@gmail.com>
+[recommendations] cold-start | user=6a06cbd66791cee583bfd413 | ratingCount=0
+[ratingController] Rating request | user=6a06cbd66791cee583bfd413 | tmdbId=1007757 | movie=Swapped | newRating=5
+[ratingController] Rating saved | user=6a06cbd66791cee583bfd413 | tmdbId=1007757 | movie=Swapped | previousRating=none | newRating=5 | vote_average=10 | count_rating=2
+[recommendations] cold-start | user=6a06cbd66791cee583bfd413 | ratingCount=1
+[ratingController] Rating request | user=6a06cbd66791cee583bfd413 | tmdbId=1171145 | movie=Crime 101 | newRating=5
+[ratingController] Rating saved | user=6a06cbd66791cee583bfd413 | tmdbId=1171145 | movie=Crime 101 | previousRating=none | newRating=5 | vote_average=7.1 | count_rating=172
+[recommendations] cold-start | user=6a06cbd66791cee583bfd413 | ratingCount=2
+[ratingController] Rating request | user=6a06cbd66791cee583bfd413 | tmdbId=687163 | movie=Project Hail Mary | newRating=5
+[ratingController] Rating saved | user=6a06cbd66791cee583bfd413 | tmdbId=687163 | movie=Project Hail Mary | previousRating=none | newRating=5 | vote_average=8.7 | count_rating=38
+[recommendations] cold-start | user=6a06cbd66791cee583bfd413 | ratingCount=3
+Email sent successfully: <af8cdf2b-f35b-6f88-6350-e59c3758c098@gmail.com>
+[ratingController] Rating request | user=6a06cbd66791cee583bfd413 | tmdbId=278 | movie=The Shawshank Redemption | newRating=5
+[ratingController] Rating saved | user=6a06cbd66791cee583bfd413 | tmdbId=278 | movie=The Shawshank Redemption | previousRating=none | newRating=5 | vote_average=8.7 | count_rating=29917
+[recommendations] cold-start | user=6a06cbd66791cee583bfd413 | ratingCount=4
+[ratingController] Rating request | user=6a06cbd66791cee583bfd413 | tmdbId=1439930 | movie=The Punisher: One Last Kill | newRating=5
+[ratingController] Rating saved | user=6a06cbd66791cee583bfd413 | tmdbId=1439930 | movie=The Punisher: One Last Kill | previousRating=none | newRating=5 | vote_average=10 | count_rating=2
+[recommendations] cold-start | user=6a06cccf6791cee583bfd476 | ratingCount=0
+Chat timing | question='Action movie' | history_ms=55 | ai_first_chunk_ms=2884 | ai_total_ms=9494 | total_ms=9610 | provider=external-movie-ai
+[recommendations] cold-start | user=6a06cccf6791cee583bfd476 | ratingCount=0
+[recommendations] cold-start | user=6a06cccf6791cee583bfd476 | ratingCount=0
+Chat timing | question='I want watch anime' | history_ms=57 | ai_first_chunk_ms=1189 | ai_total_ms=6446 | total_ms=6560 | provider=external-movie-ai
+[ratingController] Rating request | user=6a06cccf6791cee583bfd476 | tmdbId=1007757 | movie=Swapped | newRating=5
+[ratingController] Rating saved | user=6a06cccf6791cee583bfd476 | tmdbId=1007757 | movie=Swapped | previousRating=none | newRating=5 | vote_average=10 | count_rating=3
+[ratingController] Rating request | user=6a06cccf6791cee583bfd476 | tmdbId=931285 | movie=Mortal Kombat II | newRating=5
+[ratingController] Rating saved | user=6a06cccf6791cee583bfd476 | tmdbId=931285 | movie=Mortal Kombat II | previousRating=none | newRating=5 | vote_average=10 | count_rating=1
+[recommendations] cold-start | user=6a06cccf6791cee583bfd476 | ratingCount=2
+[ratingController] Rating request | user=6a06cccf6791cee583bfd476 | tmdbId=278 | movie=The Shawshank Redemption | newRating=5
+[ratingController] Rating saved | user=6a06cccf6791cee583bfd476 | tmdbId=278 | movie=The Shawshank Redemption | previousRating=none | newRating=5 | vote_average=8.7 | count_rating=29918
+[recommendations] cold-start | user=6a06cccf6791cee583bfd476 | ratingCount=3
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[ratingController] Rating request | user=6a06cccf6791cee583bfd476 | tmdbId=936075 | movie=Michael | newRating=5
+[ratingController] Rating saved | user=6a06cccf6791cee583bfd476 | tmdbId=936075 | movie=Michael | previousRating=none | newRating=5 | vote_average=10 | count_rating=2
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+Chat timing | question='tôi muốn đặt vé xem phim mario' | history_ms=50 | ai_first_chunk_ms=1838 | ai_total_ms=3643 | total_ms=3746 | provider=external-movie-ai
+[recommendations] building GCN | user=6a06cbd66791cee583bfd413 | ratingCount=5 | forceRefresh=false
+[recommendations] GCN built | user=6a06cbd66791cee583bfd413 | ratingCount=5 | results=20
+[recommendations] cache-hit | user=6a06cbd66791cee583bfd413 | ratingCount=5 | ratingsSinceLastBuild=0
+Chat timing | question='I want to watch an old-fashioned action movie, what kind of movie should I watch' | history_ms=50 | ai_first_chunk_ms=1208 | ai_total_ms=7130 | total_ms=7236 | provider=external-movie-ai
+[recommendations] cold-start | user=6a06cccf6791cee583bfd476 | ratingCount=4
+[recommendations] cold-start | user=6a06cccf6791cee583bfd476 | ratingCount=4
+[recommendations] cold-start | user=6a06cccf6791cee583bfd476 | ratingCount=4
+[recommendations] cold-start | user=6a06cccf6791cee583bfd476 | ratingCount=4
+[recommendations] cold-start | user=6a06cccf6791cee583bfd476 | ratingCount=4
+[recommendations] cold-start | user=6a06cccf6791cee583bfd476 | ratingCount=4
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+Chat timing | question='Có bộ phim Việt Nam nào không?' | history_ms=51 | ai_first_chunk_ms=2930 | ai_total_ms=6463 | total_ms=6581 | provider=external-movie-ai
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+Chat timing | question='Có những bộ phim của châu Á không?' | history_ms=46 | ai_first_chunk_ms=2958 | ai_total_ms=9062 | total_ms=9162 | provider=external-movie-ai
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+Email sent successfully: <ff55322a-5902-512d-1b8d-cfe529ba29a8@gmail.com>
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=0
+[ratingController] Rating request | user=6a06bf796791cee583bfc692 | tmdbId=240 | movie=The Godfather Part II | newRating=4
+[ratingController] Rating saved | user=6a06bf796791cee583bfc692 | tmdbId=240 | movie=The Godfather Part II | previousRating=none | newRating=4 | vote_average=8.6 | count_rating=13686
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=1
+[ratingController] Rating request | user=6a06bf796791cee583bfc692 | tmdbId=931285 | movie=Mortal Kombat II | newRating=3
+[ratingController] Rating saved | user=6a06bf796791cee583bfc692 | tmdbId=931285 | movie=Mortal Kombat II | previousRating=none | newRating=3 | vote_average=8 | count_rating=2
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=2
+[ratingController] Rating request | user=6a06bf796791cee583bfc692 | tmdbId=424 | movie=Schindler's List | newRating=4
+[ratingController] Rating saved | user=6a06bf796791cee583bfc692 | tmdbId=424 | movie=Schindler's List | previousRating=none | newRating=4 | vote_average=8.6 | count_rating=17209
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=3
+[ratingController] Rating request | user=6a06bf796791cee583bfc692 | tmdbId=1084577 | movie=Balls Up | newRating=1
+[ratingController] Rating saved | user=6a06bf796791cee583bfc692 | tmdbId=1084577 | movie=Balls Up | previousRating=none | newRating=1 | vote_average=6 | count_rating=40
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=4
+[recommendations] cold-start | user=6a06bf796791cee583bfc692 | ratingCount=4
+[ratingController] Rating request | user=6a06bf796791cee583bfc692 | tmdbId=227300 | movie=Stretch | newRating=5
+[ratingController] Rating saved | user=6a06bf796791cee583bfc692 | tmdbId=227300 | movie=Stretch | previousRating=none | newRating=5 | vote_average=6.2 | count_rating=721
+[ratingController] Rating request | user=6a06bf796791cee583bfc692 | tmdbId=227300 | movie=Stretch | newRating=2
+[ratingController] Rating saved | user=6a06bf796791cee583bfc692 | tmdbId=227300 | movie=Stretch | previousRating=5 | newRating=2 | vote_average=6.2 | count_rating=721
+[recommendations] building GCN | user=6a06bf796791cee583bfc692 | ratingCount=5 | forceRefresh=false
+[recommendations] GCN built | user=6a06bf796791cee583bfc692 | ratingCount=5 | results=20
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=5 | ratingsSinceLastBuild=0
+[ratingController] Rating request | user=6a06bf796791cee583bfc692 | tmdbId=278 | movie=The Shawshank Redemption | newRating=1
+[ratingController] Rating saved | user=6a06bf796791cee583bfc692 | tmdbId=278 | movie=The Shawshank Redemption | previousRating=none | newRating=1 | vote_average=8.7 | count_rating=29919
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+Email sent successfully: <298654a2-b05c-25e1-3ffb-b36fc197aa38@gmail.com>
+Email sent successfully: <2bfb4bb4-9c9e-43d7-92a4-5e4d2928034e@gmail.com>
+[recommendations] cold-start | user=6a06e45b6791cee583bffc18 | ratingCount=0
+Chat timing | question='Sci-fi with twist' | history_ms=49 | ai_first_chunk_ms=3000 | ai_total_ms=9418 | total_ms=9533 | provider=external-movie-ai
+Chat timing | question='phim Spiderman có bao nhiêu phàn' | history_ms=59 | ai_first_chunk_ms=948 | ai_total_ms=3992 | total_ms=4110 | provider=external-movie-ai
+Chat timing | question='Diễn viên Tom Holland' | history_ms=51 | ai_first_chunk_ms=2353 | ai_total_ms=3229 | total_ms=3338 | provider=external-movie-ai
+Chat timing | question='Liệt kê phim Tài liệu về Khoa học' | history_ms=63 | ai_first_chunk_ms=2089 | ai_total_ms=6712 | total_ms=6833 | provider=external-movie-ai
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+Chat timing | question='1 bộ phim khoa học viễn tưởng' | history_ms=50 | ai_first_chunk_ms=802 | ai_total_ms=3611 | total_ms=3717 | provider=external-movie-ai
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+[recommendations] cache-hit | user=6a06bf796791cee583bfc692 | ratingCount=6 | ratingsSinceLastBuild=1
+Email sent successfully: <1ba54401-6ff1-0690-a67d-3eb00e114937@gmail.com>
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+[recommendations] cold-start | user=697c46c4bc20184aaf148c24 | ratingCount=0
+Email sent successfully: <c49cfb8a-5d1b-e539-a028-ce803425769d@gmail.com>
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=7 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=7 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=7 | ratingsSinceLastBuild=0
+[ratingController] Rating request | user=69d726429f91bc55821ea7ab | tmdbId=687163 | movie=Project Hail Mary | newRating=5
+[ratingController] Rating saved | user=69d726429f91bc55821ea7ab | tmdbId=687163 | movie=Project Hail Mary | previousRating=none | newRating=5 | vote_average=8.7 | count_rating=39
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=8 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=8 | ratingsSinceLastBuild=0
+[recommendations] cache-hit | user=69d726429f91bc55821ea7ab | ratingCount=8 | ratingsSinceLastBuild=0

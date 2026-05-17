@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema(
     // Login 2FA OTP
     loginOtp: { type: String, default: "" },
     loginOtpExpireAt: { type: Number, default: 0 },
+
+    // Password reset OTP
+    resetOtp: { type: String, default: "" },
+    resetOtpExpireAt: { type: Number, default: 0 },
   },
   {
     timestamps: true,

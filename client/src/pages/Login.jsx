@@ -139,7 +139,7 @@ const Login = () => {
 const LoginForm = ({ form, loading, handleChange, handleLogin, navigate }) => (
   <form
     onSubmit={handleLogin}
-    className="flex w-full max-w-[400px] flex-col items-center rounded-2xl border border-white/10 bg-black/75 px-6 py-10 backdrop-blur-md shadow-[0_0_60px_rgba(59,130,246,0.25)] sm:px-8"
+    className="flex w-full max-w-[400px] flex-col items-center rounded-2xl border border-white/10 bg-black/90 px-6 py-10 sm:px-8"
   >
     <h2 className="text-4xl font-bold text-white tracking-wide mb-8">
       Sign in
@@ -153,6 +153,10 @@ const LoginForm = ({ form, loading, handleChange, handleLogin, navigate }) => (
         value={form.email}
         onChange={handleChange}
         disabled={loading}
+        autoComplete="email"
+        autoCapitalize="none"
+        autoCorrect="off"
+        spellCheck={false}
         className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-blue-500 outline-none transition-all disabled:opacity-50"
       />
 
@@ -163,6 +167,10 @@ const LoginForm = ({ form, loading, handleChange, handleLogin, navigate }) => (
         value={form.password}
         onChange={handleChange}
         disabled={loading}
+        autoComplete="new-password"
+        data-lpignore="true"
+        data-1p-ignore="true"
+        data-bwignore="true"
         className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-blue-500 outline-none transition-all disabled:opacity-50"
       />
 

@@ -1,7 +1,14 @@
-import { API_BASE_URL } from "./httpClient";
+import { resolveApiUrl } from "./httpClient";
 
-export const getChatHistory = async () => {
-  const response = await fetch(`${API_BASE_URL}/api/chat/history`, {
+const buildChatHistoryUrl = (conversationId) => {
+  const baseUrl = resolveApiUrl("/api/chat/history");
+  if (!conversationId) return baseUrl;
+  const separator = baseUrl.includes("?") ? "&" : "?";
+  return `${baseUrl}${separator}conversationId=${encodeURIComponent(conversationId)}`;
+};
+
+export const getChatHistory = async (conversationId) => {
+  const response = await fetch(buildChatHistoryUrl(conversationId), {
     credentials: "include",
   });
 
@@ -13,7 +20,7 @@ export const getChatHistory = async () => {
 };
 
 export const clearChatHistory = async () => {
-  const response = await fetch(`${API_BASE_URL}/api/chat/history`, {
+  const response = await fetch(resolveApiUrl("/api/chat/history"), {
     method: "DELETE",
     credentials: "include",
   });
@@ -21,12 +28,12 @@ export const clearChatHistory = async () => {
   return response.json();
 };
 
-export const streamChat = async ({ question, onEvent }) => {
-  const response = await fetch(`${API_BASE_URL}/api/chat/stream`, {
+export const streamChat = async ({ question, conversationId, onEvent }) => {
+  const response = await fetch(resolveApiUrl("/api/chat/stream"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "include",
-    body: JSON.stringify({ question }),
+    body: JSON.stringify({ question, conversationId }),
   });
 
   if (!response.ok || !response.body) {
@@ -57,6 +64,21 @@ export const streamChat = async ({ question, onEvent }) => {
         onEvent(JSON.parse(line.slice(6)));
       } catch {
         // Ignore malformed event chunks
+      }
+    }
+  }
+
+  if (buffer.trim()) {
+    const line = buffer
+      .split("\n")
+      .map((item) => item.trim())
+      .find((item) => item.startsWith("data: "));
+
+    if (line) {
+      try {
+        onEvent(JSON.parse(line.slice(6)));
+      } catch {
+        // Ignore malformed trailing event chunks
       }
     }
   }

@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ChatButton from "./components/ChatButton";
 import ProtectedRoute from "./components/Protectedroute";
+import ScrollToTop from "./components/ScrollToTop";
 
 import Home from "./pages/Home";
 import Movies from "./pages/Movies";
@@ -22,12 +23,16 @@ import DashBoard from "./pages/admin/DashBoard";
 import AddMovies from "./pages/admin/AddMovies";
 import ListMovies from "./pages/admin/ListMovies";
 import ListBooking from "./pages/admin/ListBooking";
+import UserActivity from "./pages/admin/UserActivity";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import EmailVerify from "./pages/EmailVerify";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
+import TopPicks from "./pages/TopPicks";
+import MyRatings from "./pages/MyRatings";
+import MyBookmarks from "./pages/MyBookmarks";
 
 const App = () => {
   const location = useLocation();
@@ -55,6 +60,8 @@ const App = () => {
         </>
       )}
 
+      <ScrollToTop />
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -76,8 +83,19 @@ const App = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/theaters/:id/:date" element={<SeatLayout />} />
           <Route path="/my-bookings" element={<MyBookings />} />
+          <Route path="/my-ratings" element={<MyRatings />} />
+          <Route path="/my-bookmarks" element={<MyBookmarks />} />
           <Route path="/profile" element={<Profile />} />
         </Route>
+
+        <Route
+          path="/top-picks"
+          element={(
+            <ProtectedRoute>
+              <TopPicks />
+            </ProtectedRoute>
+          )}
+        />
 
         <Route element={<ProtectedRoute requireAdmin />}>
           <Route path="/admin" element={<Layout />}>
@@ -85,10 +103,10 @@ const App = () => {
             <Route path="add-movies" element={<AddMovies />} />
             <Route path="list-movies" element={<ListMovies />} />
             <Route path="list-bookings" element={<ListBooking />} />
+            <Route path="users" element={<UserActivity />} />
           </Route>
         </Route>
       </Routes>
-
       {!hideNavbarAndFooter && <Footer />}
     </>
   );

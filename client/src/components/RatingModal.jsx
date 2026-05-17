@@ -32,13 +32,13 @@ const RatingModal = ({
       <div className="relative w-full max-w-md rounded-xl border border-white/10 bg-white p-6 shadow-2xl">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.25em] text-black">
+            <p className="text-sm text-black">
               Your Rating
             </p>
             <h3 className="mt-2 text-2xl font-bold text-white">
               Rate This Movie
             </h3>
-            <p className="mt-2 text-sm text-black">Choose from 1 to 5 stars</p>
+            <p className="mt-2 text-sm text-black">Your rating for this movie</p>
           </div>
 
           <button

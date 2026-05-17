@@ -1,0 +1,10 @@
+External AI stream failed: connect ECONNREFUSED 127.0.0.1:8000
+TMDB movie credits 823609 retry 1/3 after 1000ms: ECONNABORTED | timeout of 15000ms exceeded
+TMDB upcoming page 1 retry 1/3 after 1000ms: ECONNABORTED | timeout of 15000ms exceeded
+TMDB now playing page 2 retry 1/3 after 1000ms: ECONNABORTED | timeout of 15000ms exceeded
+TMDB movie credits 19016 retry 1/3 after 1000ms: ECONNABORTED | timeout of 15000ms exceeded
+TMDB movie keywords 19016 retry 1/3 after 1000ms: ECONNABORTED | timeout of 15000ms exceeded
+TMDB now playing page 2 retry 2/3 after 2000ms: ECONNABORTED | timeout of 15000ms exceeded
+TMDB movie keywords 931285 retry 1/3 after 1000ms: ECONNABORTED | timeout of 15000ms exceeded
+TMDB top rated page 1 retry 1/3 after 1000ms: ECONNABORTED | timeout of 15000ms exceeded
+TMDB upcoming page 4 retry 1/3 after 1000ms: ECONNABORTED | timeout of 15000ms exceeded

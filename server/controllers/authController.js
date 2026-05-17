@@ -1,16 +1,21 @@
 import bcrypt from "bcryptjs";
 import User from "../models/User.js";
 import sendEmail from "../utils/sendEmail.js";
-import generateToken from "../utils/generateToken.js";
+import generateToken, { getAuthCookieOptions } from "../utils/generateToken.js";
+import { parseStrictDate } from "../utils/parseStrictDate.js";
+
+const normalizeEmail = (email = "") => String(email).trim().toLowerCase();
+const generateOtpCode = () => String(Math.floor(100000 + Math.random() * 900000));
 
 export const register = async (req, res) => {
   try {
     const { name, email, password, dateOfBirth, currentCity, occupation, sex } =
       req.body;
+    const normalizedEmail = normalizeEmail(email);
 
     if (
       !name ||
-      !email ||
+      !normalizedEmail ||
       !password ||
       !dateOfBirth ||
       !currentCity ||
@@ -22,19 +27,19 @@ export const register = async (req, res) => {
         .json({ success: false, message: "Missing required fields" });
     }
 
-    const existingUser = await User.findOne({ email });
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res
         .status(400)
         .json({ success: false, message: "User already exists" });
     }
 
-    const [day, month, year] = dateOfBirth.split("/");
-    const parsedDate = new Date(year, month - 1, day);
-    if (isNaN(parsedDate.getTime())) {
+    const { isValid: isValidDateOfBirth, date: parsedDate } =
+      parseStrictDate(dateOfBirth);
+    if (!isValidDateOfBirth) {
       return res
         .status(400)
-        .json({ success: false, message: "Invalid date format" });
+        .json({ success: false, message: "Invalid date format. Use DD/MM/YYYY" });
     }
 
     if (password.length < 6) {
@@ -44,12 +49,11 @@ export const register = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const otp = generateOtpCode();
 
     const user = new User({
       name,
-      email,
+      email: normalizedEmail,
       password: hashedPassword,
       dateOfBirth: parsedDate,
       currentCity,
@@ -63,7 +67,7 @@ export const register = async (req, res) => {
     await user.save();
 
     await sendEmail({
-      to: email,
+      to: normalizedEmail,
       subject: "Verify your account",
       text: `Your verification OTP is: ${otp}. This code is valid for 24 hours.`,
     });
@@ -81,15 +85,16 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
-    if (!email || !password) {
+    if (!normalizedEmail || !password) {
       return res.status(400).json({ 
         success: false, 
         message: "Email and password are required" 
       });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(400).json({ 
         success: false, 
@@ -112,7 +117,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    const otp = generateOtpCode();
     user.loginOtp = otp;
     user.loginOtpExpireAt = Date.now() + 5 * 60 * 1000;
     await user.save();
@@ -137,15 +142,16 @@ export const login = async (req, res) => {
 export const verifyLoginOtp = async (req, res) => {
   try {
     const { email, otp } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
-    if (!email || !otp) {
+    if (!normalizedEmail || !otp) {
       return res.status(400).json({ 
         success: false, 
         message: "Email and OTP are required" 
       });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(404).json({ 
         success: false, 
@@ -179,15 +185,16 @@ export const verifyLoginOtp = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   try {
     const { email, otp } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
-    if (!email || !otp) {
+    if (!normalizedEmail || !otp) {
       return res.status(400).json({
         success: false,
         message: "Email and OTP are required",
       });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -217,18 +224,19 @@ export const verifyEmail = async (req, res) => {
   }
 };
 
-export const sendPasswordResetOtp = async (req, res) => {
+export const resendVerificationOtp = async (req, res) => {
   try {
     const { email } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
-    if (!email) {
+    if (!normalizedEmail) {
       return res.status(400).json({
         success: false,
         message: "Email is required",
       });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -236,14 +244,62 @@ export const sendPasswordResetOtp = async (req, res) => {
       });
     }
 
-    const otp = String(Math.floor(100000 + Math.random() * 900000));
+    if (user.isAccountVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is already verified. Please login.",
+      });
+    }
+
+    const otp = generateOtpCode();
+    user.verifyOtp = otp;
+    user.verifyOtpExpireAt = Date.now() + 24 * 60 * 60 * 1000;
+    await user.save();
+
+    await sendEmail({
+      to: normalizedEmail,
+      subject: "Verify your account",
+      text: `Your verification OTP is: ${otp}. This code is valid for 24 hours.`,
+    });
+
+    return res.json({
+      success: true,
+      message: "A new verification OTP has been sent to your email",
+    });
+  } catch (error) {
+    console.error("Resend verification OTP error:", error);
+    return res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
+export const sendPasswordResetOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const normalizedEmail = normalizeEmail(email);
+
+    if (!normalizedEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    const user = await User.findOne({ email: normalizedEmail });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const otp = generateOtpCode();
     
     user.resetOtp = otp;
     user.resetOtpExpireAt = Date.now() + 15 * 60 * 1000; // 15 minutes
     await user.save();
 
     await sendEmail({
-      to: email,
+      to: normalizedEmail,
       subject: "Password Reset OTP",
       text: `Your password reset OTP is: ${otp}. This code is valid for 15 minutes.`,
     });
@@ -264,8 +320,9 @@ export const sendPasswordResetOtp = async (req, res) => {
 export const resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body;
+    const normalizedEmail = normalizeEmail(email);
 
-    if (!email || !otp || !newPassword) {
+    if (!normalizedEmail || !otp || !newPassword) {
       return res.status(400).json({
         success: false,
         message: "Email, OTP and new password are required",
@@ -279,7 +336,7 @@ export const resetPassword = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email: normalizedEmail });
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -321,11 +378,7 @@ export const resetPassword = async (req, res) => {
 
 export const logout = (req, res) => {
   try {
-    res.clearCookie("token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
-    });
+    res.clearCookie("token", getAuthCookieOptions());
 
     return res.json({ success: true, message: "Logged out successfully" });
   } catch (error) {

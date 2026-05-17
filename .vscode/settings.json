@@ -1,5 +1,9 @@
 {
     "python.analysis.typeCheckingMode": "standard",
     "editor.minimap.scale": 2,
-    "python-envs.defaultEnvManager": "ms-python.python:system"
+    "python-envs.defaultEnvManager": "ms-python.python:venv",
+    "python.defaultInterpreterPath": "${workspaceFolder}/AI-service/env/Scripts/python.exe",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}/AI-service"
+    ]
 }

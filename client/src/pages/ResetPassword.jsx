@@ -126,7 +126,7 @@ const ResetPassword = () => {
           // Email Input Form
           <form
             onSubmit={handleSendOtp}
-            className="flex w-full max-w-[400px] flex-col items-center rounded-2xl border border-white/10 bg-black/75 px-6 py-10 backdrop-blur-md shadow-[0_0_60px_rgba(99,102,241,0.2)] sm:px-8"
+            className="flex w-full max-w-[400px] flex-col items-center rounded-2xl border border-white/10 bg-black/90 px-6 py-10 sm:px-8"
           >
             <h2 className="text-3xl font-bold text-white tracking-wide mb-4">
               Reset Password
@@ -142,13 +142,17 @@ const ResetPassword = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
             </div>
 
             <button
               type="submit"
-              className="mt-6 w-full h-11 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold tracking-wide shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
+              className="mt-6 w-full h-11 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold tracking-wide shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
             >
               Send OTP
             </button>
@@ -167,20 +171,20 @@ const ResetPassword = () => {
           // OTP and New Password Form
           <form
             onSubmit={handleResetPassword}
-            className="flex w-full max-w-[400px] flex-col items-center rounded-2xl border border-white/10 bg-black/75 px-6 py-10 backdrop-blur-md shadow-[0_0_60px_rgba(99,102,241,0.2)] sm:px-8"
+            className="flex w-full max-w-[400px] flex-col items-center rounded-2xl border border-white/10 bg-black/90 px-6 py-10  sm:px-8"
           >
             <h2 className="text-3xl font-bold text-white tracking-wide mb-4">
               Reset Password
             </h2>
 
-            <p className="text-center text-indigo-300 text-sm mb-8">
+            <p className="text-center text-blue text-sm mb-8">
               Enter OTP sent to {email} and your new password
             </p>
 
             <div className="w-full flex flex-col gap-4">
               <input
                 type="text"
-                placeholder="Enter 6-digit OTP"
+                placeholder="Enter OTP"
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
                 maxLength={6}
@@ -192,6 +196,10 @@ const ResetPassword = () => {
                 placeholder="New Password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                autoComplete="new-password"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-bwignore="true"
                 className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
 
@@ -200,13 +208,17 @@ const ResetPassword = () => {
                 placeholder="Confirm New Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-bwignore="true"
                 className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
             </div>
 
             <button
               type="submit"
-              className="mt-6 w-full h-11 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold tracking-wide shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
+              className="mt-6 w-full h-11 rounded-full bg-blue-600 hover:bg-blue-600 text-white font-semibold tracking-wide transition-all active:scale-95"
             >
               Reset Password
             </button>

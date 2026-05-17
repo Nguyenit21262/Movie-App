@@ -5,11 +5,14 @@ import { getCurrentUser } from "../api/userApi";
 import { AppContent } from "./AppContent";
 
 export const AppContextProvider = ({ children }) => {
-  const backendUrl = API_BASE_URL;
+  const backendUrl =
+    API_BASE_URL ||
+    (typeof window !== "undefined" ? window.location.origin : "");
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [topPicksRefreshToken, setTopPicksRefreshToken] = useState(0);
 
   const getUserData = useCallback(async () => {
     try {
@@ -51,6 +54,10 @@ export const AppContextProvider = ({ children }) => {
     }
   };
 
+  const invalidateTopPicks = useCallback(() => {
+    setTopPicksRefreshToken((current) => current + 1);
+  }, []);
+
   useEffect(() => {
     getAuthState();
   }, [getAuthState]);
@@ -65,6 +72,8 @@ export const AppContextProvider = ({ children }) => {
     getAuthState,
     logoutUser,
     loading,
+    topPicksRefreshToken,
+    invalidateTopPicks,
   };
 
   return <AppContent.Provider value={value}>{children}</AppContent.Provider>;

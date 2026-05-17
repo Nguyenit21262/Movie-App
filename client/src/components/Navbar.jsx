@@ -148,7 +148,7 @@ const GenreDropdown = memo(() => {
   );
 });
 
-const NavLinks = memo(() => (
+const NavLinks = memo(({ isLoggedIn }) => (
   <div className="hidden md:flex space-x-8">
     <Link
       to="/movies"
@@ -165,6 +165,16 @@ const NavLinks = memo(() => (
     >
       Theaters
     </Link>
+
+    {isLoggedIn && (
+      <Link
+        to="/top-picks"
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        className="text-gray-300 hover:text-white transition"
+      >
+        Top Picks
+      </Link>
+    )}
 
     <GenreDropdown />
   </div>
@@ -210,12 +220,42 @@ const UserMenu = memo(({ userData, onLogout, onNavigate }) => {
               <ul>
                 <li
                   onClick={() => {
+                    onNavigate("/top-picks");
+                    setOpen(false);
+                  }}
+                  className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
+                >
+                  Top Picks
+                </li>
+
+                <li
+                  onClick={() => {
                     onNavigate("/profile");
                     setOpen(false);
                   }}
                   className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
                 >
                   Profile
+                </li>
+
+                <li
+                  onClick={() => {
+                    onNavigate("/my-ratings");
+                    setOpen(false);
+                  }}
+                  className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
+                >
+                  My Ratings
+                </li>
+
+                <li
+                  onClick={() => {
+                    onNavigate("/my-bookmarks");
+                    setOpen(false);
+                  }}
+                  className="px-4 py-2.5 text-sm text-black hover:bg-gray-50 cursor-pointer"
+                >
+                  My Bookmarks
                 </li>
 
                 <li
@@ -291,7 +331,7 @@ const Navbar = () => {
               }
             />
 
-            <NavLinks />
+            <NavLinks isLoggedIn={isLoggedIn} />
           </div>
 
           <div className="flex items-center space-x-2 sm:space-x-3">

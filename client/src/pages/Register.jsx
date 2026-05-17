@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { registerUser } from "../api/authApi";
 
+const normalizeEmail = (email = "") => String(email).trim().toLowerCase();
+
 const Register = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
@@ -55,11 +57,12 @@ const Register = () => {
     }
 
     const loadingToast = toast.loading("Creating your account...");
+    const normalizedEmail = normalizeEmail(email);
 
     try {
       const { data } = await registerUser({
         name,
-        email,
+        email: normalizedEmail,
         password,
         dateOfBirth,
         currentCity,
@@ -68,14 +71,14 @@ const Register = () => {
       });
 
       if (data.success) {
-        localStorage.setItem("verifyEmail", email);
+        localStorage.setItem("verifyEmail", normalizedEmail);
         toast.update(loadingToast, {
           render: "Account created successfully! Please verify your email",
           type: "success",
           isLoading: false,
           autoClose: 3000,
         });
-        navigate("/email-verify");
+        navigate(`/email-verify?email=${encodeURIComponent(normalizedEmail)}`);
       } else {
         toast.update(loadingToast, {
           render: data.message || "Registration failed",
@@ -113,7 +116,7 @@ const Register = () => {
       <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
         <form
           onSubmit={handleSubmit}
-          className="flex w-full max-w-[700px] flex-col items-center rounded-2xl border border-white/10 bg-black/75 px-5 py-10 backdrop-blur-md shadow-[0_0_60px_rgba(99,102,241,0.2)] sm:px-8"
+          className="flex w-full max-w-[700px] flex-col items-center rounded-2xl border border-white/10 bg-black/90 px-5 py-10 sm:px-8"
         >
           <h2 className="text-4xl font-bold text-white tracking-wide">
             Sign up
@@ -134,6 +137,10 @@ const Register = () => {
                 placeholder="Email Address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
                 className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
 
@@ -142,6 +149,10 @@ const Register = () => {
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-bwignore="true"
                 className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
 
@@ -150,6 +161,10 @@ const Register = () => {
                 placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                autoComplete="new-password"
+                data-lpignore="true"
+                data-1p-ignore="true"
+                data-bwignore="true"
                 className="w-full h-12 rounded-full bg-black/40 border border-white/10 px-5 text-sm text-gray-200 placeholder-gray-500 focus:border-white outline-none transition-all"
               />
             </div>
@@ -197,7 +212,7 @@ const Register = () => {
 
           <button
             type="submit"
-            className="mt-8 w-full h-11 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold tracking-wide shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
+            className="mt-8 w-full h-11 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-semibold tracking-wide shadow-lg shadow-indigo-600/20 transition-all active:scale-95"
           >
             Create Account
           </button>

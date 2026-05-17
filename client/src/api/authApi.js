@@ -12,6 +12,9 @@ export const verifyLoginOtp = (payload) =>
 export const verifyAccount = (payload) =>
   httpClient.post("/api/auth/verify-account", payload);
 
+export const resendVerifyOtp = (payload) =>
+  httpClient.post("/api/auth/resend-verify-otp", payload);
+
 export const sendPasswordResetOtp = (payload) =>
   httpClient.post("/api/auth/send-reset-otp", payload);
 

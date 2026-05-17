@@ -8,14 +8,29 @@ const DEFAULT_RETRIES = 3;
 
 const tmdbAxios = axios.create({
   baseURL: TMDB_BASE_URL,
+  timeout: 15000,
   headers: {
-    Authorization: `Bearer ${process.env.TMDB_API}`,
     "Content-Type": "application/json;charset=utf-8",
   },
   params: { language: DEFAULT_LANGUAGE },
 });
 
+tmdbAxios.interceptors.request.use((config) => {
+  config.headers.Authorization = `Bearer ${process.env.TMDB_API || ""}`;
+  return config;
+});
+
 const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const extractDirectorNames = (credits = null) => {
+  const directors =
+    credits?.crew
+      ?.filter((person) => person?.job === "Director" && person?.name)
+      .map((person) => person.name.trim())
+      .filter(Boolean) || [];
+
+  return [...new Set(directors)].join(", ");
+};
 
 const summarizeTMDBError = (error) => {
   const status = error?.response?.status;
@@ -30,6 +45,12 @@ const summarizeTMDBError = (error) => {
     return status
       ? `status ${status} | ${payload.status_message}`
       : payload.status_message;
+  }
+
+  if (error?.code) {
+    return status
+      ? `status ${status} | ${error.code} | ${error.message}`
+      : `${error.code} | ${error.message}`;
   }
 
   return status
@@ -175,11 +196,47 @@ class TMDBService {
     );
   }
 
+  /**
+   * Discover movies that are both recent (last 5 years) and highly rated.
+   * Used as a cold-start fallback for new users.
+   */
+  static discoverRecentTopRated(page = 1) {
+    const cutoff = new Date();
+    cutoff.setFullYear(cutoff.getFullYear() - 5);
+    const fromDate = cutoff.toISOString().split("T")[0];
+
+    return handleTMDBRequest(
+      () =>
+        tmdbAxios.get("/discover/movie", {
+          params: {
+            sort_by: "vote_average.desc",
+            "vote_count.gte": 300,       // enough votes to be trustworthy
+            "release_date.gte": fromDate, // last 5 years
+            "vote_average.gte": 7.0,     // reasonably good
+            page,
+          },
+        }),
+      { label: `TMDB discover recent top-rated page ${page}` },
+    );
+  }
+
   static getImageUrl(path, size = "original") {
     return path ? `${TMDB_IMAGE_BASE_URL}/${size}${path}` : null;
   }
 
+  static extractDirector(credits = null) {
+    return extractDirectorNames(credits);
+  }
+
   static formatFromDetails(details, credits = null, keywords = null) {
+    // Extract origin_country: prefer origin_country array, fallback to production_countries
+    const originCountry =
+      details.origin_country?.length
+        ? details.origin_country.map((c) => c.toUpperCase())
+        : details.production_countries
+            ?.map((c) => c.iso_3166_1?.toUpperCase())
+            .filter(Boolean) || [];
+
     return {
       tmdb_id: details.id,
       title: details.title,
@@ -192,12 +249,14 @@ class TMDBService {
       count_rating: details.vote_count || 0,
       popularity: details.popularity || 0,
       original_language: details.original_language || "en",
+      origin_country: originCountry,
       tagline: details.tagline || "",
+      director: extractDirectorNames(credits),
       genres: details.genres?.map((g) => g.name) || [],
       keywords: keywords?.keywords?.map((k) => k.name) || [],
       casts:
         credits?.cast
-          ?.filter((c) => c.name && c.character?.trim()) // bỏ qua cast không có character
+          ?.filter((c) => c.name && c.character?.trim())
           .slice(0, 10)
           .map((c) => ({
             actor: c.name,
@@ -206,6 +265,7 @@ class TMDBService {
           })) || [],
     };
   }
+
   static async formatMovieData(tmdbId) {
     const details = await this.getMovieDetails(tmdbId);
     const [credits, keywords] = await Promise.all([

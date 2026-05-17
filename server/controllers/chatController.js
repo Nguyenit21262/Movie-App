@@ -1,19 +1,66 @@
 import Chat from "../models/Chat.js";
-import {
-  getPersonalizedRecommendations,
-} from "../service/recommendationService.js";
 import { streamAnswer } from "../service/llmService.js";
 
-const MAX_HISTORY = 20;
+const MAX_HISTORY = 5;
 const MAX_RESPONSE_CHARS = 12000;
+
+const normalizeConversationId = (value = "") =>
+  String(value || "").trim().slice(0, 120);
+
+const createConversationId = () =>
+  `chat-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+const buildVisibleChatMatch = ({ userId, conversationId = "" }) => {
+  const match = {
+    user: userId,
+    isHidden: { $ne: true },
+  };
+
+  if (conversationId) {
+    match.conversationId = conversationId;
+  }
+
+  return match;
+};
+
+const resolveLatestConversationId = async (userId) => {
+  const latestChat = await Chat.findOne({
+    user: userId,
+    isHidden: { $ne: true },
+  })
+    .sort({ createdAt: -1, _id: -1 })
+    .select("conversationId")
+    .lean();
+
+  return normalizeConversationId(latestChat?.conversationId);
+};
 
 const writeSse = (res, payload) => {
   res.write(`data: ${JSON.stringify(payload)}\n\n`);
 };
 
+const serializeChatMetadata = (metadata = {}) => ({
+  provider: metadata?.provider || "fallback",
+  retrievedMovies: (metadata?.retrieved_movies || []).map((movie) => ({
+    tmdb_id: movie.tmdb_id,
+    title: movie.title,
+    score: movie.score,
+  })),
+  activeMovie: metadata?.active_movie
+    ? {
+        tmdb_id: metadata.active_movie.tmdb_id ?? null,
+        title: metadata.active_movie.title || "",
+        score: metadata.active_movie.score ?? null,
+      }
+    : null,
+});
+
 export const streamChat = async (req, res) => {
   const requestStartedAt = Date.now();
   const question = req.body?.question?.trim();
+  const requestedConversationId = normalizeConversationId(
+    req.body?.conversationId,
+  );
 
   if (!question) {
     return res
@@ -30,27 +77,29 @@ export const streamChat = async (req, res) => {
 
   try {
     const historyStartedAt = Date.now();
-    const history = await Chat.find({ user: req.userId })
-      .sort({ createdAt: -1 })
+    const historyConversationId =
+      requestedConversationId || (await resolveLatestConversationId(req.userId));
+    const activeConversationId =
+      requestedConversationId || historyConversationId || createConversationId();
+
+    const history = await Chat.find(
+      buildVisibleChatMatch({
+        userId: req.userId,
+        conversationId: historyConversationId,
+      }),
+    )
+      .sort({ createdAt: -1, _id: -1 })
       .limit(MAX_HISTORY)
       .lean();
     const historyMs = Date.now() - historyStartedAt;
-
-    const recommendationsStartedAt = Date.now();
-    const { recommendations } = await getPersonalizedRecommendations({
-      user: req.user,
-      question,
-      limit: 5,
-    });
-    const recommendationsMs = Date.now() - recommendationsStartedAt;
 
     const aiStartedAt = Date.now();
     const { provider, answer, metadata } = await streamAnswer({
       question,
       user: req.user,
       userId: req.userId,
+      conversationId: activeConversationId,
       history,
-      recommendedMovies: recommendations,
       onChunk: (chunk) => {
         if (firstChunkAt === null) {
           firstChunkAt = Date.now();
@@ -64,25 +113,15 @@ export const streamChat = async (req, res) => {
 
     const safeAnswer = (answer || completeAnswer).trim().slice(0, MAX_RESPONSE_CHARS);
 
+    const chatMetadata = serializeChatMetadata(metadata);
+
     if (safeAnswer) {
       await Chat.create({
         user: req.userId,
+        conversationId: activeConversationId,
         question,
         answer: safeAnswer,
-        metadata: {
-          provider,
-          retrievedMovies: (metadata?.retrieved_movies || []).map((movie) => ({
-            tmdb_id: movie.tmdb_id,
-            title: movie.title,
-            score: movie.score,
-          })),
-          recommendedMovies: recommendations.map((movie) => ({
-            tmdb_id: movie.tmdb_id,
-            title: movie.title,
-            score: movie.score,
-            source: movie.source,
-          })),
-        },
+        metadata: chatMetadata,
       });
     }
 
@@ -90,18 +129,18 @@ export const streamChat = async (req, res) => {
       type: "done",
       provider,
       saved: Boolean(safeAnswer),
+      conversationId: activeConversationId,
+      metadata: chatMetadata,
     });
 
     console.info(
-      "Chat timing | question='%s' | history_ms=%d | recommendations_ms=%d | ai_first_chunk_ms=%s | ai_total_ms=%d | total_ms=%d | provider=%s | recommendations=%d",
+      "Chat timing | question='%s' | history_ms=%d | ai_first_chunk_ms=%s | ai_total_ms=%d | total_ms=%d | provider=%s",
       question.slice(0, 80),
       historyMs,
-      recommendationsMs,
       firstChunkMs === null ? "n/a" : String(firstChunkMs),
       aiMs,
       Date.now() - requestStartedAt,
       provider || "unknown",
-      recommendations.length,
     );
   } catch (error) {
     console.error("streamChat error:", error);
@@ -116,18 +155,36 @@ export const streamChat = async (req, res) => {
 
 export const getChatHistory = async (req, res) => {
   try {
-    const chats = await Chat.find({ user: req.userId })
-      .sort({ createdAt: -1 })
-      .limit(20)
+    const requestedConversationId = normalizeConversationId(
+      req.query?.conversationId,
+    );
+    const activeConversationId =
+      requestedConversationId || (await resolveLatestConversationId(req.userId));
+
+    const chats = await Chat.find(
+      buildVisibleChatMatch({
+        userId: req.userId,
+        conversationId: activeConversationId,
+      }),
+    )
+      .sort({ createdAt: -1, _id: -1 })
+      .limit(MAX_HISTORY)
       .lean();
 
     res.json({
       success: true,
+      conversationId: activeConversationId || null,
       history: chats.map((chat) => ({
         id: chat._id,
+        conversationId: chat.conversationId || null,
         question: chat.question,
         answer: chat.answer,
         createdAt: chat.createdAt,
+        metadata: {
+          provider: chat.metadata?.provider || "fallback",
+          retrievedMovies: chat.metadata?.retrievedMovies || [],
+          activeMovie: chat.metadata?.activeMovie || null,
+        },
       })),
     });
   } catch (error) {

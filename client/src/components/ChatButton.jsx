@@ -1,18 +1,101 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { MessageCircle, Send, Sparkles, X } from "lucide-react";
+﻿import React, { useContext, useEffect, useRef, useState } from "react";
+import { MessageCircle, Send, X } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { AppContent } from "../context/AppContent";
-import { getChatHistory, streamChat, clearChatHistory } from "../api/chatApi";
+import { getChatHistory, streamChat } from "../api/chatApi";
+
+const CHAT_SESSION_STORAGE_KEY_PREFIX = "movie-chat-session";
+
+const createConversationId = () => {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return `chat-${crypto.randomUUID()}`;
+  }
+
+  return `chat-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
+
+const getConversationStorageKey = (userId) =>
+  `${CHAT_SESSION_STORAGE_KEY_PREFIX}:${userId}`;
+
+const escapeRegex = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const buildMovieTitleMatcher = (movies = []) => {
+  const uniqueMovies = movies
+    .filter((movie) => movie?.tmdb_id && movie?.title)
+    .filter(
+      (movie, index, allMovies) =>
+        index ===
+        allMovies.findIndex(
+          (candidate) =>
+            candidate.tmdb_id === movie.tmdb_id &&
+            candidate.title.toLowerCase() === movie.title.toLowerCase(),
+        ),
+    )
+    .sort((left, right) => right.title.length - left.title.length);
+
+  if (!uniqueMovies.length) {
+    return null;
+  }
+
+  return {
+    byTitle: new Map(
+      uniqueMovies.map((movie) => [movie.title.toLowerCase(), movie]),
+    ),
+    regex: new RegExp(
+      `(${uniqueMovies.map((movie) => escapeRegex(movie.title)).join("|")})`,
+      "gi",
+    ),
+  };
+};
+
+const renderAssistantMessage = (content, movies, onMovieClick) => {
+  const matcher = buildMovieTitleMatcher(movies);
+
+  if (!matcher || !content) {
+    return content;
+  }
+
+  const parts = content.split(matcher.regex);
+  if (parts.length === 1) {
+    return content;
+  }
+
+  return parts.map((part, index) => {
+    const matchedMovie = matcher.byTitle.get(part.toLowerCase());
+
+    if (!matchedMovie) {
+      return <React.Fragment key={`${part}-${index}`}>{part}</React.Fragment>;
+    }
+
+    return (
+      <button
+        key={`${matchedMovie.tmdb_id}-${index}`}
+        type="button"
+        onClick={() => onMovieClick(matchedMovie.tmdb_id)}
+        className="cursor-pointer font-semibold text-blue-600 underline decoration-blue-400 underline-offset-2 transition-colors hover:text-blue-800"
+      >
+        {part}
+      </button>
+    );
+  });
+};
 
 const ChatButton = () => {
-  const { isLoggedIn, loading } = useContext(AppContent);
+  const navigate = useNavigate();
+  const { isLoggedIn, loading, userData } = useContext(AppContent);
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [conversationId, setConversationId] = useState("");
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const chatWindowRef = useRef(null);
   const bodyRef = useRef(null);
+  const conversationStorageKey = userData?._id
+    ? getConversationStorageKey(userData._id)
+    : "";
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -32,11 +115,37 @@ const ChatButton = () => {
   }, []);
 
   useEffect(() => {
+    if (!conversationStorageKey) {
+      setConversationId("");
+      setMessages([]);
+      setHistoryLoaded(false);
+      return;
+    }
+
+    const storedConversationId =
+      window.localStorage.getItem(conversationStorageKey) || "";
+    setConversationId(storedConversationId);
+    setMessages([]);
+    setHistoryLoaded(false);
+  }, [conversationStorageKey]);
+
+  useEffect(() => {
+    if (!conversationStorageKey) return;
+
+    if (!conversationId) {
+      window.localStorage.removeItem(conversationStorageKey);
+      return;
+    }
+
+    window.localStorage.setItem(conversationStorageKey, conversationId);
+  }, [conversationId, conversationStorageKey]);
+
+  useEffect(() => {
     if (!isOpen || !isLoggedIn || historyLoaded) return;
 
     const loadHistory = async () => {
       try {
-        const data = await getChatHistory();
+        const data = await getChatHistory(conversationId || undefined);
         const historyMessages = (data.history || [])
           .slice()
           .reverse()
@@ -50,10 +159,14 @@ const ChatButton = () => {
               id: `${item.id}-answer`,
               role: "assistant",
               content: item.answer,
+              metadata: item.metadata || null,
             },
           ]);
 
         setMessages(historyMessages);
+        if (data.conversationId) {
+          setConversationId(data.conversationId);
+        }
       } catch (error) {
         console.error("Failed to load chat history:", error);
       } finally {
@@ -62,7 +175,7 @@ const ChatButton = () => {
     };
 
     loadHistory();
-  }, [historyLoaded, isLoggedIn, isOpen]);
+  }, [conversationId, historyLoaded, isLoggedIn, isOpen]);
 
   useEffect(() => {
     if (!bodyRef.current) return;
@@ -102,9 +215,29 @@ const ChatButton = () => {
     );
   };
 
+  const attachAssistantMetadata = (metadata) => {
+    if (!metadata) return;
+
+    setMessages((prev) =>
+      prev.map((message, index) =>
+        index === prev.length - 1 && message.role === "assistant"
+          ? { ...message, metadata }
+          : message,
+      ),
+    );
+  };
+
+  const handleMovieClick = (tmdbId) => {
+    if (!tmdbId) return;
+    navigate(`/movies/tmdb/${tmdbId}`);
+    setIsOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const handleSendMessage = async () => {
     const question = input.trim();
     if (!question || sending) return;
+    setShowClearConfirm(false);
 
     if (!isLoggedIn) {
       setMessages((prev) => [
@@ -140,12 +273,17 @@ const ChatButton = () => {
     try {
       await streamChat({
         question,
+        conversationId,
         onEvent: (event) => {
           if (event.type === "chunk" && event.content) {
             appendAssistantChunk(event.content);
           }
 
           if (event.type === "done") {
+            if (event.conversationId) {
+              setConversationId(event.conversationId);
+            }
+            attachAssistantMetadata(event.metadata);
             finalizeAssistantMessage();
           }
 
@@ -181,16 +319,18 @@ const ChatButton = () => {
     }
   };
 
-  const handleClearChat = async () => {
-    if (!window.confirm("Bạn có chắc muốn xoá toàn bộ lịch sử trò chuyện và bắt đầu hội thoại mới?")) return;
-    try {
-      if (isLoggedIn) {
-        await clearChatHistory();
-      }
-      setMessages([]);
-    } catch (error) {
-      console.error("Failed to clear chat:", error);
-    }
+  const clearCurrentChat = () => {
+    setConversationId(createConversationId());
+    setMessages([]);
+    setInput("");
+    setHistoryLoaded(true);
+    setShowClearConfirm(false);
+    setIsOpen(true);
+  };
+
+  const handleClearChat = () => {
+    if (sending) return;
+    setShowClearConfirm(true);
   };
 
   const handleKeyDown = (event) => {
@@ -222,7 +362,7 @@ const ChatButton = () => {
           className="fixed inset-x-3 bottom-24 flex h-[min(32rem,calc(100vh-8rem))] w-auto flex-col overflow-hidden rounded-lg border border-blue-100 bg-white shadow-[0_24px_70px_rgba(15,23,42,0.18)] sm:absolute sm:right-0 sm:bottom-20 sm:left-auto sm:h-[32rem] sm:w-[25rem]"
         >
           <div className="relative overflow-hidden bg-blue px-4 py-4 text-white sm:px-5">
-            <div className="absolute inset-0]" />
+            <div className="absolute inset-0" />
             <div className="relative flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div>
@@ -235,7 +375,8 @@ const ChatButton = () => {
                 {messages.length > 0 && (
                   <button
                     onClick={handleClearChat}
-                    className="rounded-full bg-white/20 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-white/30"
+                    disabled={sending}
+                    className="rounded-full bg-white/20 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-white/30 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     New Chat
                   </button>
@@ -248,6 +389,29 @@ const ChatButton = () => {
                 </button>
               </div>
             </div>
+            {showClearConfirm && (
+              <div className="relative mt-3 rounded-lg border border-white/15 bg-white/15 p-3">
+                <p className="text-sm font-semibold text-white">
+                  Start a new chat?
+                </p>
+                <div className="mt-3 flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowClearConfirm(false)}
+                    className="rounded-full border border-white/20 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-white/10"
+                  >
+                    No
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clearCurrentChat}
+                    className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-blue transition-colors hover:bg-slate-100"
+                  >
+                    Yes
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div
@@ -264,7 +428,7 @@ const ChatButton = () => {
                   {loading
                     ? "Checking your sign-in status..."
                     : isLoggedIn
-                      ? "Ask for recommendations, genres, plot twists, actors, or quick movie suggestions."
+                      ? "Ask about movies, genres, plot twists, actors, or showtimes."
                       : "Sign in to start chatting and keep your conversation history."}
                 </div>
 
@@ -308,6 +472,14 @@ const ChatButton = () => {
                             <span className="h-2 w-2 animate-pulse rounded-full bg-neutral-600 [animation-delay:120ms]" />
                             <span className="h-2 w-2 animate-pulse rounded-full bg-neutral-500 [animation-delay:240ms]" />
                           </div>
+                        ) : isAssistant ? (
+                          <>
+                            {renderAssistantMessage(
+                              message.content,
+                              message.metadata?.retrievedMovies || [],
+                              handleMovieClick,
+                            )}
+                          </>
                         ) : (
                           message.content
                         )}

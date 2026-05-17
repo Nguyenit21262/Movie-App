@@ -1,7 +1,12 @@
 import React, { useContext } from "react";
-import { FaHome, FaFilm } from "react-icons/fa";
-import { MdDashboard, MdAddBox, MdList } from "react-icons/md";
-import { BsTicketPerforated } from "react-icons/bs";
+import {
+  HomeIcon,
+  LayoutDashboardIcon,
+  ListIcon,
+  PlusSquareIcon,
+  TicketIcon,
+  UsersIcon,
+} from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { AppContent } from "../../context/AppContent";
 
@@ -9,57 +14,59 @@ const AdminSidebar = () => {
   const { userData } = useContext(AppContent);
 
   const adminNavlinks = [
-  { name: "Home", path: "/", icon: FaHome },
-  { name: "Dashboard", path: "/admin", icon: MdDashboard },
-  { name: "Add Movies", path: "/admin/add-movies", icon: MdAddBox },
-  { name: "List Movies", path: "/admin/list-movies", icon: MdList },
-  { name: "List Booking", path: "/admin/list-bookings", icon: BsTicketPerforated },
-];
-    
+    { name: "Home", path: "/", icon: HomeIcon, end: true },
+    { name: "Dashboard", path: "/admin", icon: LayoutDashboardIcon, end: true },
+    { name: "Users", path: "/admin/users", icon: UsersIcon },
+    { name: "Add Movies", path: "/admin/add-movies", icon: PlusSquareIcon },
+    { name: "List Movies", path: "/admin/list-movies", icon: ListIcon },
+    { name: "List Booking", path: "/admin/list-bookings", icon: TicketIcon },
+  ];
+
+  const avatarText = userData?.avatar || userData?.name?.charAt(0)?.toUpperCase() || "U";
 
   return (
     <aside
-      className="
-    h-full
-    w-14 md:w-60
-    bg-blue
-    rounded-lg
-    text-sm
-    flex flex-col
-    items-center
-    pt-8
-  "
+      className="sticky top-0 h-screen w-16 shrink-0 bg-blue text-sm text-white shadow-sm sm:w-64"
     >
-      {/* USER */}
-      <div className="h-9 md:h-14 w-9 md:w-14 rounded-full bg-white flex items-center justify-center text-blue font-bold text-lg">
-        {userData?.avatar || "U"}
+      <div className="flex h-full flex-col overflow-hidden">
+        <div className="flex flex-col items-center border-b border-white/15 px-3 py-6 sm:items-start sm:px-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-lg font-bold text-blue">
+              {avatarText}
+            </div>
+            <div className="hidden min-w-0 sm:block">
+              <p className="truncate text-base font-semibold">
+                {userData ? userData.name : "Loading..."}
+              </p>
+              <p className="text-xs text-white/70">Administrator</p>
+            </div>
+          </div>
+        </div>
+
+        <nav className="flex-1 space-y-1 overflow-y-auto px-2 py-4 sm:px-3">
+          {adminNavlinks.map((link) => (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              end={link.end}
+              title={link.name}
+              className={({ isActive }) =>
+                [
+                  "flex min-h-11 items-center justify-center gap-3 rounded-md px-3 transition sm:justify-start",
+                  isActive
+                    ? "bg-white text-blue-600"
+                    : "text-white hover:bg-white/12",
+                ].join(" ")
+              }
+            >
+              <link.icon className="h-5 w-5 shrink-0" />
+              <span className="hidden truncate font-medium sm:inline">
+                {link.name}
+              </span>
+            </NavLink>
+          ))}
+        </nav>
       </div>
-
-      <p className="mt-2 text-base text-white max-md:hidden">
-       {userData ? userData.name : " Loading..."}
-      </p>
-
-      {/* NAV LINKS */}
-      <nav className="w-full mt-6">
-        {adminNavlinks.map((link, index) => (
-          <NavLink
-            key={index}
-            to={link.path}
-            end
-            className={({ isActive }) =>
-              `relative flex items-center
-               max-md:justify-center gap-2
-               w-full py-2.5 md:pl-10
-               text-white
-               ${isActive ? "bg-yellow/15 text-blue" : ""}
-               transition`
-            }
-          >
-            <link.icon className="w-5 h-5" />
-            <p className="max-md:hidden">{link.name}</p>
-          </NavLink>
-        ))}
-      </nav>
     </aside>
   );
 };

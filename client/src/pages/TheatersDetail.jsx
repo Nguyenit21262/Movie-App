@@ -257,7 +257,7 @@ const TheatersDetail = () => {
         </div>
       </div>
 
-      <div id="booking" className="bg-neutral-900 px-4 py-16 sm:px-6 md:px-16 lg:px-40">
+      <div id="booking" className="scroll-mt-24 bg-neutral-900 px-4 py-16 sm:px-6 md:px-16 lg:px-40">
         <div className="max-w-7xl mx-auto border-t border-white/5 pt-16">
           <h2 className="text-3xl font-bold mb-8">Select Showtimes</h2>
 
@@ -295,7 +295,10 @@ const TheatersDetail = () => {
               <TheatersCard
                 key={item.id}
                 movie={item}
-                onClick={() => navigate(`/theaters/tmdb/${item.id}`)}
+                onClick={() => {
+                  navigate(`/theaters/tmdb/${item.id}`);
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
               />
             ))}
           </div>

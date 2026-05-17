@@ -20,13 +20,13 @@ import {
   searchMovies,
   searchMovieSuggestions,
   ensureMovieExists,
-  getRecommendations,
 } from "../controllers/movieController.js";
 import {
   getMyMovieRating,
   submitMovieRating,
 } from "../controllers/ratingController.js";
 import userAuth from "../middlewares/userAuth.js";
+import { isAdmin } from "../middlewares/adminAuth.js";
 import commentRoutes from "./commentRoutes.js";
 
 const movieRouter = express.Router();
@@ -44,9 +44,6 @@ movieRouter.get("/tmdb/:tmdbId/rating/me", userAuth, getMyMovieRating);
 movieRouter.post("/tmdb/:tmdbId/rating", userAuth, submitMovieRating);
 movieRouter.get("/tmdb/:tmdbId", getTMDBMovieDetails);
 
-// Personalized recommendations (requires auth)
-movieRouter.get("/recommendations", userAuth, getRecommendations);
-
 // Local DB routes
 movieRouter.get("/search", searchMovies);
 movieRouter.get("/suggestions", searchMovieSuggestions);
@@ -57,10 +54,10 @@ movieRouter.get("/:id", getMovieById);
 
 movieRouter.use("/:movieId/comments", commentRoutes);
 
-movieRouter.post("/import", userAuth, importMoviesFromTMDB);
-movieRouter.post("/add", userAuth, addMovieFromTMDB);
-movieRouter.post("/ensure/:tmdbId", userAuth, ensureMovieExists);
-movieRouter.put("/:id", userAuth, updateMovie);
-movieRouter.delete("/:id", userAuth, deleteMovie);
+movieRouter.post("/import", userAuth, isAdmin, importMoviesFromTMDB);
+movieRouter.post("/add", userAuth, isAdmin, addMovieFromTMDB);
+movieRouter.post("/ensure/:tmdbId", userAuth, isAdmin, ensureMovieExists);
+movieRouter.put("/:id", userAuth, isAdmin, updateMovie);
+movieRouter.delete("/:id", userAuth, isAdmin, deleteMovie);
 
 export default movieRouter;

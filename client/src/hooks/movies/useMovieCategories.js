@@ -30,14 +30,15 @@ export const useMovieCategories = () => {
   const fetchedRef = useRef(new Set());
 
   const fetchCategory = useCallback(async (category, endpoint, options = {}) => {
-    if (fetchedRef.current.has(category)) return;
+    const cacheKey = options.cacheKey || category;
+    if (fetchedRef.current.has(cacheKey)) return;
 
     const fetcher = endpointMap[endpoint];
     const customFetcher = options.fetcher;
 
     if (!fetcher && !customFetcher) return;
 
-    fetchedRef.current.add(category);
+    fetchedRef.current.add(cacheKey);
 
     try {
       const response = customFetcher
@@ -49,7 +50,7 @@ export const useMovieCategories = () => {
       }));
     } catch (error) {
       console.error(`Fetch ${category} error`, error);
-      fetchedRef.current.delete(category);
+      fetchedRef.current.delete(cacheKey);
     } finally {
       setLoadingInitial(false);
     }
@@ -69,6 +70,7 @@ export const useMovieCategories = () => {
   const fetchGenreDiscover = useCallback(
     async (category, genreId) =>
       fetchCategory(category, "discover", {
+        cacheKey: `${category}:${genreId}`,
         fetcher: () => discoverMoviesByGenre(genreId),
       }),
     [fetchCategory],

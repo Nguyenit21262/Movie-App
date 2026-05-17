@@ -5,32 +5,94 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 const HorizontalScollCard = ({
   data = [],
   heading = "",
+  eyebrow = "",
+  subheading = "",
   media_type,
   onItemClick,
+  actionLabel = "",
+  onAction,
 }) => {
   const contaierRef = useRef();
 
+  const getScrollStep = () => {
+    const container = contaierRef.current;
+    if (!container) return 0;
+
+    const firstCard = container.firstElementChild;
+    if (!firstCard) return 0;
+
+    const containerStyles = window.getComputedStyle(container);
+    const gap = parseFloat(containerStyles.columnGap || containerStyles.gap || "0");
+    const cardWidth = firstCard.getBoundingClientRect().width;
+
+    return cardWidth + gap;
+  };
+
   const handleNext = () => {
-    contaierRef.current.scrollLeft += 245;
+    const container = contaierRef.current;
+    const step = getScrollStep();
+    if (!container || !step) return;
+
+    const currentIndex = Math.round(container.scrollLeft / step);
+    container.scrollTo({
+      left: (currentIndex + 1) * step,
+      behavior: "smooth",
+    });
   };
-  
+
   const handlePrevious = () => {
-    contaierRef.current.scrollLeft -= 245;
+    const container = contaierRef.current;
+    const step = getScrollStep();
+    if (!container || !step) return;
+
+    const currentIndex = Math.round(container.scrollLeft / step);
+    container.scrollTo({
+      left: Math.max(0, (currentIndex - 1) * step),
+      behavior: "smooth",
+    });
   };
+
   if (!Array.isArray(data)) {
     console.error(`${heading} - Data is not an array:`, data);
     return null;
   }
 
   return (
-    <section className="px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mt-2">
-      {/* Heading */}
-      <h2 className="text-xl lg:text-2xl font-bold mb-4 text-white capitalize">
-        {heading}
-      </h2>
+    <section className="mt-2 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12">
+      {(eyebrow || heading || subheading || (actionLabel && onAction)) && (
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            {eyebrow && (
+              <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-gray-500">
+                {eyebrow}
+              </p>
+            )}
+
+            {heading && (
+              <h2 className="text-xl font-bold text-white capitalize lg:text-2xl">
+                {heading}
+              </h2>
+            )}
+
+            {subheading && (
+              <p className="mt-2 max-w-2xl text-sm text-gray-400">
+                {subheading}
+              </p>
+            )}
+          </div>
+
+          {actionLabel && onAction && (
+            <button
+              onClick={onAction}
+              className="text-xs font-semibold text-gray-400 transition hover:text-white"
+            >
+              {actionLabel}
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="relative">
-        {/* Scroll container */}
         <div
           ref={contaierRef}
           className="
@@ -40,6 +102,7 @@ const HorizontalScollCard = ({
             scrollbar-none
             pb-2
             scroll-smooth
+            snap-x snap-mandatory
           "
         >
           {data.length > 0 ? (
@@ -55,20 +118,20 @@ const HorizontalScollCard = ({
                   movie={item}
                   media_type={media_type}
                   onClick={() => onItemClick?.(item)}
+                  className="snap-start"
                 />
               );
             })
           ) : (
-            <div className="text-gray-400 py-8">No movies available</div>
+            <div className="py-8 text-gray-400">No movies available</div>
           )}
         </div>
 
-        {/* Navigation Buttons */}
         {data.length > 0 && (
-          <div className="absolute inset-0 hidden lg:flex items-center justify-between pointer-events-none">
+          <div className="pointer-events-none absolute inset-0 hidden items-center justify-between lg:flex">
             <button
               onClick={handlePrevious}
-              className="pointer-events-auto bg-white p-1 text-black rounded-full -ml-2 shadow hover:bg-gray-200 transition"
+              className="pointer-events-auto -ml-2 rounded-full bg-white p-1 text-black shadow transition hover:bg-gray-200"
               aria-label="Scroll left"
             >
               <ChevronLeft size={20} />
@@ -76,7 +139,7 @@ const HorizontalScollCard = ({
 
             <button
               onClick={handleNext}
-              className="pointer-events-auto bg-white p-1 text-black rounded-full -mr-2 shadow hover:bg-gray-200 transition"
+              className="pointer-events-auto -mr-2 rounded-full bg-white p-1 text-black shadow transition hover:bg-gray-200"
               aria-label="Scroll right"
             >
               <ChevronRight size={20} />

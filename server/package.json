@@ -4,8 +4,10 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
+    "build:client": "npm --prefix ../client run build",
     "server": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "start:app": "npm run build:client && npm run start"
   },
   "keywords": [],
   "author": "",

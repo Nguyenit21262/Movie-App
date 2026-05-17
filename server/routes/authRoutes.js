@@ -4,6 +4,7 @@ import {
   login,
   logout,
   register,
+  resendVerificationOtp,
   verifyEmail,
   resetPassword,
   verifyLoginOtp,
@@ -17,6 +18,7 @@ const authRouter = express.Router();
 authRouter.post("/register", register);
 authRouter.post("/login", login);
 authRouter.post("/verify-account", verifyEmail);
+authRouter.post("/resend-verify-otp", resendVerificationOtp);
 authRouter.post("/verify-login-otp", verifyLoginOtp);
 authRouter.post("/send-reset-otp", sendPasswordResetOtp);
 authRouter.post("/reset-password", resetPassword);

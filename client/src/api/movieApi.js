@@ -39,10 +39,16 @@ export const searchMovies = (query) =>
 export const getMovieSuggestions = (query) =>
   httpClient.get("/api/movies/suggestions", { params: { q: query } });
 
-// Fetch personalized recommendations for the logged-in user
-export const fetchRecommendations = (limit = 20, config = {}) =>
-  httpClient.get("/api/movies/recommendations", {
+export const fetchPersonalRecommendations = (
+  limit = 20,
+  forceRefresh = false,
+  config = {},
+) =>
+  httpClient.get("/api/user/recommendations", {
     ...config,
-    params: { limit, ...(config.params || {}) },
+    params: {
+      ...(config.params || {}),
+      limit,
+      ...(forceRefresh ? { refresh: "true" } : {}),
+    },
   });
-

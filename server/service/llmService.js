@@ -1,13 +1,104 @@
 import axios from "axios";
 
-const MAX_HISTORY_ITEMS = 10;
+const MAX_HISTORY_ITEMS = 5;
+const VIETNAMESE_ACCENT_RE =
+  /[\u0102\u0103\u00C2\u00E2\u00CA\u00EA\u00D4\u00F4\u01A0\u01A1\u01AF\u01B0\u0110\u0111\u1EA0-\u1EF9]/;
+const VIETNAMESE_HINT_WORDS = new Set([
+  "ban",
+  "bo",
+  "cam",
+  "cho",
+  "chao",
+  "co",
+  "cua",
+  "dao",
+  "de",
+  "dien",
+  "duoc",
+  "gi",
+  "goi",
+  "hay",
+  "hen",
+  "la",
+  "lai",
+  "minh",
+  "mot",
+  "muon",
+  "nao",
+  "nen",
+  "nay",
+  "on",
+  "phim",
+  "the",
+  "toi",
+  "ve",
+  "xem",
+  "tam",
+]);
+const VIETNAMESE_HINT_PHRASES = [
+  "toi muon",
+  "minh muon",
+  "xin chao",
+  "cam on",
+  "tam biet",
+  "hen gap lai",
+  "muon xem",
+  "goi y",
+  "bo phim",
+  "phim nay",
+  "phim do",
+  "the loai",
+  "dao dien",
+  "dien vien",
+  "noi dung",
+  "tom tat",
+];
+
+const normalizeLanguageText = (text = "") =>
+  String(text)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\u0111/g, "d")
+    .replace(/\u0110/g, "D")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+const detectResponseLanguage = (text = "") => {
+  const rawText = String(text || "");
+  if (VIETNAMESE_ACCENT_RE.test(rawText)) return "vi";
+
+  const normalized = normalizeLanguageText(rawText);
+  if (!normalized) return "en";
+  if (VIETNAMESE_HINT_PHRASES.some((phrase) => normalized.includes(phrase))) {
+    return "vi";
+  }
+
+  const words = normalized.split(/\s+/);
+  const hits = words.filter((word) => VIETNAMESE_HINT_WORDS.has(word));
+  return new Set(hits).size >= 2 ? "vi" : "en";
+};
+
+const responseLanguageLabel = (language) =>
+  language === "vi" ? "Vietnamese" : "English";
 
 const normalizeHistoryPayload = (history = []) =>
-  history.slice(0, MAX_HISTORY_ITEMS).map((item) => ({
-    question: item?.question || "",
-    answer: item?.answer || "",
-    createdAt: item?.createdAt || null,
-  }));
+  history
+    .slice(0, MAX_HISTORY_ITEMS)
+    .reverse()
+    .map((item) => ({
+      question: item?.question || "",
+      answer: item?.answer || "",
+      createdAt: item?.createdAt || null,
+      metadata: {
+        retrievedMovies: (item?.metadata?.retrievedMovies || []).map((movie) => ({
+          tmdb_id: movie?.tmdb_id ?? null,
+          title: movie?.title || "",
+          score: movie?.score ?? null,
+        })),
+        activeMovie: item?.metadata?.activeMovie || null,
+      },
+    }));
 
 const normalizeUserPayload = (user, userId) => ({
   id: String(user?._id || userId || ""),
@@ -19,57 +110,24 @@ const normalizeUserPayload = (user, userId) => ({
   dateOfBirth: user?.dateOfBirth || null,
 });
 
-const normalizeRecommendationPayload = (recommendations = []) =>
-  recommendations.map((movie) => ({
-    tmdb_id: movie?.tmdb_id ?? null,
-    title: movie?.title || "",
-    overview: movie?.overview || "",
-    genres: movie?.genres || [],
-    keywords: movie?.keywords || [],
-    runtime: movie?.runtime || 0,
-    vote_average: movie?.vote_average || 0,
-    count_rating: movie?.count_rating || 0,
-    release_date: movie?.release_date || null,
-    score: movie?.score ?? null,
-    reason: movie?.reason || "",
-    source: movie?.source || "",
-  }));
-
 const buildFallbackPrompt = ({
   question,
   user,
   userId,
   history = [],
-  recommendedMovies = [],
 }) => {
+  const responseLanguage = detectResponseLanguage(question);
+  const responseLanguageName = responseLanguageLabel(responseLanguage);
   const historyBlock = history.length
     ? history
         .slice(0, MAX_HISTORY_ITEMS)
+        .reverse()
         .map(
           (item, index) =>
             `Conversation ${index + 1}:\nQuestion: ${item.question}\nAnswer: ${item.answer}`,
         )
         .join("\n\n")
     : "No recent conversation history.";
-
-  const recommendationBlock = recommendedMovies.length
-    ? recommendedMovies
-        .map((movie, index) => {
-          const year = movie.release_date
-            ? new Date(movie.release_date).getFullYear()
-            : "Unknown";
-          const reason = movie.reason ? `\nReason: ${movie.reason}` : "";
-          return [
-            `Recommendation ${index + 1}: ${movie.title} (${year})`,
-            `Genres: ${movie.genres?.join(", ") || "Unknown"}`,
-            `Average rating: ${movie.vote_average || "N/A"}/10`,
-            reason.trim(),
-          ]
-            .filter(Boolean)
-            .join("\n");
-        })
-        .join("\n\n")
-    : "No personalized recommendations are currently available.";
 
   return `
 You are an intelligent movie assistant for a cinema web app.
@@ -82,14 +140,12 @@ USER PROFILE:
 RECENT CHAT HISTORY:
 ${historyBlock}
 
-PERSONALIZED RECOMMENDATIONS:
-${recommendationBlock}
-
 INSTRUCTIONS:
-1. Answer in the same language as the user's question.
+1. Answer only in ${responseLanguageName}. The chatbot supports only Vietnamese and English responses.
 2. If AI-service retrieval is unavailable, say you are answering without the local movie knowledge base.
 3. Do not invent movie facts you are unsure about.
 4. Be conversational, concise, and helpful.
+5. Do not mention movie ratings, scores, stars, or vote averages. Focus on the movie plot and why it fits the user's request.
 
 USER QUESTION:
 ${question}
@@ -97,11 +153,11 @@ ${question}
 };
 
 const streamExternalMovieAI = async ({
+  conversationId,
   question,
   user,
   userId,
   history,
-  recommendedMovies,
   onChunk,
 }) => {
   const baseUrl = process.env.AI_MOVIE_API_URL;
@@ -113,13 +169,13 @@ const streamExternalMovieAI = async ({
     `${baseUrl.replace(/\/$/, "")}/conversation/chat`,
     {
       conversation_id:
+        conversationId ||
         process.env.AI_CONVERSATION_ID ||
         "movie-app-conversation",
       user_id: String(userId),
       question,
       user: normalizeUserPayload(user, userId),
       history: normalizeHistoryPayload(history),
-      recommendations: normalizeRecommendationPayload(recommendedMovies),
     },
     {
       headers: { "Content-Type": "application/json" },
@@ -270,56 +326,37 @@ const streamOpenAICompatible = async ({
   return { provider: "openai-compatible", answer, metadata: {} };
 };
 
-const buildFallbackAnswer = ({
-  question,
-  recommendedMovies = [],
-}) => {
-  if (!recommendedMovies.length) {
+const buildFallbackAnswer = ({ question }) => {
+  if (detectResponseLanguage(question) === "vi") {
     return [
-      "I could not reach the AI movie service, so I am answering without the local movie knowledge base.",
-      "Try asking with a movie title, genre, actor, mood, or plot keyword.",
-      "To get full RAG answers, make sure AI_MOVIE_API_URL, Qdrant, and Ollama are running.",
+      `Mình chưa kết nối được AI movie service cho câu hỏi "${question}", nên đang trả lời không có kho tri thức phim cục bộ.`,
+      "Bạn có thể hỏi bằng tên phim, thể loại, diễn viên, tâm trạng hoặc từ khóa cốt truyện.",
+      "Để có câu trả lời RAG đầy đủ, hãy kiểm tra AI_MOVIE_API_URL và Python AI service.",
     ].join(" ");
   }
 
-  const recommendationLines = recommendedMovies
-    .map((movie) => {
-      const year = movie.release_date
-        ? new Date(movie.release_date).getFullYear()
-        : "Unknown year";
-      const reason = movie.reason ? ` Reason: ${movie.reason}` : "";
-      return `- ${movie.title} (${year})${reason}`;
-    })
-    .join("\n");
-
-  const sections = [`Here are the best matches I found for "${question}":`];
-
-  if (recommendationLines) {
-    sections.push(`Personalized recommendations:\n${recommendationLines}`);
-  }
-
-  sections.push(
-    "The backend is currently using fallback mode. To get full streamed RAG responses, configure AI_MOVIE_API_URL and make sure the Python AI service is running.",
-  );
-
-  return sections.join("\n\n");
+  return [
+    `I could not reach the AI movie service for "${question}", so I am answering without the local movie knowledge base.`,
+    "Try asking with a movie title, genre, actor, mood, or plot keyword.",
+    "To get full RAG answers, make sure AI_MOVIE_API_URL and the Python AI service are running.",
+  ].join(" ");
 };
 
 export const streamAnswer = async ({
+  conversationId,
   question,
   user,
   userId,
   history = [],
-  recommendedMovies = [],
   onChunk,
 }) => {
   try {
     const externalResult = await streamExternalMovieAI({
+      conversationId,
       question,
       user,
       userId,
       history,
-      recommendedMovies,
       onChunk,
     });
 
@@ -336,7 +373,6 @@ export const streamAnswer = async ({
       user,
       userId,
       history,
-      recommendedMovies,
     });
     const openAiResult = await streamOpenAICompatible({
       prompt,
@@ -350,10 +386,7 @@ export const streamAnswer = async ({
     console.error("OpenAI-compatible stream failed:", error.message);
   }
 
-  const fallbackAnswer = buildFallbackAnswer({
-    question,
-    recommendedMovies,
-  });
+  const fallbackAnswer = buildFallbackAnswer({ question });
   onChunk(fallbackAnswer);
 
   return {

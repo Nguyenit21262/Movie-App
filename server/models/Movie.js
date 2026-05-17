@@ -27,7 +27,6 @@ const movieSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-      index: "text",
     },
 
     overview: {
@@ -57,9 +56,23 @@ const movieSchema = new mongoose.Schema(
       lowercase: true,
     },
 
+    origin_country: [
+      {
+        type: String,
+        uppercase: true,
+        trim: true,
+      },
+    ],
+
     tagline: {
       type: String,
       default: "",
+    },
+
+    director: {
+      type: String,
+      default: "",
+      trim: true,
     },
 
     genres: [
@@ -120,6 +133,8 @@ movieSchema.index({ genres: 1 });
 movieSchema.index({ keywords: 1 });
 movieSchema.index({ popularity: -1 });
 movieSchema.index({ vote_average: -1 });
+movieSchema.index({ origin_country: 1 });
+movieSchema.index({ director: 1 });
 
 const Movie = mongoose.model("Movie", movieSchema);
 

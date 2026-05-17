@@ -2,7 +2,8 @@ import { assets } from "../assets/assets";
 import { useEmailVerify } from "../hooks";
 
 const EmailVerify = () => {
-  const { otpProps, onSubmitHandler } = useEmailVerify();
+  const { email, setEmail, otpProps, onSubmitHandler, onResendHandler } =
+    useEmailVerify();
   const { setRef, handleInput, handleKeyDown, handlePaste } = otpProps;
 
   return (
@@ -28,8 +29,20 @@ const EmailVerify = () => {
         </h1>
 
         <p className="text-center mb-6 text-indigo-300">
-          Enter the OTP sent to your email
+          Enter your email and the OTP sent to your inbox
         </p>
+
+        <input
+          type="email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="Email address"
+          autoComplete="email"
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          className="w-full h-12 mb-6 px-4 rounded-md bg-[#333A5C] text-white outline-none"
+        />
 
         <div className="flex justify-between mb-8" onPaste={handlePaste}>
           {Array(6)
@@ -53,9 +66,13 @@ const EmailVerify = () => {
 
         <p className="text-center text-gray-400 text-sm mt-4">
           Didn't receive the code?{" "}
-          <span className="text-indigo-400 cursor-pointer hover:underline">
+          <button
+            type="button"
+            onClick={onResendHandler}
+            className="text-indigo-400 cursor-pointer hover:underline"
+          >
             Resend
-          </span>
+          </button>
         </p>
       </form>
     </div>
